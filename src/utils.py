@@ -1,35 +1,23 @@
 import os, os.path
-import copy
-import math 
-from operator import itemgetter, ne
-from typing import overload
-from numpy.core.numerictypes import ScalarType
 import pandas as pd
 import numpy as np
-from numpy.core.fromnumeric import shape, transpose, var
-from scipy.sparse import data
-from scipy.spatial.kdtree import distance_matrix
-from sklearn.cluster import KMeans
-import sklearn
-import scipy.spatial
-import sys
-from PIL import Image
+np.random.seed(0)
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+import matplotlib.patches as  mpatches
 import seaborn as sns
 import cv2
 import rasterio 
-from rasterio.plot import show, show_hist
 from rasterio.mask import mask
 from rasterio.coords import BoundingBox
 from rasterio import windows
 from rasterio import warp
 from rasterio.merge import merge
-import matplotlib.patches as  mpatches
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
 from scipy.stats import pearsonr
 
-np.random.seed(0)
+from src.configs import blocks_information
+
+
 
 #-------------------------------------------------------------------------------------------#
 #                                      Data Generation                                     #
@@ -345,7 +333,24 @@ class dataframe_split_csv_gen():
 #-------------------------------------------------------------------------------------------#
 #                                    Vineyard Data Vis                                      #
 #-------------------------------------------------------------------------------------------#
+def dual_emp_effective_hist_plot(emp, effective):
+     
+    fig, axs = plt.subplots(1, 2 , figsize = (15, 4))
 
+    sns.set_style("whitegrid", {'axes.grid' : False})
+    plt.rcParams["figure.autolayout"] = True
+    plt.subplots_adjust(hspace = 0.01)
+
+    bins_value  = np.arange(1, 31, 1)
+    ax1 = sns.barplot(x = bins_value, y= emp, color = sns.color_palette()[0], width = 0.9, ax = axs[0])
+    ax1.set_title("Emprical Label Distribution", fontsize = 14)
+    ax2 = sns.barplot(x = bins_value, y= effective, color = sns.color_palette()[0], width = 0.9, ax = axs[1])
+    ax2.set_title("Effective Label Distribution", fontsize = 14)
+
+
+    None
+
+    
 class vineyard_data_visulization():
     def __init__(self, dataset:dict, cultivar: list):
         self.dataset = dataset
@@ -679,73 +684,3 @@ class data_complexity_measure():
 
         return f2s
 
-
-
-
-
-
-
-
-
-blocks_information = {'LIV_003':['MALVASIA_BIANCA', '7', '12', '7', '1991', '4WIREWO', '1'], 
-          'LIV_004':['MUSCAT_OF_ALEXANDRIA', '10', '11', '5', '2011', 'SPLIT', '2'], 
-          'LIV_005':['CABERNET_SAUVIGNON', '2', '11', '5', '1996', 'LIVDC', '3'], 
-          'LIV_006':['MALVASIA_BIANCA', '7', '12', '7', '1993', '4WIREWO', '1'], 
-          'LIV_007':['SYMPHONY', '14', '10', '5', '1996', 'LIVDC', '3'], 
-          'LIV_008':['MERLOT', '8', '10', '8', '1994', '4WIREWM', '4'], 
-          'LIV_009':['PINOT_GRIS', '11', '10', '4', '2014', 'STACKEDT', '5'], 
-          'LIV_010':['CHARDONNAY', '3', '10', '6', '1993', '4WIREWO', '1'], 
-          'LIV_011':['CHARDONNAY', '3', '10', '6', '1993', '4WIREWO', '1'], 
-          'LIV_012':['SYRAH', '15', '10', '8', '1995', 'LIVDC', '3'], 
-          'LIV_013':['SYRAH', '15', '12', '7', '1995', 'LIVDC', '3'], 
-          'LIV_014':['RIESLING', '13', '11', '5', '2010', 'SPLIT', '2'], 
-          'LIV_015':['MALVASIA_BIANCA', '7', '12', '7', '1985', 'QUAD', '6'], 
-          'LIV_016':['MUSCAT_OF_ALEXANDRIA', '10', '11', '5', '2011', 'SPLIT', '2'], 
-          'LIV_017':['CABERNET_SAUVIGNON', '2', '11', '5', '1996', 'LIVDC', '3'], 
-          'LIV_018':['CHARDONNAY', '3','10', '4', '1995', 'LIVDC', '3'], 
-          'LIV_019':['RIESLING','13', '11', '5', '2012', 'SPLIT', '2'], 
-          'LIV_021':['PINOT_GRIS', '11', '10', '4', '2015', 'STACKEDT', '5'], 
-          'LIV_022':['PINOT_NOIR', '12', '10', '5', '1997', 'SPLIT', '2'],
-          'LIV_025':['CABERNET_SAUVIGNON', '2', '9', '9', '1996', '4WIREWO', '1'], 
-          'LIV_026':['MERLOT', '8', '10', '8', '1994', '4WIREWM', '4'], 
-          'LIV_027':['MERLOT', '8', '10', '4', '1994', 'LIVDC', '3'], 
-          'LIV_028':['MUSCAT_CANELLI', '9', '11', '5', '2011', 'SPLIT', '2'], 
-          'LIV_032':['CABERNET_SAUVIGNON', '2', '10', '5', '1996', 'LIVDC', '3'], 
-          'LIV_038':['MERLOT', '8', '10', '8', '1994', '4WIREWM', '4'], 
-          'LIV_050':['SYMPHONY', '14', '10', '7', '1997', 'LIVDC', '3'], 
-          'LIV_058':['MERLOT', '8', '10', '8', '1994', '4WIREWM', '4'], 
-          'LIV_061':['PINOT_GRIS', '11', '10', '6', '2002', '4WIREWO', '1'], 
-          'LIV_062':['SYRAH', '15', '10', '8', '1995', 'LIVDC', '3'], 
-          'LIV_063':['PINOT_GRIS', '11', '10', '4', '2014', 'STACKEDT', '5'], 
-          'LIV_064':['CABERNET_SAUVIGNON', '2', '8', '9', '1997', '4WIREWO', '1'], 
-          'LIV_066':['PINOT_GRIS', '11', '10', '4', '2012', 'SPLIT', '2'], 
-          'LIV_068':['MERLOT', '8', '10', '8', '1994', '4WIREWM', '4'], 
-          'LIV_070':['CABERNET_SAUVIGNON', '2', '8', '9', '1996', '4WIREWO', '1'], 
-          'LIV_073':['PINOT_NOIR', '12', '12', '7', '2003', 'SPLIT', '2'], 
-          'LIV_076':['RIESLING', '13', '11', '5', '2012', 'SPLIT', '2'], 
-          'LIV_077':['MUSCAT_OF_ALEXANDRIA', '10', '11', '5', '2010', 'SPLIT', '2'], 
-          'LIV_089':['CHARDONNAY', '3', '9', '6', '2010', 'VERTICAL', '7'], 
-          'LIV_090':['CHARDONNAY', '3', '11', '6', '1993', 'VERTICAL', '7'], 
-          'LIV_094':['RIESLING', '13', '11', '5', '2014', 'STACKEDT', '5'], 
-          'LIV_102':['MUSCAT_OF_ALEXANDRIA', '10', '11', '5', '2011', 'SPLIT', '2'], 
-          'LIV_103':['CABERNET_SAUVIGNON', '2', '9', '6', '2012', 'HIGHWIRE', '8'], 
-          'LIV_105':['MUSCAT_OF_ALEXANDRIA', '10', '10', '4', '2011', 'LIVDC', '3'], 
-          'LIV_107':['RIESLING', '13', '11', '5', '2013', 'SPLIT', '2'], 
-          'LIV_111':['CHARDONNAY', '3', '10', '4', '1995', 'LIVDC', '3'], 
-          'LIV_114':['MALVASIA_BIANCA', '7', '11', '5', '2011', 'SPLIT', '2'], 
-          'LIV_123':['MALBEC', '6', '11', '5', '2010', 'SPLIT', '2'], 
-          'LIV_125':['DORNFELDER', '4', '11', '5', '2011', 'SPLIT', '2'], 
-          'LIV_126':['CABERNET_SAUVIGNON', '2', '9', '6', '2010', 'TALLVERTICAL', '9'], 
-          'LIV_128':['RIESLING', '13', '11', '5', '2013', 'SPLIT', '2'], 
-          'LIV_135':['CHARDONNAY', '3', '11', '5', '2012', 'SPLIT', '2'], 
-          'LIV_136':['ALICANTE_BOUSCHET', '1', '11', '5', '2012', 'SPLIT', '2'], 
-          'LIV_163':['CHARDONNAY', '3', '12', '4', '1995', 'LIVDC', '3'], 
-          'LIV_172':['MUSCAT_CANELLI', '9', '11', '5', '2011', 'SPLIT', '2'], 
-          'LIV_175':['CHARDONNAY', '3', '11', '4', '1994', 'LIVDC', '3'], 
-          'LIV_176':['CHARDONNAY', '3', '11', '7', '1994', '4WIREWO', '1'], 
-          'LIV_177':['CHARDONNAY', '3', '10', '6', '1993', '4WIREWO', '1'], 
-          'LIV_178':['RIESLING', '13', '11', '5', '2012', 'SPLIT', '2'], 
-          'LIV_181':['SYMPHONY', '14', '10', '6', '1997', 'LIVDC', '3'], 
-          'LIV_182':['LAMBRUSCO', '5', '11', '5', '2013', 'QUAD', '6'], 
-          'LIV_186':['RIESLING', '13', '11', '7', '2012', 'SPLIT', '2'], 
-          'LIV_193':['MERLOT', '8', '11', '5', '2010', 'SPLIT', '2']}

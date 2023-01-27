@@ -2,6 +2,7 @@ import os, os.path
 import pandas as pd
 import numpy as np
 np.random.seed(0)
+import math
 import matplotlib.pyplot as plt
 import matplotlib.patches as  mpatches
 import seaborn as sns
@@ -20,7 +21,7 @@ from src.configs import blocks_information
 
 
 #-------------------------------------------------------------------------------------------#
-#                                      Data Generation                                     #
+#                                      Data Generation                                      #
 #-------------------------------------------------------------------------------------------#
 
 class hyperspectral_label_mtx_gen():
@@ -39,7 +40,6 @@ class hyperspectral_label_mtx_gen():
 
         block_full_dict = {}
         inner_block_dict = {}
-
 
         label_names = sorted(os.listdir(self.lable_dir))
         img_names   = os.listdir(self.img_dir)
@@ -347,10 +347,30 @@ def dual_emp_effective_hist_plot(emp, effective):
     ax2 = sns.barplot(x = bins_value, y= effective, color = sns.color_palette()[0], width = 0.9, ax = axs[1])
     ax2.set_title("Effective Label Distribution", fontsize = 14)
 
+    None
+
+
+def triple_emp_effective_weights_hist_plot(emp, effective, weights, method: str):
+     
+    fig, axs = plt.subplots(1, 3 , figsize = (21, 4))
+
+    sns.set_style("whitegrid", {'axes.grid' : False})
+    plt.rcParams["figure.autolayout"] = True
+    plt.subplots_adjust(hspace = 0.01)
+
+    bins_value  = np.arange(1, 31, 1)
+    ax1 = sns.barplot(x = bins_value, y= emp, color = sns.color_palette()[0], width = 0.9, ax = axs[0])
+    ax1.set_title("Emprical Label Distribution", fontsize = 14)
+
+
+    ax2 = sns.barplot(x = bins_value, y= effective, color = sns.color_palette()[0], width = 0.9, ax = axs[1])
+    ax2.set_title("Effective Label Distribution", fontsize = 14)
+
+    ax3 = sns.barplot(x = bins_value, y= weights, color = sns.color_palette()[0], width = 0.9, ax = axs[2])
+    ax3.set_title(r" Weights ({})".format(method), fontsize = 14)
 
     None
 
-    
 class vineyard_data_visulization():
     def __init__(self, dataset:dict, cultivar: list):
         self.dataset = dataset

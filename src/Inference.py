@@ -57,12 +57,13 @@ def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
     true_label_C3 = true_labels[np.where(true_labels >= th2)]
     pred_label_C3 = pred_labels[np.where(true_labels >= th2)]
 
-    print(f"{len(true_label_C1)} | {len(true_label_C2)} | {len(true_label_C3)} ")
+    print(f"C1 num samples: {len(true_label_C1)} | C2 num samples: {len(true_label_C2)} | C3 num samples: {len(true_label_C3)} ")
     C1_R2, C1_MAE, C1_RMSE, C1_MAPE, _, _ = regression_metrics(true_label_C1, pred_label_C1)
     C2_R2, C2_MAE, C2_RMSE, C2_MAPE, _, _ = regression_metrics(true_label_C2, pred_label_C2)
     C3_R2, C3_MAE, C3_RMSE, C3_MAPE, _, _ = regression_metrics(true_label_C3, pred_label_C3)
 
-    print(f"Test Dataset==> C1: MAE = {C1_MAE:.2f}, MAPE = {C1_MAPE*100:.2f} | C2: MAE = {C2_MAE:.2f}, MAPE = {C2_MAPE*100:.2f} | C3: MAE = {C3_MAE:.2f}, MAPE = {C3_MAPE*100:.2f}")
+    print(f"C1 is yield value between 0 and {th1}, C2 is yield value between {th1} and {th2}, and C3 is yield value bigger than {th2}")
+    print(f"C1: MAE = {C1_MAE:.2f}, MAPE = {C1_MAPE*100:.2f} | C2: MAE = {C2_MAE:.2f}, MAPE = {C2_MAPE*100:.2f} | C3: MAE = {C3_MAE:.2f}, MAPE = {C3_MAPE*100:.2f}")
 
     return [C1_MAE, C1_MAPE, C2_MAE, C2_MAPE, C3_MAE, C3_MAPE]
 
@@ -436,7 +437,10 @@ def return_samples_error_per_bins(df):
         else: 
             Data  = df.loc[(df['ytrue'] > i) & (df['ytrue'] <= (i+1))] 
         counts.append(len(Data))
-        MAPE = mean_absolute_percentage_error(Data['ytrue'], Data['ypred_w15'])
+        if len(Data) == 0: 
+            MAPE = 0
+        else:
+            MAPE = mean_absolute_percentage_error(Data['ytrue'], Data['ypred_w15'])
         if MAPE > 1: 
             MAPE = 1
         MAPE_Errors.append(MAPE*100)

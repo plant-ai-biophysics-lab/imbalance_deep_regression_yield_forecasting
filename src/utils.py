@@ -347,7 +347,38 @@ def dual_emp_effective_hist_plot(emp, effective):
     ax2 = sns.barplot(x = bins_value, y= effective, color = sns.color_palette()[0], width = 0.9, ax = axs[1])
     ax2.set_title("Effective Label Distribution", fontsize = 14)
 
+    ymax_value = max(max(emp), max(effective)) 
+    ax1.set_ylim(0, ymax_value)
+    ax2.set_ylim(0, ymax_value)
     None
+
+def cs_emp_effective_we_std_hist_plot(emp, effective, w, std):
+     
+    fig, axs = plt.subplots(2, 2 , figsize = (15, 8))
+
+    sns.set_style("whitegrid", {'axes.grid' : False})
+    plt.rcParams["figure.autolayout"] = True
+    plt.subplots_adjust(hspace = 0.01)
+
+    bins_value  = np.arange(1, 31, 1)
+
+    ax1 = sns.barplot(x = bins_value, y= emp, color = sns.color_palette()[0], width = 0.9, ax = axs[0, 0])
+    ax1.set_title("Emprical Label Distribution", fontsize = 14)
+    ax2 = sns.barplot(x = bins_value, y= effective, color = sns.color_palette()[0], width = 0.9, ax = axs[0, 1])
+    ax2.set_title("Effective Label Distribution", fontsize = 14)
+
+    ymax_value = max(max(emp), max(effective)) 
+    ax1.set_ylim(0, ymax_value)
+    ax2.set_ylim(0, ymax_value)
+
+    ax3 = sns.barplot(x = bins_value, y= w, color = sns.color_palette()[0], width = 0.9, ax = axs[1, 0])
+    ax3.set_title("Weights", fontsize = 14)
+    ax4 = sns.barplot(x = bins_value, y= std, color = sns.color_palette()[0], width = 0.9, ax = axs[1, 1])
+    ax4.set_title("STD of bin pixels value", fontsize = 14)
+
+
+    None
+
 
 
 def triple_emp_effective_weights_hist_plot(emp, effective, weights, method: str):

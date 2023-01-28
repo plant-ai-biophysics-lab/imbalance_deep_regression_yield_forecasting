@@ -181,6 +181,83 @@ class check_lds_reweighting_():
         src = np.load(src, allow_pickle=True)
         crop_src = src[:, xcoord:xcoord + 16, ycoord:ycoord + 16, :]
         return crop_src 
+
+
+class check_cost_sensitive_reweighting():
+    def __init__(self, df):
+        self.df = df
+
+    def return_pixelwise_weight(self):
+        pixel_values, pixel_stds, pixel_means, pixel_weights = self.calc_pixelwise_weight_std()
+
+        avg_weights, avg_stds = self.return_avg_weights_per_bins(pixel_weights, pixel_stds, pixel_values)
+        
+        return avg_weights, avg_stds
+
+    def calc_pixelwise_weight_std(self):
+        pixel_values, pixel_stds, pixel_means, pixel_weights = [], [], [], []
+        for idx, row in self.df.iterrows():
+            xcoord     = row['X'] 
+            ycoord     = row['Y'] 
+            label_path = row['LABEL_PATH'] 
+            label_mean = row['patch_mean'] 
+            label_weight = row['NormWeight']
+
+
+            mask  = self.crop_gen(label_path, xcoord, ycoord) 
+            mask  = np.swapaxes(mask, -1, 0)
+            mask_flat  = mask.flatten()
+            arr_std    = abs(mask_flat - label_mean)
+
+            l = len(mask_flat)
+            pixel_values.append(mask_flat)
+            pixel_stds.append(arr_std)
+            pixel_means.append(l*[label_mean])
+            pixel_weights.append(l*[label_weight])
+
+        pixel_values = np.concatenate(pixel_values)
+        pixel_stds = np.concatenate(pixel_stds)
+        pixel_means = np.concatenate(pixel_means)
+        pixel_weights = np.concatenate(pixel_weights)
+
+        #print(f"{pixel_values.shape} |{pixel_stds.shape} |{pixel_means.shape} |{pixel_weights.shape} ")
+
+        return pixel_values, pixel_stds, pixel_means, pixel_weights
+
+
+    def return_avg_weights_per_bins(self, weights, stds, labels):
+
+        avg_weights = {}
+        avg_stds = {}
+
+        for i in range(30):
+            if i == 0: 
+                Ws = weights[np.where((labels >= i) &(labels <=(i+1)))]
+                avg_weights[i] = np.mean(Ws)
+                std = stds[np.where((labels >= i) &(labels <=(i+1)))]
+                avg_stds[i] = np.mean(std)
+            elif i == 29:
+                Ws = weights[np.where((labels >= i))]
+                avg_weights[i] = np.mean(Ws)
+                std = stds[np.where((labels >= i))]
+                avg_stds[i] = np.mean(std)      
+            else: 
+                Ws = weights[np.where((labels >i) &(labels <= (i+1)))]
+                avg_weights[i] = np.mean(Ws)
+                std = stds[np.where((labels >i) &(labels <= (i+1)))]
+                avg_stds[i] = np.mean(std) 
+
+        avg_weights = list(avg_weights.values()) 
+        avg_weights = [0 if math.isnan(x) else x for x in avg_weights]  
+        avg_stds = list(avg_stds.values()) 
+
+        return avg_weights, avg_stds
+
+
+    def crop_gen(self, src, xcoord, ycoord):
+        src = np.load(src, allow_pickle=True)
+        crop_src = src[:, xcoord:xcoord + 16, ycoord:ycoord + 16, :]
+        return crop_src 
 #=======================================================================================================#
 #                                     Emprical Weight Sampler                                           #
 #=======================================================================================================#

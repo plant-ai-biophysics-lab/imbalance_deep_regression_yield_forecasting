@@ -10,12 +10,20 @@ from src.RWSampler import lds_prepare_weights
 
 
 class dataloader_RGB(object):
-    def __init__(self, npy_dir, csv_dir, category = None, patch_size = None, in_channels = None):
+    def __init__(self, npy_dir, csv_dir, 
+                                category: str, 
+                                patch_size: int, 
+                                in_channels: int, 
+                                lds_ks: int, 
+                                lds_sigma: int
+                                ):
 
         self.npy_dir      = npy_dir
         self.csv_dir      = csv_dir
         self.wsize        = patch_size
         self.in_channels  = in_channels
+        self.lds_ks       = lds_ks
+        self.lds_sigma    = lds_sigma
 
         if category    == 'train': 
             self.NewDf = pd.read_csv(os.path.join(self.csv_dir, 'coords') +'/train.csv', index_col=0) 
@@ -107,7 +115,12 @@ class dataloader_RGB(object):
 
 
         reshaped_masks = np.reshape(masks, (masks.shape[0]*masks.shape[1]*masks.shape[2]))
-        weights = lds_prepare_weights(reshaped_masks, 'sqrt_inv', max_target=30, lds=True, lds_kernel='gaussian', lds_ks=20, lds_sigma=6)
+        weights = lds_prepare_weights(reshaped_masks, 'inverse', 
+                                    max_target=30, 
+                                    lds=True, 
+                                    lds_kernel='gaussian', 
+                                    lds_ks=self.lds_ks, 
+                                    lds_sigma=self.lds_sigma)
 
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
 

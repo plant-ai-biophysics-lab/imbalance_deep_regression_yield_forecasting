@@ -28,6 +28,8 @@ def train(scenario: str,
             weight_decay: float,
             in_channel: int, 
             emb_channel: int, 
+            lds_ks: int, 
+            lds_sigma: int, 
             loss_stop_tolerance: int, 
             epochs: int, 
             exp_name: str):
@@ -83,9 +85,27 @@ def train(scenario: str,
     #============================================     Reading Data                =================================#
     #==============================================================================================================#
     #csv_coord_dir = '/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/'
-    dataset_training = dataloader_RGB(data_dir, exp_output_dir, category = 'train', patch_size = patch_size, in_channels = in_channel)
-    dataset_validate = dataloader_RGB(data_dir, exp_output_dir, category = 'val',  patch_size = patch_size, in_channels = in_channel)
-    dataset_test     = dataloader_RGB(data_dir, exp_output_dir, category = 'test',  patch_size = patch_size, in_channels = in_channel)     
+    dataset_training = dataloader_RGB(data_dir, exp_output_dir, 
+                                        category = 'train', 
+                                        patch_size = patch_size, 
+                                        in_channels = in_channel,
+                                        lds_ks = lds_ks,
+                                        lds_sigma = lds_sigma)
+
+    dataset_validate = dataloader_RGB(data_dir, 
+                                        exp_output_dir, 
+                                        category = 'val',  
+                                        patch_size = patch_size, 
+                                        in_channels = in_channel,
+                                        lds_ks = lds_ks,
+                                        lds_sigma = lds_sigma)
+    dataset_test     = dataloader_RGB(data_dir, 
+                                        exp_output_dir, 
+                                        category = 'test',  
+                                        patch_size = patch_size, 
+                                        in_channels = in_channel,
+                                        lds_ks = lds_ks,
+                                        lds_sigma = lds_sigma)     
     #==============================================================================================================#
     #=============================================      Data Loader               =================================#
     #==============================================================================================================#                      
@@ -385,16 +405,28 @@ def train(scenario: str,
 if __name__ == "__main__":
 
 
-
-
-
-
-
+    lds_kds = [5, 10, 15, 20]
+    lds_sigmas = [2, 4, 6, 8]
 
     
-    train(scenario = 'BHO', spatial_resolution = 10, patch_size = 16, patch_offset = 2,  
-        cultivar_list = None, year_list = None, 
-        dropout = 0.3, batch_size = 64, learning_rate = 0.001, weight_decay = 0.05,
-        in_channel = 6, emb_channel = 4, loss_stop_tolerance = 100, epochs = 500, exp_name = '007_001_05_RGB_LDS_sqinv_20_6') 
+    for kd in lds_kds: 
+        for sigma in lds_sigmas: 
+            ExpName = '008_001_05_RGB_LDSinv_' + str(kd) + '_' + str(sigma)
+            train(scenario = 'BHO', spatial_resolution = 10, 
+                patch_size = 16, 
+                patch_offset = 2,  
+                cultivar_list = None, 
+                year_list = None, 
+                lds_ks = kd, 
+                lds_sigma = sigma, 
+                dropout = 0.3, 
+                batch_size = 64, 
+                learning_rate = 0.001, 
+                weight_decay = 0.05,
+                in_channel = 6, 
+                emb_channel = 4, 
+                loss_stop_tolerance = 100, 
+                epochs = 500, 
+                exp_name = ExpName) 
 
-        
+                

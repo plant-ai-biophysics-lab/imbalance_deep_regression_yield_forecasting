@@ -4,6 +4,7 @@ import numpy as np
 from glob import glob
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+import matplotlib.patches as  mpatches
 import matplotlib.gridspec as gridspec
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
 import seaborn as sns
@@ -11,7 +12,8 @@ sns.set(rc={'axes.facecolor':'white', 'figure.facecolor':'white'})
 sns.set(font_scale=1.5)
 sns.set_theme(style='white')
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
+from scipy.stats import pearsonr
 
 
 def regression_metrics(ytrue, ypred):
@@ -57,15 +59,91 @@ def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
     true_label_C3 = true_labels[np.where(true_labels >= th2)]
     pred_label_C3 = pred_labels[np.where(true_labels >= th2)]
 
+    All_R2, All_MAE, All_RMSE, All_MAPE, _, _ = regression_metrics(true_labels, pred_labels)
     print(f"C1 num samples: {len(true_label_C1)} | C2 num samples: {len(true_label_C2)} | C3 num samples: {len(true_label_C3)} ")
     C1_R2, C1_MAE, C1_RMSE, C1_MAPE, _, _ = regression_metrics(true_label_C1, pred_label_C1)
     C2_R2, C2_MAE, C2_RMSE, C2_MAPE, _, _ = regression_metrics(true_label_C2, pred_label_C2)
     C3_R2, C3_MAE, C3_RMSE, C3_MAPE, _, _ = regression_metrics(true_label_C3, pred_label_C3)
 
     print(f"C1 is yield value between 0 and {th1}, C2 is yield value between {th1} and {th2}, and C3 is yield value bigger than {th2}")
-    print(f"C1: MAE = {C1_MAE:.2f}, MAPE = {C1_MAPE*100:.2f} | C2: MAE = {C2_MAE:.2f}, MAPE = {C2_MAPE*100:.2f} | C3: MAE = {C3_MAE:.2f}, MAPE = {C3_MAPE*100:.2f}")
-
+    print(f"All: MAE = {All_MAE:.2f}, MAPE = {All_MAPE:.2f} | C1: MAE = {C1_MAE:.2f}, MAPE = {C1_MAPE*100:.2f} | C2: MAE = {C2_MAE:.2f}, MAPE = {C2_MAPE*100:.2f} | C3: MAE = {C3_MAE:.2f}, MAPE = {C3_MAPE*100:.2f}")
+    print(f"===============================================================================")
     return [C1_MAE, C1_MAPE, C2_MAE, C2_MAPE, C3_MAE, C3_MAPE]
+
+
+def Erroe_hist_visulization(df):
+
+    fig, axs = plt.subplots(1, 2 , figsize = (15, 4))
+
+    sns.set_style("whitegrid", {'axes.grid' : False})
+    plt.rcParams["figure.autolayout"] = True
+    plt.subplots_adjust(hspace = 0.01)
+
+    ax1 = sns.histplot(df, x = 'ytrue', bins = 30, ax = axs[0])
+    ax1.set_title("Yield observation distribution")
+    MAPE_Errors, counts = [], []
+    for i in range(30):
+        Data  = df.loc[(df['ytrue'] > i) & (df['ytrue'] <= (i+1))] 
+        counts.append(len(Data))
+        MAPE = mean_absolute_percentage_error(Data['ytrue'], Data['ypred_w15'])
+        if MAPE > 1: 
+            MAPE = 1
+        MAPE_Errors.append(MAPE*100)
+
+    pearson_value = pearsonr(MAPE_Errors, counts)[0]
+    bins_value  = np.arange(1, 31, 1)
+    ax2 = sns.barplot(x = bins_value, y= MAPE_Errors, color = sns.color_palette()[0], width = 0.9, ax = axs[1])
+
+
+
+    ax2.set(ylabel='MAPE Error')
+    ax2.set(xlabel='yture')
+    ax2.set_title(r"Pearson Correlation:{:.2f}".format(pearson_value))
+
+    None
+
+def Erroe_hist_visulization_V2(df):
+
+    fig, axs = plt.subplots(1, 1 , figsize = (12, 4))
+
+    sns.set_style("whitegrid", {'axes.grid' : False})
+    plt.rcParams["figure.autolayout"] = True
+    plt.subplots_adjust(hspace = 0.01)
+
+    MAPE_Errors, counts = [], []
+    for i in range(1, 30):
+        if i == 1:
+            Data  = df.loc[(df['ytrue'] < (i+1))]
+        elif i == 29: 
+            Data  = df.loc[(df['ytrue'] >= (i))]
+        else: 
+            Data  = df.loc[(df['ytrue'] >= i) & (df['ytrue'] < (i+1))] 
+        counts.append(len(Data))
+        MAPE = mean_absolute_percentage_error(Data['ytrue'], Data['ypred_w15'])
+        if MAPE > 1: 
+            MAPE = 1
+        MAPE_Errors.append(MAPE*100)
+
+    pearson_value = pearsonr(MAPE_Errors, counts)[0]
+    bins_value  = np.arange(1, 30, 1)
+
+    ax1  = sns.barplot(x = bins_value, y= counts, color = sns.color_palette()[0], width = 0.9, ax = axs)
+    axs01 = axs.twinx()
+    ax01 = sns.barplot(x = bins_value, y= MAPE_Errors, color = sns.color_palette()[3], alpha = 0.5, width = 0.9, ax = axs01)
+
+
+    handles = [mpatches.Patch(facecolor = sns.color_palette()[0], label = 'Number of Samples'),
+    mpatches.Patch(facecolor = sns.color_palette()[3], label = 'MAPE Error')
+    ]
+    axs.legend(handles = handles, loc = 'upper right')
+
+
+    ax1.set(ylabel='Number of Samples')
+    ax01.set(ylabel='MAPE Error')
+    ax1.set(xlabel='yield value')
+    plt.title(r"Pearson Correlation:{:.2f}".format(pearson_value))
+
+    None
 
 
 def time_series_evaluation_plots(train, val, test, fig_save_name): 

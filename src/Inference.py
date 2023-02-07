@@ -71,6 +71,49 @@ def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
     return [C1_MAE, C1_MAPE, C2_MAE, C2_MAPE, C3_MAE, C3_MAPE]
 
 
+def eval_on_extreme_main_label_range_pred(df, th1: int, th2: int):
+
+    true_labels = df['ytrue'].values
+    pred_labels = df['ypred_w15'].values
+
+
+    #for i in range(30):
+
+    #if i < th1: 
+    true_label_C1 = true_labels[np.where(true_labels < th1)]
+    pred_label_C1 = pred_labels[np.where(true_labels < th1)]
+
+    #elif i >= th2: 
+    true_label_C3 = true_labels[np.where(true_labels >= th2)]
+    pred_label_C3 = pred_labels[np.where(true_labels >= th2)]
+
+
+    #elif (i >= th1) & (i < th2):
+    true_label_Cm = true_labels[np.where((true_labels >= th1) & (true_labels < th2))]
+    pred_label_Cm = pred_labels[np.where((true_labels >= th1) & (true_labels < th2))]
+
+    true_label_ex = []
+    true_label_ex.append(true_label_C1)
+    true_label_ex.append(true_label_C3)
+    true_label_ex = np.concatenate(true_label_ex)
+    pred_label_ex = []
+    pred_label_ex.append(pred_label_C1)
+    pred_label_ex.append(pred_label_C3)
+    pred_label_ex = np.concatenate(pred_label_ex)
+
+
+    All_R2, All_MAE, All_RMSE, All_MAPE, _, _ = regression_metrics(true_labels, pred_labels)
+    print(f"Majority range yield: {len(true_label_Cm)} | Extreme yield value: {len(true_label_ex)}")
+
+    Cm_R2, Cm_MAE, Cm_RMSE, Cm_MAPE, _, _ = regression_metrics(true_label_Cm, pred_label_Cm)
+    Cex_R2, Cex_MAE, Cex_RMSE, Cex_MAPE, _, _ = regression_metrics(true_label_ex, pred_label_ex)
+
+    #print(f"C1 is yield value between 0 and {th1}, C2 is yield value between {th1} and {th2}, and C3 is yield value bigger than {th2}")
+    print(f"All: MAE = {All_MAE:.2f}, MAPE = {All_MAPE:.2f} | Cm: MAE = {Cm_MAE:.2f}, MAPE = {Cm_MAPE*100:.2f} | Cex: MAE = {Cex_MAE:.2f}, MAPE = {Cex_MAPE*100:.2f}")
+    print(f"===============================================================================")
+    return [Cm_MAE, Cm_MAPE, Cex_MAE, Cex_MAPE]
+
+
 def Erroe_hist_visulization(df):
 
     fig, axs = plt.subplots(1, 2 , figsize = (15, 4))

@@ -1,0 +1,42 @@
+nohup: ignoring input
+True
+TargetRelevance alpha: 2
+Using Silverman Bandwidth 0.24248968434115364
+TargetRelevance alpha: 2
+Using Silverman Bandwidth 0.20808224179129048
+TargetRelevance alpha: 2
+Using Silverman Bandwidth 0.21125947234207024
+Epoch 001: | Time(s): 59.224| Train Loss: 3064.3661 | Val Loss: 2165.4518
+Best model Saved! Val MSE: 2165.4518
+W1:106.70|W2:139.27|W3:155.47|W4:159.65|W5:159.60|W6:157.86|W7:154.94|W8:151.49|W9:147.83|W10:144.61|W11:141.75|W12:139.58|W13:137.54|W14:135.52|W15:133.63
+count: 0
+Epoch 002: | Time(s): 57.180| Train Loss: 1266.8093 | Val Loss: 588.4209
+Best model Saved! Val MSE: 588.4209
+W1:33.97|W2:39.24|W3:38.23|W4:38.59|W5:39.13|W6:39.57|W7:39.96|W8:39.94|W9:39.90|W10:39.91|W11:39.94|W12:39.98|W13:39.97|W14:40.01|W15:40.08
+count: 0
+Epoch 003: | Time(s): 57.702| Train Loss: 644.9828 | Val Loss: 467.0470
+Best model Saved! Val MSE: 467.0470
+W1:34.00|W2:38.14|W3:30.69|W4:30.61|W5:30.37|W6:30.82|W7:31.71|W8:30.96|W9:29.75|W10:29.42|W11:29.30|W12:29.94|W13:30.16|W14:30.53|W15:30.64
+count: 0
+Epoch 004: | Time(s): 55.680| Train Loss: 458.0969 | Val Loss: 372.1432
+Best model Saved! Val MSE: 372.1432
+W1:17.85|W2:29.25|W3:27.24|W4:27.18|W5:27.49|W6:28.21|W7:30.79|W8:29.72|W9:26.18|W10:23.88|W11:21.56|W12:21.54|W13:20.67|W14:20.22|W15:20.37
+count: 0
+Epoch 005: | Time(s): 56.923| Train Loss: 349.4908 | Val Loss: 189.4197
+Best model Saved! Val MSE: 189.4197
+W1:16.85|W2:18.13|W3:15.04|W4:12.76|W5:12.41|W6:12.23|W7:12.54|W8:12.12|W9:11.28|W10:11.07|W11:10.95|W12:10.91|W13:11.01|W14:11.03|W15:11.09
+count: 0
+Epoch 006: | Time(s): 56.320| Train Loss: 287.6672 | Val Loss: 242.9227
+Model is not saved! Current val Loss: 242.9227
+count: 1
+Epoch 007: | Time(s): 59.386| Train Loss: 265.5650 | Val Loss: 123.4814
+Best model Saved! Val MSE: 123.4814
+W1:8.49|W2:10.36|W3:9.15|W4:8.27|W5:8.07|W6:8.02|W7:8.05|W8:7.90|W9:7.80|W10:7.79|W11:7.83|W12:7.86|W13:7.93|W14:7.92|W15:8.04
+count: 0
+Epoch 008: | Time(s): 55.977| Train Loss: 252.1058 | Val Loss: 116.6865
+Best model Saved! Val MSE: 116.6865
+W1:8.30|W2:9.18|W3:7.97|W4:7.59|W5:7.55|W6:7.58|W7:7.58|W8:7.57|W9:7.54|W10:7.53|W11:7.60|W12:7.64|W13:7.65|W14:7.69|W15:7.70
+count: 0
+Epoch 009: | Time(s): 57.096| Train Loss: 234.4281 | Val Loss: 123.7735
+Model is not saved! Current val Loss: 123.7735
+count: 1

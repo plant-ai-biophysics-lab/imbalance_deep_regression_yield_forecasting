@@ -384,9 +384,6 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             ycoord_batch_train  = sample['Y']
             
             WithinBlockMean_train    = sample['win_block_mean']
-            WithinBlockStd_train     = sample['win_block_std']
-            WithinCultivarMean_train = sample['win_cultivar_mean']
-            WithinCultivarStd_train  = sample['win_cultivar_std']
             
             list_y_train_pred = model(X_batch_train, C_batch_train)
             
@@ -410,7 +407,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
 
 
             this_batch_train = {"block": ID_batch_train, "cultivar": Cult_batch_train, "X": Xcoord_batch_train, "Y": ycoord_batch_train,
-                                "win_block_mean":WithinBlockMean_train,"win_block_std": WithinBlockStd_train, "win_cultivar_mean": WithinCultivarMean_train, "win_cultivar_std": WithinCultivarStd_train,
+                                "win_block_mean":WithinBlockMean_train,
                                 "ytrue": y_true_train, "ypred_w1": ytpw1, "ypred_w2": ytpw2,"ypred_w3": ytpw3,"ypred_w4": ytpw4,"ypred_w5": ytpw5,"ypred_w6": ytpw6,"ypred_w7": ytpw7,"ypred_w8": ytpw8,
                                 "ypred_w9": ytpw9,"ypred_w10": ytpw10,"ypred_w11": ytpw11,"ypred_w12": ytpw12,"ypred_w13": ytpw13,"ypred_w14": ytpw14,"ypred_w15": ytpw15}
             
@@ -435,9 +432,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             Xcoord_batch_val  = sample['X']
             ycoord_batch_val  = sample['Y']
             WithinBlockMean_val    = sample['win_block_mean']
-            WithinBlockStd_val     = sample['win_block_std']
-            WithinCultivarMean_val = sample['win_cultivar_mean']
-            WithinCultivarStd_val  = sample['win_cultivar_std']
+
 
             list_y_val_pred = model(X_batch_val, C_batch_val)
                 
@@ -461,8 +456,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             
 
             this_batch_val = {"block": ID_batch_val, "cultivar": Cult_batch_val, "X": Xcoord_batch_val, "Y": ycoord_batch_val, 
-                                "win_block_mean":WithinBlockMean_val,"win_block_std": WithinBlockStd_val, "win_cultivar_mean": WithinCultivarMean_val, "win_cultivar_std": WithinCultivarStd_val,
-                                "ytrue": y_true_val, "ypred_w1": yvpw1, "ypred_w2": yvpw2, "ypred_w3": yvpw3, "ypred_w4": yvpw4, "ypred_w5": yvpw5, "ypred_w6": yvpw6, "ypred_w7": yvpw7, "ypred_w8": yvpw8,
+                                "win_block_mean":WithinBlockMean_val, "ytrue": y_true_val, "ypred_w1": yvpw1, "ypred_w2": yvpw2, "ypred_w3": yvpw3, "ypred_w4": yvpw4, "ypred_w5": yvpw5, "ypred_w6": yvpw6, "ypred_w7": yvpw7, "ypred_w8": yvpw8,
                                 "ypred_w9": yvpw9, "ypred_w10": yvpw10, "ypred_w11": yvpw11, "ypred_w12": yvpw12, "ypred_w13": yvpw13, "ypred_w14": yvpw14, "ypred_w15": yvpw15} 
 
                 
@@ -488,10 +482,8 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             Xcoord_batch_test  = sample['X']
             ycoord_batch_test  = sample['Y']
             WithinBlockMean_test = sample['win_block_mean']
-            WithinBlockStd_test = sample['win_block_std']
-            WithinCultivarMean_test = sample['win_cultivar_mean']
-            WithinCultivarStd_test  = sample['win_cultivar_std']
-        
+
+
 
             list_y_test_pred = model(X_batch_test, C_batch_test)
             y_true_test = y_batch_test.detach().cpu().numpy()
@@ -513,7 +505,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             ytepw15 = list_y_test_pred[14].detach().cpu().numpy()
 
             this_batch_test = {"block": ID_batch_test, "cultivar": Cult_batch_test, "X": Xcoord_batch_test, "Y": ycoord_batch_test, 
-                            "win_block_mean":WithinBlockMean_test,"win_block_std": WithinBlockStd_test, "win_cultivar_mean": WithinCultivarMean_test,"win_cultivar_std": WithinCultivarStd_test,
+                            "win_block_mean":WithinBlockMean_test,
                             "ytrue": y_true_test, "ypred_w1": ytepw1, "ypred_w2": ytepw2, "ypred_w3": ytepw3, "ypred_w4": ytepw4, "ypred_w5": ytepw5, "ypred_w6": ytepw6, "ypred_w7": ytepw7, 
                             "ypred_w8": ytepw8, "ypred_w9": ytepw9, "ypred_w10": ytepw10, "ypred_w11": ytepw11, "ypred_w12": ytepw12, "ypred_w13": ytepw13, "ypred_w14": ytepw14, "ypred_w15": ytepw15}
             

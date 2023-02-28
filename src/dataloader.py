@@ -6,8 +6,11 @@ import random
 import pandas as pd
 import torch
 import torch.nn as nn
-from src.RWSampler import lds_prepare_weights
+from KDEpy import FFTKDE
+from sklearn.preprocessing import MinMaxScaler
+from src.RWSampler import lds_prepare_weights, TargetRelevance
 
+    
 
 class dataloader_RGB(object):
     def __init__(self, npy_dir, csv_dir, 
@@ -15,15 +18,16 @@ class dataloader_RGB(object):
                                 patch_size: int, 
                                 in_channels: int, 
                                 lds_ks: int, 
-                                lds_sigma: int
+                                lds_sigma: int, 
+                                dw_alpha: float,
+                                re_weighting_method: str
                                 ):
 
         self.npy_dir      = npy_dir
         self.csv_dir      = csv_dir
         self.wsize        = patch_size
         self.in_channels  = in_channels
-        self.lds_ks       = lds_ks
-        self.lds_sigma    = lds_sigma
+
 
         if category    == 'train': 
             self.NewDf = pd.read_csv(os.path.join(self.csv_dir, 'coords') +'/train.csv', index_col=0) 
@@ -37,8 +41,11 @@ class dataloader_RGB(object):
         
         self.images = sorted(glob(os.path.join(self.npy_dir , 'imgs') +'/*.npy'))
         self.labels = sorted(glob(os.path.join(self.npy_dir , 'labels') +'/*.npy'))
-        self.weights = self.return_pixelwise_weight()
-    
+
+        if re_weighting_method == 'lds':
+            self.weights = self.return_pixelwise_weight_lds(lds_ks, lds_sigma)
+        if re_weighting_method == 'dw':
+            self.weights = self.return_pixelwise_weight_dw(dw_alpha)
 
     def __getitem__(self, idx):
 
@@ -90,15 +97,15 @@ class dataloader_RGB(object):
         weight_mtx = torch.as_tensor(weight_mtx)
 
         
-        sample = {"image": image, "mask": mask, "EmbMatrix": EmbMat, "block": block_id, "cultivar": cultivar, "X": xcoord, "Y": ycoord, "win_block_mean":WithinBlockMean, 
-                    "win_block_std": WithinBlockStd, "win_cultivar_mean": WithinCultivarMean, "win_cultivar_std":WithinCultivarStd, "lds": weight_mtx}
+        sample = {"image": image, "mask": mask, "EmbMatrix": EmbMat, "block": block_id, "cultivar": cultivar, 
+                  "X": xcoord, "Y": ycoord, "win_block_mean":WithinBlockMean,  "weight": weight_mtx}
              
         return sample
 
     def __len__(self):
         return len(self.NewDf)
     
-    def return_pixelwise_weight(self):
+    def return_pixelwise_weight_lds(self, lds_ks, lds_sigma):
 
         masks = None
         for idx, row in self.NewDf.iterrows():
@@ -119,13 +126,38 @@ class dataloader_RGB(object):
                                     max_target=30, 
                                     lds=True, 
                                     lds_kernel='gaussian', 
-                                    lds_ks=self.lds_ks, 
-                                    lds_sigma=self.lds_sigma)
-
+                                    lds_ks   =lds_ks, 
+                                    lds_sigma=lds_sigma)
+        
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
 
 
         return weights
+
+    def return_pixelwise_weight_dw(self, dw_alpha):
+
+        masks = None
+        for idx, row in self.NewDf.iterrows():
+            xcoord     = row['X'] 
+            ycoord     = row['Y'] 
+            label_path = row['LABEL_PATH'] 
+            mask  = self.crop_gen(label_path, xcoord, ycoord) 
+            mask  = np.swapaxes(mask, -1, 0)
+
+            if masks is None: 
+                masks = mask
+            else: 
+                masks = np.concatenate([masks, mask], axis = 0)
+
+
+        reshaped_masks = np.reshape(masks, (masks.shape[0]*masks.shape[1]*masks.shape[2]))
+
+        #weights = TargetRelevance(reshaped_masks, alpha = dw_alpha).get_relevance()
+        weights = TargetRelevance(reshaped_masks, alpha = dw_alpha).__call__(reshaped_masks)
+
+        weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
+        return weights
+    
 
     def crop_gen(self, src, xcoord, ycoord):
         src = np.load(src, allow_pickle=True)

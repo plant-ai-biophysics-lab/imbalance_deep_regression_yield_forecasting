@@ -16,22 +16,11 @@ print(torch.cuda.is_available())
 #==============================================================================================================#
 #==================================================Initialization =============================================#
 #==============================================================================================================#
-def train(scenario: str, 
-            spatial_resolution: int, 
-            patch_size: int, 
-            patch_offset: int,  
-            cultivar_list: list,  
-            year_list: list, 
-            dropout: int, 
-            batch_size: int, 
-            learning_rate: float, 
-            weight_decay: float,
-            in_channel: int, 
-            emb_channel: int, 
-            lds_ks: int, 
-            lds_sigma: int, 
-            loss_stop_tolerance: int, 
-            epochs: int, 
+def train(patch_size: int, dropout: int, 
+            batch_size: int, learning_rate: float, weight_decay: float,
+            in_channel: int, emb_channel: int, epochs: int, loss_stop_tolerance: int, 
+            lds_ks: int, lds_sigma: int, dw_alpha :float, 
+            re_weighting_method: str,
             exp_name: str):
 
 
@@ -65,9 +54,9 @@ def train(scenario: str,
     #==============================================================================================================#
     #============================================ Imprical Data Weight Generation =================================#
     #==============================================================================================================#
-    #train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir)
+    '''train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
 
-    '''train_weights = train_csv['NormWeight'].to_numpy() 
+    train_weights = train_csv['NormWeight'].to_numpy() 
     train_weights = torch.DoubleTensor(train_weights)
     train_sampler = torch.utils.data.sampler.WeightedRandomSampler(train_weights, 
                                                                    len(train_weights), replacement=True)    
@@ -90,7 +79,9 @@ def train(scenario: str,
                                         patch_size = patch_size, 
                                         in_channels = in_channel,
                                         lds_ks = lds_ks,
-                                        lds_sigma = lds_sigma)
+                                        lds_sigma = lds_sigma, 
+                                        dw_alpha = dw_alpha, 
+                                        re_weighting_method = 'dw')
 
     dataset_validate = dataloader_RGB(data_dir, 
                                         exp_output_dir, 
@@ -98,24 +89,30 @@ def train(scenario: str,
                                         patch_size = patch_size, 
                                         in_channels = in_channel,
                                         lds_ks = lds_ks,
-                                        lds_sigma = lds_sigma)
+                                        lds_sigma = lds_sigma,
+                                        dw_alpha = dw_alpha, 
+                                        re_weighting_method = 'dw')
+    
+
     dataset_test     = dataloader_RGB(data_dir, 
                                         exp_output_dir, 
                                         category = 'test',  
                                         patch_size = patch_size, 
                                         in_channels = in_channel,
                                         lds_ks = lds_ks,
-                                        lds_sigma = lds_sigma)     
+                                        lds_sigma = lds_sigma,
+                                        dw_alpha = dw_alpha, 
+                                        re_weighting_method = 'dw')     
     #==============================================================================================================#
     #=============================================      Data Loader               =================================#
     #==============================================================================================================#                      
     # define training and validation data loaders
     data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
-                                                    shuffle=True, num_workers=8) #, sampler=train_sampler,
+                                                    shuffle=True, num_workers=8) #   sampler=train_sampler, 
     data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
-                                                    shuffle=False, num_workers=8) #, sampler=val_sampler,
+                                                    shuffle=False,  num_workers=8) #sampler=val_sampler,
     data_loader_test     = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, 
-                                                    shuffle=False, num_workers=8) #sampler=test_sampler, 
+                                                    shuffle=False,  num_workers=8) #sampler=test_sampler,
     #==============================================================================================================#
     #================================================ Model Calling ===============================================#
     #==============================================================================================================#
@@ -162,7 +159,7 @@ def train(scenario: str,
             y_train_batch         = sample['mask']
             y_train_batch         = y_train_batch[:,:,:,:,0]
             E_train_batch         = sample['EmbMatrix']
-            weights               = sample['lds'].to(device)
+            weights               = sample['weight'].to(device)
 
             X_train_batch, E_train_batch = X_train_batch.to(device), E_train_batch.to(device)
             y_train_batch  = y_train_batch.to(device)
@@ -253,7 +250,7 @@ def train(scenario: str,
                 y_val_batch      = sample['mask']
                 y_val_batch      = y_val_batch[:,:,:,:,0]
                 E_val_batch      = sample['EmbMatrix']
-                Val_weights      = sample['lds'].to(device)
+                Val_weights      = sample['weight'].to(device)
                 
                 X_val_batch, E_val_batch = X_val_batch.to(device), E_val_batch.to(device)
                 y_val_batch = y_val_batch.to(device)
@@ -403,30 +400,18 @@ def train(scenario: str,
 
 
 if __name__ == "__main__":
-
-
-    lds_kds = [5, 10, 15, 20]
-    lds_sigmas = [2, 4, 6, 8]
+    #lds_kds = [5, 10, 15, 20]
+    #lds_sigmas = [2, 4, 6, 8]
 
     
-    for kd in lds_kds: 
-        for sigma in lds_sigmas: 
-            ExpName = '008_001_05_RGB_LDSinv_' + str(kd) + '_' + str(sigma)
-            train(scenario = 'BHO', spatial_resolution = 10, 
-                patch_size = 16, 
-                patch_offset = 2,  
-                cultivar_list = None, 
-                year_list = None, 
-                lds_ks = kd, 
-                lds_sigma = sigma, 
-                dropout = 0.3, 
-                batch_size = 64, 
-                learning_rate = 0.001, 
-                weight_decay = 0.05,
-                in_channel = 6, 
-                emb_channel = 4, 
-                loss_stop_tolerance = 100, 
-                epochs = 500, 
-                exp_name = ExpName) 
-
-                
+    #for kd in lds_kds: 
+    #   for sigma in lds_sigmas: 
+    alpha_list = [2, 3, 4, 5, 10]
+    for a in alpha_list: 
+        ExpName = '012_64_001_05_RGB_DW_Alpha_' + str(a)
+        train(patch_size = 16, dropout = 0.3, 
+            batch_size = 64, learning_rate = 0.001, weight_decay = 0.05,
+            in_channel = 6, emb_channel = 4, epochs = 500, loss_stop_tolerance = 200, 
+            lds_ks = 10, lds_sigma = 8, dw_alpha = a, 
+            re_weighting_method = 'dw',
+            exp_name = ExpName) 

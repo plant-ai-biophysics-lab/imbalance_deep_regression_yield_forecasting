@@ -67,7 +67,7 @@ def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
 
     print(f"C1 is yield value between 0 and {th1}, C2 is yield value between {th1} and {th2}, and C3 is yield value bigger than {th2}")
     print(f"All: MAE = {All_MAE:.2f}, MAPE = {All_MAPE:.2f} | C1: MAE = {C1_MAE:.2f}, MAPE = {C1_MAPE*100:.2f} | C2: MAE = {C2_MAE:.2f}, MAPE = {C2_MAPE*100:.2f} | C3: MAE = {C3_MAE:.2f}, MAPE = {C3_MAPE*100:.2f}")
-    print(f"===============================================================================")
+    print(f"=========================================================================================================================")
     return [C1_MAE, C1_MAPE, C2_MAE, C2_MAPE, C3_MAE, C3_MAPE]
 
 
@@ -110,7 +110,7 @@ def eval_on_extreme_main_label_range_pred(df, th1: int, th2: int):
 
     #print(f"C1 is yield value between 0 and {th1}, C2 is yield value between {th1} and {th2}, and C3 is yield value bigger than {th2}")
     print(f"All: MAE = {All_MAE:.2f}, MAPE = {All_MAPE:.2f} | Cm: MAE = {Cm_MAE:.2f}, MAPE = {Cm_MAPE*100:.2f} | Cex: MAE = {Cex_MAE:.2f}, MAPE = {Cex_MAPE*100:.2f}")
-    print(f"===============================================================================")
+    print(f"==============================================================================================================")
     return [Cm_MAE, Cm_MAPE, Cex_MAE, Cex_MAPE]
 
 
@@ -567,3 +567,19 @@ def return_samples_error_per_bins(df):
         MAPE_Errors.append(MAPE*100)
 
     return counts, MAPE_Errors
+
+def return_samples_weight_per_bins(df): 
+    ytrue_counts, weight_means = [], []
+    for i in range(30):
+            if i == 0:
+                    yture_count = df.loc[(df['ytrue'] >= i) & (df['ytrue'] <= (i+1))]
+                    weight_mean = df['weights'].loc[(df['ytrue'] >= i) & (df['ytrue'] <= (i+1))].mean()
+            
+            else: 
+                    yture_count = df.loc[(df['ytrue'] > i) & (df['ytrue'] <= (i+1))] 
+                    weight_mean = df['weights'].loc[(df['ytrue'] > i) & (df['ytrue'] <= (i+1))].mean()
+
+            ytrue_counts.append(len(yture_count))
+            weight_means.append(weight_mean)
+
+    return weight_means, ytrue_counts

@@ -48,8 +48,8 @@ def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
     #for i in range(30):
 
     #if i < th1: 
-    true_label_C1 = true_labels[np.where(true_labels < th1)]
-    pred_label_C1 = pred_labels[np.where(true_labels < th1)]
+    true_label_C1 = true_labels[np.where((true_labels > 0) & (true_labels < th1))]
+    pred_label_C1 = pred_labels[np.where((true_labels > 0) & (true_labels < th1))]
 
     #elif (i >= th1) & (i < th2):
     true_label_C2 = true_labels[np.where((true_labels >= th1) & (true_labels < th2))]
@@ -336,10 +336,13 @@ def train_val_test_satterplot(train_df, valid_df, test_df, week = None, cmap  = 
     plt.legend([extra], [scores], loc='upper left')
     #plt.title('Validation Data')
     #========================================================
+
+
     w_test_e1  = test_df[['ytrue', week_pred]]
     w_test_e1  = w_test_e1.rename(columns={week_pred: "ypred"})
     test_true = w_test_e1['ytrue']
     valid_pred = w_test_e1['ypred']
+
     test_r2, test_mae, test_rmse, test_mape, _,_ = regression_metrics(test_true, valid_pred)
 
     Te = sns.jointplot(x=test_true, y = valid_pred, kind="hex", height=8, ratio=4, 

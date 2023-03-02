@@ -90,6 +90,27 @@ def lds_prepare_weights(labels, reweight, max_target=30, lds=True, lds_kernel='g
     weights = [scaling * x for x in weights]
     return weights
 
+def cb_prepare_weights(labels, lds_kernel='gaussian', lds_ks=5, lds_sigma=2, betha=2):
+    value_dict = {x: 0 for x in range(30)}
+
+    for label in labels:
+        value_dict[min(30 - 1, int(label))] += 1
+
+    value_dict = {k: v for k, v in value_dict.items()}  # clip weights for inverse re-weight
+
+
+    emperical_values = [v for _, v in value_dict.items()]
+    lds_kernel_window = get_lds_kernel_window(lds_kernel, lds_ks, lds_sigma)
+    #print(f'Using LDS: [{lds_kernel.upper()}] ({lds_ks}/{lds_sigma})')
+    smoothed_value = convolve1d(
+        np.asarray([v for _, v in value_dict.items()]), weights=lds_kernel_window, mode='constant')
+    num_per_label = [smoothed_value[min(30 - 1, int(label))] for label in labels]
+
+
+    effective_value_norm = (num_per_label - np.min(num_per_label)) / (np.max(num_per_label) - np.min(num_per_label))
+    weights = [np.float32((1-betha) / (1-(betha**x))) if (1-(betha**x)) != 0 else 1 for x in effective_value_norm]
+
+    return weights
 
 
 
@@ -165,6 +186,7 @@ class check_lds_reweighting_():
             return None
         #print(f"Using re-weighting: [{reweight.upper()}]")
         emperical_vales = [v for _, v in value_dict.items()]
+
         if lds:
             lds_kernel_window = get_lds_kernel_window('gaussian', self.lds_ks, self.lds_sigma)
             #print(f'Using LDS: [{lds_kernel.upper()}] ({lds_ks}/{lds_sigma})')
@@ -183,7 +205,90 @@ class check_lds_reweighting_():
         crop_src = src[:, xcoord:xcoord + 16, ycoord:ycoord + 16, :]
         return crop_src 
 
+class check_cb_reweighting():
+    def __init__(self, df, lds_ks: int, lds_sigma: int, betha: int):
+        self.df = df
+        self.lds_ks = lds_ks
+        self.lds_sigma = lds_sigma
+        self.betha = betha
 
+        
+    def return_pixelwise_weight(self):
+        masks = None
+        for idx, row in self.df.iterrows():
+            xcoord     = row['X'] 
+            ycoord     = row['Y'] 
+            label_path = row['LABEL_PATH'] 
+            mask  = self.crop_gen(label_path, xcoord, ycoord) 
+            mask  = np.swapaxes(mask, -1, 0)
+
+            if masks is None: 
+                masks = mask
+            else: 
+                masks = np.concatenate([masks, mask], axis = 0)
+
+
+        labels_ = np.reshape(masks, (masks.shape[0]*masks.shape[1]*masks.shape[2]))
+
+
+        weights, effective_value, emperical_values  = self.cb_prepare_weights(labels_, 
+                                                                              lds_kernel='gaussian', 
+                                                                              lds_ks=self.lds_ks, 
+                                                                              lds_sigma=self.lds_sigma, 
+                                                                              betha=self.betha)
+
+        avg_weights = self.return_avg_weights_per_labels(np.array(weights), np.array(labels_))
+
+        return weights, labels_, effective_value, emperical_values, avg_weights
+
+    def cb_prepare_weights(self, labels, lds_kernel='gaussian', lds_ks=5, lds_sigma=2, betha=2):
+        value_dict = {x: 0 for x in range(30)}
+
+        for label in labels:
+            value_dict[min(30 - 1, int(label))] += 1
+
+        value_dict = {k: v for k, v in value_dict.items()}  # clip weights for inverse re-weight
+
+
+        emperical_values = [v for _, v in value_dict.items()]
+        lds_kernel_window = get_lds_kernel_window(lds_kernel, lds_ks, lds_sigma)
+        #print(f'Using LDS: [{lds_kernel.upper()}] ({lds_ks}/{lds_sigma})')
+        smoothed_value = convolve1d(
+            np.asarray([v for _, v in value_dict.items()]), weights=lds_kernel_window, mode='constant')
+        num_per_label = [smoothed_value[min(30 - 1, int(label))] for label in labels]
+
+
+        effective_value_norm = (num_per_label - np.min(num_per_label)) / (np.max(num_per_label) - np.min(num_per_label))
+        weights = [np.float32((1-betha) / (1-(betha**x))) if (1-(betha**x)) != 0 else 50 for x in effective_value_norm]
+        return weights, smoothed_value, emperical_values
+    
+
+    def return_avg_weights_per_labels(self, weights, labels):
+
+        avg_weights = {}
+
+        for i in range(30):
+            if i == 0: 
+                Ws = weights[np.where((labels >= i) &(labels <=(i+1)))]
+                avg_weights[i] = np.mean(Ws)
+            elif i == 29:
+                Ws = weights[np.where((labels >= i))]
+                avg_weights[i] = np.mean(Ws)
+            else: 
+                Ws = weights[np.where((labels >i) &(labels <= (i+1)))]
+                avg_weights[i] = np.mean(Ws)
+
+        avg_weights = list(avg_weights.values()) 
+        avg_weights = [0 if math.isnan(x) else x for x in avg_weights]  
+
+        return avg_weights
+
+
+    def crop_gen(self, src, xcoord, ycoord):
+        src = np.load(src, allow_pickle=True)
+        crop_src = src[:, xcoord:xcoord + 16, ycoord:ycoord + 16, :]
+        return crop_src 
+    
 class check_cost_sensitive_reweighting():
     def __init__(self, df):
         self.df = df

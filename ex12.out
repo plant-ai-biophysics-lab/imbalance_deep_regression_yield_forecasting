@@ -1,42 +1,1509 @@
 nohup: ignoring input
 True
-TargetRelevance alpha: 2
-Using Silverman Bandwidth 0.24248968434115364
-TargetRelevance alpha: 2
-Using Silverman Bandwidth 0.20808224179129048
-TargetRelevance alpha: 2
-Using Silverman Bandwidth 0.21125947234207024
-Epoch 001: | Time(s): 59.224| Train Loss: 3064.3661 | Val Loss: 2165.4518
-Best model Saved! Val MSE: 2165.4518
-W1:106.70|W2:139.27|W3:155.47|W4:159.65|W5:159.60|W6:157.86|W7:154.94|W8:151.49|W9:147.83|W10:144.61|W11:141.75|W12:139.58|W13:137.54|W14:135.52|W15:133.63
+Epoch 001: | Time(s): 56.563| Train Loss: 11726.9603 | Val Loss: 5164.9353
+Best model Saved! Val MSE: 5164.9353
+W1:490.80|W2:388.99|W3:353.69|W4:334.39|W5:324.96|W6:318.98|W7:316.12|W8:317.58|W9:320.85|W10:327.68|W11:333.33|W12:334.34|W13:334.49|W14:334.46|W15:334.27
 count: 0
-Epoch 002: | Time(s): 57.180| Train Loss: 1266.8093 | Val Loss: 588.4209
-Best model Saved! Val MSE: 588.4209
-W1:33.97|W2:39.24|W3:38.23|W4:38.59|W5:39.13|W6:39.57|W7:39.96|W8:39.94|W9:39.90|W10:39.91|W11:39.94|W12:39.98|W13:39.97|W14:40.01|W15:40.08
-count: 0
-Epoch 003: | Time(s): 57.702| Train Loss: 644.9828 | Val Loss: 467.0470
-Best model Saved! Val MSE: 467.0470
-W1:34.00|W2:38.14|W3:30.69|W4:30.61|W5:30.37|W6:30.82|W7:31.71|W8:30.96|W9:29.75|W10:29.42|W11:29.30|W12:29.94|W13:30.16|W14:30.53|W15:30.64
-count: 0
-Epoch 004: | Time(s): 55.680| Train Loss: 458.0969 | Val Loss: 372.1432
-Best model Saved! Val MSE: 372.1432
-W1:17.85|W2:29.25|W3:27.24|W4:27.18|W5:27.49|W6:28.21|W7:30.79|W8:29.72|W9:26.18|W10:23.88|W11:21.56|W12:21.54|W13:20.67|W14:20.22|W15:20.37
-count: 0
-Epoch 005: | Time(s): 56.923| Train Loss: 349.4908 | Val Loss: 189.4197
-Best model Saved! Val MSE: 189.4197
-W1:16.85|W2:18.13|W3:15.04|W4:12.76|W5:12.41|W6:12.23|W7:12.54|W8:12.12|W9:11.28|W10:11.07|W11:10.95|W12:10.91|W13:11.01|W14:11.03|W15:11.09
-count: 0
-Epoch 006: | Time(s): 56.320| Train Loss: 287.6672 | Val Loss: 242.9227
-Model is not saved! Current val Loss: 242.9227
+Epoch 002: | Time(s): 56.231| Train Loss: 4884.1939 | Val Loss: 6810.0385
+Model is not saved! Current val Loss: 6810.0385
 count: 1
-Epoch 007: | Time(s): 59.386| Train Loss: 265.5650 | Val Loss: 123.4814
-Best model Saved! Val MSE: 123.4814
-W1:8.49|W2:10.36|W3:9.15|W4:8.27|W5:8.07|W6:8.02|W7:8.05|W8:7.90|W9:7.80|W10:7.79|W11:7.83|W12:7.86|W13:7.93|W14:7.92|W15:8.04
+Epoch 003: | Time(s): 57.363| Train Loss: 3085.6603 | Val Loss: 1932.4295
+Best model Saved! Val MSE: 1932.4295
+W1:70.85|W2:111.54|W3:130.88|W4:139.80|W5:142.88|W6:143.01|W7:139.50|W8:135.95|W9:133.42|W10:131.69|W11:130.55|W12:130.41|W13:130.42|W14:130.65|W15:130.86
 count: 0
-Epoch 008: | Time(s): 55.977| Train Loss: 252.1058 | Val Loss: 116.6865
-Best model Saved! Val MSE: 116.6865
-W1:8.30|W2:9.18|W3:7.97|W4:7.59|W5:7.55|W6:7.58|W7:7.58|W8:7.57|W9:7.54|W10:7.53|W11:7.60|W12:7.64|W13:7.65|W14:7.69|W15:7.70
-count: 0
-Epoch 009: | Time(s): 57.096| Train Loss: 234.4281 | Val Loss: 123.7735
-Model is not saved! Current val Loss: 123.7735
+Epoch 004: | Time(s): 56.229| Train Loss: 2214.3851 | Val Loss: 5135.7528
+Model is not saved! Current val Loss: 5135.7528
 count: 1
+Epoch 005: | Time(s): 57.511| Train Loss: 1487.5889 | Val Loss: 688.4254
+Best model Saved! Val MSE: 688.4254
+W1:61.79|W2:58.50|W3:47.18|W4:44.78|W5:43.51|W6:43.34|W7:44.04|W8:44.29|W9:44.52|W10:43.94|W11:43.16|W12:42.61|W13:42.45|W14:42.29|W15:42.04
+count: 0
+Epoch 006: | Time(s): 57.431| Train Loss: 1191.4762 | Val Loss: 1377.6114
+Model is not saved! Current val Loss: 1377.6114
+count: 1
+Epoch 007: | Time(s): 57.546| Train Loss: 965.8700 | Val Loss: 893.9373
+Model is not saved! Current val Loss: 893.9373
+count: 2
+Epoch 008: | Time(s): 58.539| Train Loss: 895.5762 | Val Loss: 952.1510
+Model is not saved! Current val Loss: 952.1510
+count: 3
+Epoch 009: | Time(s): 58.646| Train Loss: 866.8505 | Val Loss: 901.1746
+Model is not saved! Current val Loss: 901.1746
+count: 4
+Epoch 010: | Time(s): 57.376| Train Loss: 830.4689 | Val Loss: 391.2162
+Best model Saved! Val MSE: 391.2162
+W1:31.14|W2:30.10|W3:27.55|W4:26.56|W5:26.07|W6:25.88|W7:26.63|W8:25.48|W9:25.60|W10:25.00|W11:24.63|W12:24.69|W13:24.14|W14:24.03|W15:23.71
+count: 0
+Epoch 011: | Time(s): 56.602| Train Loss: 815.7349 | Val Loss: 1376.0238
+Model is not saved! Current val Loss: 1376.0238
+count: 1
+Epoch 012: | Time(s): 57.125| Train Loss: 801.3389 | Val Loss: 1634.4928
+Model is not saved! Current val Loss: 1634.4928
+count: 2
+Epoch 013: | Time(s): 57.736| Train Loss: 834.2327 | Val Loss: 484.8100
+Model is not saved! Current val Loss: 484.8100
+count: 3
+Epoch 014: | Time(s): 57.444| Train Loss: 804.9655 | Val Loss: 523.5135
+Model is not saved! Current val Loss: 523.5135
+count: 4
+Epoch 015: | Time(s): 58.231| Train Loss: 785.5709 | Val Loss: 1093.8517
+Model is not saved! Current val Loss: 1093.8517
+count: 5
+Epoch 016: | Time(s): 57.231| Train Loss: 783.5921 | Val Loss: 1009.3955
+Model is not saved! Current val Loss: 1009.3955
+count: 6
+Epoch 017: | Time(s): 57.042| Train Loss: 780.6688 | Val Loss: 619.1160
+Model is not saved! Current val Loss: 619.1160
+count: 7
+Epoch 018: | Time(s): 57.591| Train Loss: 755.3597 | Val Loss: 1938.0528
+Model is not saved! Current val Loss: 1938.0528
+count: 8
+Epoch 019: | Time(s): 58.141| Train Loss: 754.3237 | Val Loss: 1034.0560
+Model is not saved! Current val Loss: 1034.0560
+count: 9
+Epoch 020: | Time(s): 57.192| Train Loss: 756.2731 | Val Loss: 483.9582
+Model is not saved! Current val Loss: 483.9582
+count: 10
+Epoch 021: | Time(s): 57.205| Train Loss: 774.0160 | Val Loss: 549.7555
+Model is not saved! Current val Loss: 549.7555
+count: 11
+Epoch 022: | Time(s): 57.054| Train Loss: 732.0943 | Val Loss: 393.1799
+Model is not saved! Current val Loss: 393.1799
+count: 12
+Epoch 023: | Time(s): 56.032| Train Loss: 721.6455 | Val Loss: 469.2401
+Model is not saved! Current val Loss: 469.2401
+count: 13
+Epoch 024: | Time(s): 56.861| Train Loss: 725.3996 | Val Loss: 774.0988
+Model is not saved! Current val Loss: 774.0988
+count: 14
+Epoch 025: | Time(s): 57.850| Train Loss: 739.6929 | Val Loss: 1553.9034
+Model is not saved! Current val Loss: 1553.9034
+count: 15
+Epoch 026: | Time(s): 56.290| Train Loss: 708.5843 | Val Loss: 1773.5263
+Model is not saved! Current val Loss: 1773.5263
+count: 16
+Epoch 027: | Time(s): 56.790| Train Loss: 702.0565 | Val Loss: 2053.8342
+Model is not saved! Current val Loss: 2053.8342
+count: 17
+Epoch 028: | Time(s): 57.488| Train Loss: 686.0945 | Val Loss: 2507.8107
+Model is not saved! Current val Loss: 2507.8107
+count: 18
+Epoch 029: | Time(s): 57.135| Train Loss: 682.4551 | Val Loss: 447.6562
+Model is not saved! Current val Loss: 447.6562
+count: 19
+Epoch 030: | Time(s): 56.442| Train Loss: 681.4128 | Val Loss: 479.0851
+Model is not saved! Current val Loss: 479.0851
+count: 20
+Epoch 031: | Time(s): 56.047| Train Loss: 672.3139 | Val Loss: 468.4570
+Model is not saved! Current val Loss: 468.4570
+count: 21
+Epoch 032: | Time(s): 57.119| Train Loss: 674.5123 | Val Loss: 457.0624
+Model is not saved! Current val Loss: 457.0624
+count: 22
+Epoch 033: | Time(s): 56.948| Train Loss: 654.1743 | Val Loss: 770.3316
+Model is not saved! Current val Loss: 770.3316
+count: 23
+Epoch 034: | Time(s): 57.814| Train Loss: 655.1699 | Val Loss: 469.6990
+Model is not saved! Current val Loss: 469.6990
+count: 24
+Epoch 035: | Time(s): 56.463| Train Loss: 652.2181 | Val Loss: 442.6567
+Model is not saved! Current val Loss: 442.6567
+count: 25
+Epoch 036: | Time(s): 56.666| Train Loss: 633.5463 | Val Loss: 389.2451
+Best model Saved! Val MSE: 389.2451
+W1:39.40|W2:34.12|W3:26.70|W4:24.75|W5:24.80|W6:24.41|W7:24.61|W8:24.23|W9:24.08|W10:23.86|W11:23.62|W12:23.54|W13:23.58|W14:23.76|W15:23.78
+count: 0
+Epoch 037: | Time(s): 57.020| Train Loss: 621.5906 | Val Loss: 490.2900
+Model is not saved! Current val Loss: 490.2900
+count: 1
+Epoch 038: | Time(s): 57.075| Train Loss: 631.9606 | Val Loss: 3146.0684
+Model is not saved! Current val Loss: 3146.0684
+count: 2
+Epoch 039: | Time(s): 56.719| Train Loss: 625.9738 | Val Loss: 1525.3983
+Model is not saved! Current val Loss: 1525.3983
+count: 3
+Epoch 040: | Time(s): 56.422| Train Loss: 641.8001 | Val Loss: 444.6837
+Model is not saved! Current val Loss: 444.6837
+count: 4
+Epoch 041: | Time(s): 57.607| Train Loss: 639.8201 | Val Loss: 1545.3676
+Model is not saved! Current val Loss: 1545.3676
+count: 5
+Epoch 042: | Time(s): 56.349| Train Loss: 616.1558 | Val Loss: 1589.8582
+Model is not saved! Current val Loss: 1589.8582
+count: 6
+Epoch 043: | Time(s): 56.837| Train Loss: 613.3676 | Val Loss: 2277.6093
+Model is not saved! Current val Loss: 2277.6093
+count: 7
+Epoch 044: | Time(s): 56.953| Train Loss: 592.0135 | Val Loss: 1090.0182
+Model is not saved! Current val Loss: 1090.0182
+count: 8
+Epoch 045: | Time(s): 57.073| Train Loss: 597.6729 | Val Loss: 491.8480
+Model is not saved! Current val Loss: 491.8480
+count: 9
+Epoch 046: | Time(s): 56.517| Train Loss: 568.7215 | Val Loss: 1545.0139
+Model is not saved! Current val Loss: 1545.0139
+count: 10
+Epoch 047: | Time(s): 56.882| Train Loss: 572.5070 | Val Loss: 2143.5325
+Model is not saved! Current val Loss: 2143.5325
+count: 11
+Epoch 048: | Time(s): 57.325| Train Loss: 576.4140 | Val Loss: 687.2161
+Model is not saved! Current val Loss: 687.2161
+count: 12
+Epoch 049: | Time(s): 56.381| Train Loss: 581.7521 | Val Loss: 2122.1652
+Model is not saved! Current val Loss: 2122.1652
+count: 13
+Epoch 050: | Time(s): 56.887| Train Loss: 585.5408 | Val Loss: 3253.5146
+Model is not saved! Current val Loss: 3253.5146
+count: 14
+Epoch 051: | Time(s): 57.854| Train Loss: 561.5216 | Val Loss: 4220.9646
+Model is not saved! Current val Loss: 4220.9646
+count: 15
+Epoch 052: | Time(s): 57.135| Train Loss: 580.2943 | Val Loss: 2670.1612
+Model is not saved! Current val Loss: 2670.1612
+count: 16
+Epoch 053: | Time(s): 56.751| Train Loss: 548.1607 | Val Loss: 3544.8887
+Model is not saved! Current val Loss: 3544.8887
+count: 17
+Epoch 054: | Time(s): 57.285| Train Loss: 538.8369 | Val Loss: 825.1054
+Model is not saved! Current val Loss: 825.1054
+count: 18
+Epoch 055: | Time(s): 56.263| Train Loss: 547.6056 | Val Loss: 1301.7619
+Model is not saved! Current val Loss: 1301.7619
+count: 19
+Epoch 056: | Time(s): 57.508| Train Loss: 552.6615 | Val Loss: 1742.9134
+Model is not saved! Current val Loss: 1742.9134
+count: 20
+Epoch 057: | Time(s): 57.358| Train Loss: 542.7433 | Val Loss: 1394.7924
+Model is not saved! Current val Loss: 1394.7924
+count: 21
+Epoch 058: | Time(s): 55.907| Train Loss: 552.5549 | Val Loss: 2831.5214
+Model is not saved! Current val Loss: 2831.5214
+count: 22
+Epoch 059: | Time(s): 57.424| Train Loss: 523.2561 | Val Loss: 2435.8301
+Model is not saved! Current val Loss: 2435.8301
+count: 23
+Epoch 060: | Time(s): 56.920| Train Loss: 526.3037 | Val Loss: 3683.6549
+Model is not saved! Current val Loss: 3683.6549
+count: 24
+Epoch 061: | Time(s): 58.618| Train Loss: 527.9822 | Val Loss: 2060.3274
+Model is not saved! Current val Loss: 2060.3274
+count: 25
+Epoch 062: | Time(s): 56.455| Train Loss: 515.9629 | Val Loss: 2316.6950
+Model is not saved! Current val Loss: 2316.6950
+count: 26
+Epoch 063: | Time(s): 56.831| Train Loss: 511.3961 | Val Loss: 2239.2442
+Model is not saved! Current val Loss: 2239.2442
+count: 27
+Epoch 064: | Time(s): 57.114| Train Loss: 497.1280 | Val Loss: 2457.1113
+Model is not saved! Current val Loss: 2457.1113
+count: 28
+Epoch 065: | Time(s): 56.781| Train Loss: 533.7645 | Val Loss: 1019.7083
+Model is not saved! Current val Loss: 1019.7083
+count: 29
+Epoch 066: | Time(s): 56.785| Train Loss: 511.5627 | Val Loss: 1104.4151
+Model is not saved! Current val Loss: 1104.4151
+count: 30
+Epoch 067: | Time(s): 57.291| Train Loss: 505.4219 | Val Loss: 3188.5527
+Model is not saved! Current val Loss: 3188.5527
+count: 31
+Epoch 068: | Time(s): 57.161| Train Loss: 502.5132 | Val Loss: 2258.7489
+Model is not saved! Current val Loss: 2258.7489
+count: 32
+Epoch 069: | Time(s): 57.285| Train Loss: 485.7342 | Val Loss: 1540.6702
+Model is not saved! Current val Loss: 1540.6702
+count: 33
+Epoch 070: | Time(s): 57.690| Train Loss: 495.7282 | Val Loss: 1995.1774
+Model is not saved! Current val Loss: 1995.1774
+count: 34
+Epoch 071: | Time(s): 57.740| Train Loss: 490.5361 | Val Loss: 593.2163
+Model is not saved! Current val Loss: 593.2163
+count: 35
+Epoch 072: | Time(s): 57.484| Train Loss: 480.5408 | Val Loss: 1467.2362
+Model is not saved! Current val Loss: 1467.2362
+count: 36
+Epoch 073: | Time(s): 57.949| Train Loss: 467.4547 | Val Loss: 1783.9400
+Model is not saved! Current val Loss: 1783.9400
+count: 37
+Epoch 074: | Time(s): 58.026| Train Loss: 475.6617 | Val Loss: 2459.2073
+Model is not saved! Current val Loss: 2459.2073
+count: 38
+Epoch 075: | Time(s): 58.241| Train Loss: 463.5222 | Val Loss: 1840.6267
+Model is not saved! Current val Loss: 1840.6267
+count: 39
+Epoch 076: | Time(s): 56.642| Train Loss: 472.8304 | Val Loss: 2184.3020
+Model is not saved! Current val Loss: 2184.3020
+count: 40
+Epoch 077: | Time(s): 57.265| Train Loss: 458.8580 | Val Loss: 1087.2194
+Model is not saved! Current val Loss: 1087.2194
+count: 41
+Epoch 078: | Time(s): 56.806| Train Loss: 449.3321 | Val Loss: 1724.5488
+Model is not saved! Current val Loss: 1724.5488
+count: 42
+Epoch 079: | Time(s): 57.917| Train Loss: 453.0440 | Val Loss: 2148.1450
+Model is not saved! Current val Loss: 2148.1450
+count: 43
+Epoch 080: | Time(s): 56.404| Train Loss: 452.7113 | Val Loss: 2604.4484
+Model is not saved! Current val Loss: 2604.4484
+count: 44
+Epoch 081: | Time(s): 57.578| Train Loss: 466.0061 | Val Loss: 2641.7902
+Model is not saved! Current val Loss: 2641.7902
+count: 45
+Epoch 082: | Time(s): 57.505| Train Loss: 446.5954 | Val Loss: 3286.3701
+Model is not saved! Current val Loss: 3286.3701
+count: 46
+Epoch 083: | Time(s): 57.041| Train Loss: 443.8343 | Val Loss: 584.4962
+Model is not saved! Current val Loss: 584.4962
+count: 47
+Epoch 084: | Time(s): 57.122| Train Loss: 450.9400 | Val Loss: 2194.7846
+Model is not saved! Current val Loss: 2194.7846
+count: 48
+Epoch 085: | Time(s): 56.858| Train Loss: 464.1590 | Val Loss: 535.0497
+Model is not saved! Current val Loss: 535.0497
+count: 49
+Epoch 086: | Time(s): 57.562| Train Loss: 448.7283 | Val Loss: 757.0936
+Model is not saved! Current val Loss: 757.0936
+count: 50
+Epoch 087: | Time(s): 56.954| Train Loss: 430.8701 | Val Loss: 3349.1931
+Model is not saved! Current val Loss: 3349.1931
+count: 51
+Epoch 088: | Time(s): 57.371| Train Loss: 428.4925 | Val Loss: 664.0452
+Model is not saved! Current val Loss: 664.0452
+count: 52
+Epoch 089: | Time(s): 56.351| Train Loss: 426.9653 | Val Loss: 1427.5841
+Model is not saved! Current val Loss: 1427.5841
+count: 53
+Epoch 090: | Time(s): 58.448| Train Loss: 432.6382 | Val Loss: 1186.9915
+Model is not saved! Current val Loss: 1186.9915
+count: 54
+Epoch 091: | Time(s): 57.611| Train Loss: 437.5658 | Val Loss: 2233.3287
+Model is not saved! Current val Loss: 2233.3287
+count: 55
+Epoch 092: | Time(s): 58.067| Train Loss: 437.2565 | Val Loss: 2312.1009
+Model is not saved! Current val Loss: 2312.1009
+count: 56
+Epoch 093: | Time(s): 57.077| Train Loss: 407.5652 | Val Loss: 2656.6623
+Model is not saved! Current val Loss: 2656.6623
+count: 57
+Epoch 094: | Time(s): 56.472| Train Loss: 426.9002 | Val Loss: 2563.7595
+Model is not saved! Current val Loss: 2563.7595
+count: 58
+Epoch 095: | Time(s): 56.989| Train Loss: 414.9272 | Val Loss: 3583.3423
+Model is not saved! Current val Loss: 3583.3423
+count: 59
+Epoch 096: | Time(s): 57.249| Train Loss: 407.2988 | Val Loss: 2571.0649
+Model is not saved! Current val Loss: 2571.0649
+count: 60
+Epoch 097: | Time(s): 56.790| Train Loss: 407.2860 | Val Loss: 2592.6276
+Model is not saved! Current val Loss: 2592.6276
+count: 61
+Epoch 098: | Time(s): 57.353| Train Loss: 402.5120 | Val Loss: 2091.9187
+Model is not saved! Current val Loss: 2091.9187
+count: 62
+Epoch 099: | Time(s): 57.711| Train Loss: 408.3371 | Val Loss: 2602.3556
+Model is not saved! Current val Loss: 2602.3556
+count: 63
+Epoch 100: | Time(s): 57.170| Train Loss: 407.7158 | Val Loss: 708.4063
+Model is not saved! Current val Loss: 708.4063
+count: 64
+Epoch 101: | Time(s): 57.242| Train Loss: 405.0596 | Val Loss: 2731.7822
+Model is not saved! Current val Loss: 2731.7822
+count: 65
+Epoch 102: | Time(s): 57.001| Train Loss: 397.2220 | Val Loss: 3543.1187
+Model is not saved! Current val Loss: 3543.1187
+count: 66
+Epoch 103: | Time(s): 57.151| Train Loss: 384.4894 | Val Loss: 2894.1174
+Model is not saved! Current val Loss: 2894.1174
+count: 67
+Epoch 104: | Time(s): 57.216| Train Loss: 383.9144 | Val Loss: 3800.2066
+Model is not saved! Current val Loss: 3800.2066
+count: 68
+Epoch 105: | Time(s): 58.686| Train Loss: 378.1580 | Val Loss: 875.3143
+Model is not saved! Current val Loss: 875.3143
+count: 69
+Epoch 106: | Time(s): 57.402| Train Loss: 389.5742 | Val Loss: 762.0019
+Model is not saved! Current val Loss: 762.0019
+count: 70
+Epoch 107: | Time(s): 56.677| Train Loss: 381.9725 | Val Loss: 1650.7672
+Model is not saved! Current val Loss: 1650.7672
+count: 71
+Epoch 108: | Time(s): 58.981| Train Loss: 374.4379 | Val Loss: 3115.6950
+Model is not saved! Current val Loss: 3115.6950
+count: 72
+Epoch 109: | Time(s): 55.450| Train Loss: 376.3581 | Val Loss: 3272.9407
+Model is not saved! Current val Loss: 3272.9407
+count: 73
+Epoch 110: | Time(s): 57.469| Train Loss: 374.4317 | Val Loss: 2152.3992
+Model is not saved! Current val Loss: 2152.3992
+count: 74
+Epoch 111: | Time(s): 56.936| Train Loss: 396.0208 | Val Loss: 1704.7601
+Model is not saved! Current val Loss: 1704.7601
+count: 75
+Epoch 112: | Time(s): 58.469| Train Loss: 376.0525 | Val Loss: 1931.0216
+Model is not saved! Current val Loss: 1931.0216
+count: 76
+Epoch 113: | Time(s): 56.879| Train Loss: 366.2413 | Val Loss: 3049.5705
+Model is not saved! Current val Loss: 3049.5705
+count: 77
+Epoch 114: | Time(s): 56.702| Train Loss: 367.2091 | Val Loss: 1635.9534
+Model is not saved! Current val Loss: 1635.9534
+count: 78
+Epoch 115: | Time(s): 57.830| Train Loss: 376.2506 | Val Loss: 2616.5270
+Model is not saved! Current val Loss: 2616.5270
+count: 79
+Epoch 116: | Time(s): 56.811| Train Loss: 382.8399 | Val Loss: 2848.8535
+Model is not saved! Current val Loss: 2848.8535
+count: 80
+Epoch 117: | Time(s): 57.844| Train Loss: 356.3667 | Val Loss: 3061.7253
+Model is not saved! Current val Loss: 3061.7253
+count: 81
+Epoch 118: | Time(s): 57.708| Train Loss: 357.0689 | Val Loss: 1950.7752
+Model is not saved! Current val Loss: 1950.7752
+count: 82
+Epoch 119: | Time(s): 59.185| Train Loss: 367.1016 | Val Loss: 1592.2766
+Model is not saved! Current val Loss: 1592.2766
+count: 83
+Epoch 120: | Time(s): 56.644| Train Loss: 346.1324 | Val Loss: 1358.7693
+Model is not saved! Current val Loss: 1358.7693
+count: 84
+Epoch 121: | Time(s): 56.617| Train Loss: 356.1429 | Val Loss: 949.8423
+Model is not saved! Current val Loss: 949.8423
+count: 85
+Epoch 122: | Time(s): 56.019| Train Loss: 349.5626 | Val Loss: 2309.2226
+Model is not saved! Current val Loss: 2309.2226
+count: 86
+Epoch 123: | Time(s): 55.865| Train Loss: 357.8846 | Val Loss: 613.1397
+Model is not saved! Current val Loss: 613.1397
+count: 87
+Epoch 124: | Time(s): 58.389| Train Loss: 377.0682 | Val Loss: 2199.9503
+Model is not saved! Current val Loss: 2199.9503
+count: 88
+Epoch 125: | Time(s): 56.928| Train Loss: 352.7805 | Val Loss: 1269.3686
+Model is not saved! Current val Loss: 1269.3686
+count: 89
+Epoch 126: | Time(s): 58.945| Train Loss: 362.3456 | Val Loss: 2176.4987
+Model is not saved! Current val Loss: 2176.4987
+count: 90
+Epoch 127: | Time(s): 56.679| Train Loss: 352.7000 | Val Loss: 686.3517
+Model is not saved! Current val Loss: 686.3517
+count: 91
+Epoch 128: | Time(s): 57.857| Train Loss: 351.2803 | Val Loss: 496.5727
+Model is not saved! Current val Loss: 496.5727
+count: 92
+Epoch 129: | Time(s): 56.819| Train Loss: 356.8480 | Val Loss: 2580.5757
+Model is not saved! Current val Loss: 2580.5757
+count: 93
+Epoch 130: | Time(s): 57.748| Train Loss: 339.6659 | Val Loss: 2311.1112
+Model is not saved! Current val Loss: 2311.1112
+count: 94
+Epoch 131: | Time(s): 56.800| Train Loss: 344.4363 | Val Loss: 2450.9919
+Model is not saved! Current val Loss: 2450.9919
+count: 95
+Epoch 132: | Time(s): 57.179| Train Loss: 339.3644 | Val Loss: 2194.8803
+Model is not saved! Current val Loss: 2194.8803
+count: 96
+Epoch 133: | Time(s): 57.260| Train Loss: 330.6289 | Val Loss: 3552.0172
+Model is not saved! Current val Loss: 3552.0172
+count: 97
+Epoch 134: | Time(s): 56.718| Train Loss: 343.3479 | Val Loss: 2295.8988
+Model is not saved! Current val Loss: 2295.8988
+count: 98
+Epoch 135: | Time(s): 57.149| Train Loss: 329.4920 | Val Loss: 1873.3640
+Model is not saved! Current val Loss: 1873.3640
+count: 99
+Epoch 136: | Time(s): 57.599| Train Loss: 318.4035 | Val Loss: 3140.3959
+Model is not saved! Current val Loss: 3140.3959
+count: 100
+Epoch 137: | Time(s): 57.272| Train Loss: 329.7446 | Val Loss: 1298.4047
+Model is not saved! Current val Loss: 1298.4047
+count: 101
+Epoch 138: | Time(s): 57.683| Train Loss: 327.1136 | Val Loss: 2312.5452
+Model is not saved! Current val Loss: 2312.5452
+count: 102
+Epoch 139: | Time(s): 56.673| Train Loss: 317.6347 | Val Loss: 2864.9839
+Model is not saved! Current val Loss: 2864.9839
+count: 103
+Epoch 140: | Time(s): 57.086| Train Loss: 321.7965 | Val Loss: 2838.7386
+Model is not saved! Current val Loss: 2838.7386
+count: 104
+Epoch 141: | Time(s): 57.121| Train Loss: 319.5948 | Val Loss: 2762.0956
+Model is not saved! Current val Loss: 2762.0956
+count: 105
+Epoch 142: | Time(s): 57.220| Train Loss: 320.4691 | Val Loss: 3045.1075
+Model is not saved! Current val Loss: 3045.1075
+count: 106
+Epoch 143: | Time(s): 57.291| Train Loss: 331.9711 | Val Loss: 2032.5696
+Model is not saved! Current val Loss: 2032.5696
+count: 107
+Epoch 144: | Time(s): 56.462| Train Loss: 318.2021 | Val Loss: 3415.3627
+Model is not saved! Current val Loss: 3415.3627
+count: 108
+Epoch 145: | Time(s): 57.501| Train Loss: 308.6070 | Val Loss: 2196.9011
+Model is not saved! Current val Loss: 2196.9011
+count: 109
+Epoch 146: | Time(s): 57.963| Train Loss: 320.7339 | Val Loss: 3092.8149
+Model is not saved! Current val Loss: 3092.8149
+count: 110
+Epoch 147: | Time(s): 57.592| Train Loss: 309.9367 | Val Loss: 2415.8801
+Model is not saved! Current val Loss: 2415.8801
+count: 111
+Epoch 148: | Time(s): 57.330| Train Loss: 323.9312 | Val Loss: 3482.1292
+Model is not saved! Current val Loss: 3482.1292
+count: 112
+Epoch 149: | Time(s): 57.323| Train Loss: 315.8747 | Val Loss: 2372.9513
+Model is not saved! Current val Loss: 2372.9513
+count: 113
+Epoch 150: | Time(s): 57.756| Train Loss: 308.0981 | Val Loss: 2000.1199
+Model is not saved! Current val Loss: 2000.1199
+count: 114
+Epoch 151: | Time(s): 58.236| Train Loss: 323.5508 | Val Loss: 2682.9208
+Model is not saved! Current val Loss: 2682.9208
+count: 115
+Epoch 152: | Time(s): 56.570| Train Loss: 310.2738 | Val Loss: 2121.5437
+Model is not saved! Current val Loss: 2121.5437
+count: 116
+Epoch 153: | Time(s): 57.391| Train Loss: 297.6528 | Val Loss: 2675.5815
+Model is not saved! Current val Loss: 2675.5815
+count: 117
+Epoch 154: | Time(s): 56.440| Train Loss: 304.0467 | Val Loss: 2358.9322
+Model is not saved! Current val Loss: 2358.9322
+count: 118
+Epoch 155: | Time(s): 56.966| Train Loss: 295.9855 | Val Loss: 2074.6515
+Model is not saved! Current val Loss: 2074.6515
+count: 119
+Epoch 156: | Time(s): 56.676| Train Loss: 299.1618 | Val Loss: 3604.8984
+Model is not saved! Current val Loss: 3604.8984
+count: 120
+Epoch 157: | Time(s): 56.296| Train Loss: 290.3676 | Val Loss: 1425.2509
+Model is not saved! Current val Loss: 1425.2509
+count: 121
+Epoch 158: | Time(s): 56.758| Train Loss: 301.3247 | Val Loss: 4207.6961
+Model is not saved! Current val Loss: 4207.6961
+count: 122
+Epoch 159: | Time(s): 57.891| Train Loss: 294.7954 | Val Loss: 2109.6233
+Model is not saved! Current val Loss: 2109.6233
+count: 123
+Epoch 160: | Time(s): 57.111| Train Loss: 300.6159 | Val Loss: 1248.6086
+Model is not saved! Current val Loss: 1248.6086
+count: 124
+Epoch 161: | Time(s): 56.075| Train Loss: 303.8109 | Val Loss: 2708.6012
+Model is not saved! Current val Loss: 2708.6012
+count: 125
+Epoch 162: | Time(s): 56.572| Train Loss: 293.2185 | Val Loss: 1282.2418
+Model is not saved! Current val Loss: 1282.2418
+count: 126
+Epoch 163: | Time(s): 57.323| Train Loss: 299.8339 | Val Loss: 3419.6284
+Model is not saved! Current val Loss: 3419.6284
+count: 127
+Epoch 164: | Time(s): 56.834| Train Loss: 292.1461 | Val Loss: 3321.9470
+Model is not saved! Current val Loss: 3321.9470
+count: 128
+Epoch 165: | Time(s): 57.327| Train Loss: 292.7897 | Val Loss: 1040.2924
+Model is not saved! Current val Loss: 1040.2924
+count: 129
+Epoch 166: | Time(s): 56.659| Train Loss: 280.5481 | Val Loss: 4015.0637
+Model is not saved! Current val Loss: 4015.0637
+count: 130
+Epoch 167: | Time(s): 56.793| Train Loss: 281.2744 | Val Loss: 1791.0388
+Model is not saved! Current val Loss: 1791.0388
+count: 131
+Epoch 168: | Time(s): 56.850| Train Loss: 289.3089 | Val Loss: 4089.6335
+Model is not saved! Current val Loss: 4089.6335
+count: 132
+Epoch 169: | Time(s): 56.708| Train Loss: 284.3527 | Val Loss: 1464.7013
+Model is not saved! Current val Loss: 1464.7013
+count: 133
+Epoch 170: | Time(s): 57.393| Train Loss: 276.5588 | Val Loss: 2925.3874
+Model is not saved! Current val Loss: 2925.3874
+count: 134
+Epoch 171: | Time(s): 56.926| Train Loss: 281.8362 | Val Loss: 2094.3244
+Model is not saved! Current val Loss: 2094.3244
+count: 135
+Epoch 172: | Time(s): 56.659| Train Loss: 286.3739 | Val Loss: 2581.8407
+Model is not saved! Current val Loss: 2581.8407
+count: 136
+Epoch 173: | Time(s): 59.088| Train Loss: 278.8854 | Val Loss: 993.8938
+Model is not saved! Current val Loss: 993.8938
+count: 137
+Epoch 174: | Time(s): 57.034| Train Loss: 274.4541 | Val Loss: 1791.9603
+Model is not saved! Current val Loss: 1791.9603
+count: 138
+Epoch 175: | Time(s): 57.215| Train Loss: 284.7947 | Val Loss: 2127.9801
+Model is not saved! Current val Loss: 2127.9801
+count: 139
+Epoch 176: | Time(s): 56.783| Train Loss: 278.9596 | Val Loss: 1280.7682
+Model is not saved! Current val Loss: 1280.7682
+count: 140
+Epoch 177: | Time(s): 56.138| Train Loss: 287.3474 | Val Loss: 3531.3211
+Model is not saved! Current val Loss: 3531.3211
+count: 141
+Epoch 178: | Time(s): 57.849| Train Loss: 273.7421 | Val Loss: 2580.1241
+Model is not saved! Current val Loss: 2580.1241
+count: 142
+Epoch 179: | Time(s): 55.975| Train Loss: 255.9605 | Val Loss: 3398.3739
+Model is not saved! Current val Loss: 3398.3739
+count: 143
+Epoch 180: | Time(s): 57.294| Train Loss: 269.1138 | Val Loss: 2459.9905
+Model is not saved! Current val Loss: 2459.9905
+count: 144
+Epoch 181: | Time(s): 55.892| Train Loss: 258.0573 | Val Loss: 3082.9097
+Model is not saved! Current val Loss: 3082.9097
+count: 145
+Epoch 182: | Time(s): 57.154| Train Loss: 254.8097 | Val Loss: 3713.9748
+Model is not saved! Current val Loss: 3713.9748
+count: 146
+Epoch 183: | Time(s): 57.840| Train Loss: 273.5664 | Val Loss: 1986.5686
+Model is not saved! Current val Loss: 1986.5686
+count: 147
+Epoch 184: | Time(s): 56.936| Train Loss: 271.3249 | Val Loss: 2524.8523
+Model is not saved! Current val Loss: 2524.8523
+count: 148
+Epoch 185: | Time(s): 57.368| Train Loss: 261.5638 | Val Loss: 2986.0362
+Model is not saved! Current val Loss: 2986.0362
+count: 149
+Epoch 186: | Time(s): 57.292| Train Loss: 252.5367 | Val Loss: 1896.7204
+Model is not saved! Current val Loss: 1896.7204
+count: 150
+Epoch 187: | Time(s): 57.045| Train Loss: 249.9931 | Val Loss: 3297.3625
+Model is not saved! Current val Loss: 3297.3625
+count: 151
+Epoch 188: | Time(s): 57.762| Train Loss: 277.8840 | Val Loss: 1518.1423
+Model is not saved! Current val Loss: 1518.1423
+count: 152
+Epoch 189: | Time(s): 55.831| Train Loss: 261.3869 | Val Loss: 1021.7837
+Model is not saved! Current val Loss: 1021.7837
+count: 153
+Epoch 190: | Time(s): 56.340| Train Loss: 253.6898 | Val Loss: 3076.0736
+Model is not saved! Current val Loss: 3076.0736
+count: 154
+Epoch 191: | Time(s): 57.372| Train Loss: 244.6844 | Val Loss: 2665.0508
+Model is not saved! Current val Loss: 2665.0508
+count: 155
+Epoch 192: | Time(s): 56.416| Train Loss: 243.7705 | Val Loss: 3129.6392
+Model is not saved! Current val Loss: 3129.6392
+count: 156
+Epoch 193: | Time(s): 56.621| Train Loss: 262.2971 | Val Loss: 1845.1561
+Model is not saved! Current val Loss: 1845.1561
+count: 157
+Epoch 194: | Time(s): 56.692| Train Loss: 243.9103 | Val Loss: 2688.1022
+Model is not saved! Current val Loss: 2688.1022
+count: 158
+Epoch 195: | Time(s): 56.849| Train Loss: 240.7281 | Val Loss: 1878.4019
+Model is not saved! Current val Loss: 1878.4019
+count: 159
+Epoch 196: | Time(s): 56.716| Train Loss: 241.4737 | Val Loss: 576.2963
+Model is not saved! Current val Loss: 576.2963
+count: 160
+Epoch 197: | Time(s): 56.498| Train Loss: 265.3804 | Val Loss: 1336.7728
+Model is not saved! Current val Loss: 1336.7728
+count: 161
+Epoch 198: | Time(s): 56.697| Train Loss: 252.4352 | Val Loss: 1270.1740
+Model is not saved! Current val Loss: 1270.1740
+count: 162
+Epoch 199: | Time(s): 56.818| Train Loss: 252.8625 | Val Loss: 3729.1561
+Model is not saved! Current val Loss: 3729.1561
+count: 163
+Epoch 200: | Time(s): 57.223| Train Loss: 255.9516 | Val Loss: 2182.2797
+Model is not saved! Current val Loss: 2182.2797
+count: 164
+Epoch 201: | Time(s): 57.199| Train Loss: 235.4426 | Val Loss: 2655.1412
+Model is not saved! Current val Loss: 2655.1412
+count: 165
+Epoch 202: | Time(s): 57.438| Train Loss: 248.9536 | Val Loss: 4064.2555
+Model is not saved! Current val Loss: 4064.2555
+count: 166
+Epoch 203: | Time(s): 57.448| Train Loss: 262.5949 | Val Loss: 1962.6471
+Model is not saved! Current val Loss: 1962.6471
+count: 167
+Epoch 204: | Time(s): 56.430| Train Loss: 248.2358 | Val Loss: 2183.3615
+Model is not saved! Current val Loss: 2183.3615
+count: 168
+Epoch 205: | Time(s): 57.135| Train Loss: 242.2011 | Val Loss: 3736.9095
+Model is not saved! Current val Loss: 3736.9095
+count: 169
+Epoch 206: | Time(s): 55.979| Train Loss: 267.4699 | Val Loss: 542.3423
+Model is not saved! Current val Loss: 542.3423
+count: 170
+Epoch 207: | Time(s): 56.964| Train Loss: 242.9923 | Val Loss: 561.9294
+Model is not saved! Current val Loss: 561.9294
+count: 171
+Epoch 208: | Time(s): 56.565| Train Loss: 234.8188 | Val Loss: 388.7188
+Best model Saved! Val MSE: 388.7188
+W1:43.64|W2:30.12|W3:26.92|W4:25.80|W5:25.25|W6:23.25|W7:23.11|W8:23.43|W9:23.76|W10:23.79|W11:24.06|W12:23.63|W13:24.31|W14:24.02|W15:23.63
+count: 0
+Epoch 209: | Time(s): 56.859| Train Loss: 236.1057 | Val Loss: 513.5898
+Model is not saved! Current val Loss: 513.5898
+count: 1
+Epoch 210: | Time(s): 57.066| Train Loss: 231.1200 | Val Loss: 449.4188
+Model is not saved! Current val Loss: 449.4188
+count: 2
+Epoch 211: | Time(s): 57.463| Train Loss: 233.9176 | Val Loss: 612.1423
+Model is not saved! Current val Loss: 612.1423
+count: 3
+Epoch 212: | Time(s): 56.870| Train Loss: 232.8231 | Val Loss: 730.4337
+Model is not saved! Current val Loss: 730.4337
+count: 4
+Epoch 213: | Time(s): 57.559| Train Loss: 239.9285 | Val Loss: 991.7402
+Model is not saved! Current val Loss: 991.7402
+count: 5
+Epoch 214: | Time(s): 57.078| Train Loss: 230.3313 | Val Loss: 1447.2137
+Model is not saved! Current val Loss: 1447.2137
+count: 6
+Epoch 215: | Time(s): 57.224| Train Loss: 230.0754 | Val Loss: 1720.5556
+Model is not saved! Current val Loss: 1720.5556
+count: 7
+Epoch 216: | Time(s): 58.361| Train Loss: 233.0572 | Val Loss: 859.8058
+Model is not saved! Current val Loss: 859.8058
+count: 8
+Epoch 217: | Time(s): 57.686| Train Loss: 225.1086 | Val Loss: 457.2252
+Model is not saved! Current val Loss: 457.2252
+count: 9
+Epoch 218: | Time(s): 56.618| Train Loss: 237.6727 | Val Loss: 3315.8318
+Model is not saved! Current val Loss: 3315.8318
+count: 10
+Epoch 219: | Time(s): 56.752| Train Loss: 250.0580 | Val Loss: 3684.2562
+Model is not saved! Current val Loss: 3684.2562
+count: 11
+Epoch 220: | Time(s): 57.216| Train Loss: 231.7342 | Val Loss: 473.9809
+Model is not saved! Current val Loss: 473.9809
+count: 12
+Epoch 221: | Time(s): 57.079| Train Loss: 240.1780 | Val Loss: 2297.1955
+Model is not saved! Current val Loss: 2297.1955
+count: 13
+Epoch 222: | Time(s): 56.970| Train Loss: 224.9782 | Val Loss: 745.9102
+Model is not saved! Current val Loss: 745.9102
+count: 14
+Epoch 223: | Time(s): 57.502| Train Loss: 222.3673 | Val Loss: 503.4405
+Model is not saved! Current val Loss: 503.4405
+count: 15
+Epoch 224: | Time(s): 56.502| Train Loss: 227.3340 | Val Loss: 1196.1120
+Model is not saved! Current val Loss: 1196.1120
+count: 16
+Epoch 225: | Time(s): 58.218| Train Loss: 220.7429 | Val Loss: 1240.8245
+Model is not saved! Current val Loss: 1240.8245
+count: 17
+Epoch 226: | Time(s): 57.380| Train Loss: 241.9039 | Val Loss: 2289.2920
+Model is not saved! Current val Loss: 2289.2920
+count: 18
+Epoch 227: | Time(s): 56.833| Train Loss: 235.4613 | Val Loss: 1809.4719
+Model is not saved! Current val Loss: 1809.4719
+count: 19
+Epoch 228: | Time(s): 58.660| Train Loss: 226.0010 | Val Loss: 2290.3326
+Model is not saved! Current val Loss: 2290.3326
+count: 20
+Epoch 229: | Time(s): 56.456| Train Loss: 229.1301 | Val Loss: 1639.8596
+Model is not saved! Current val Loss: 1639.8596
+count: 21
+Epoch 230: | Time(s): 56.947| Train Loss: 225.3703 | Val Loss: 1494.9561
+Model is not saved! Current val Loss: 1494.9561
+count: 22
+Epoch 231: | Time(s): 56.926| Train Loss: 220.6209 | Val Loss: 1089.5164
+Model is not saved! Current val Loss: 1089.5164
+count: 23
+Epoch 232: | Time(s): 57.163| Train Loss: 216.2355 | Val Loss: 2029.5453
+Model is not saved! Current val Loss: 2029.5453
+count: 24
+Epoch 233: | Time(s): 56.696| Train Loss: 216.4156 | Val Loss: 3022.0787
+Model is not saved! Current val Loss: 3022.0787
+count: 25
+Epoch 234: | Time(s): 56.522| Train Loss: 226.3000 | Val Loss: 2110.1436
+Model is not saved! Current val Loss: 2110.1436
+count: 26
+Epoch 235: | Time(s): 57.070| Train Loss: 245.7445 | Val Loss: 1347.7394
+Model is not saved! Current val Loss: 1347.7394
+count: 27
+Epoch 236: | Time(s): 57.205| Train Loss: 220.2883 | Val Loss: 2138.1824
+Model is not saved! Current val Loss: 2138.1824
+count: 28
+Epoch 237: | Time(s): 56.063| Train Loss: 215.5926 | Val Loss: 1115.4581
+Model is not saved! Current val Loss: 1115.4581
+count: 29
+Epoch 238: | Time(s): 57.387| Train Loss: 217.7081 | Val Loss: 1507.1736
+Model is not saved! Current val Loss: 1507.1736
+count: 30
+Epoch 239: | Time(s): 56.870| Train Loss: 213.6527 | Val Loss: 4014.8608
+Model is not saved! Current val Loss: 4014.8608
+count: 31
+Epoch 240: | Time(s): 55.831| Train Loss: 219.9925 | Val Loss: 2243.3049
+Model is not saved! Current val Loss: 2243.3049
+count: 32
+Epoch 241: | Time(s): 57.088| Train Loss: 213.7444 | Val Loss: 1094.0818
+Model is not saved! Current val Loss: 1094.0818
+count: 33
+Epoch 242: | Time(s): 57.860| Train Loss: 226.4305 | Val Loss: 534.7522
+Model is not saved! Current val Loss: 534.7522
+count: 34
+Epoch 243: | Time(s): 57.151| Train Loss: 215.0899 | Val Loss: 1136.6267
+Model is not saved! Current val Loss: 1136.6267
+count: 35
+Epoch 244: | Time(s): 58.330| Train Loss: 212.6721 | Val Loss: 849.4865
+Model is not saved! Current val Loss: 849.4865
+count: 36
+Epoch 245: | Time(s): 56.986| Train Loss: 214.1587 | Val Loss: 1988.9314
+Model is not saved! Current val Loss: 1988.9314
+count: 37
+Epoch 246: | Time(s): 56.509| Train Loss: 213.6366 | Val Loss: 2975.2301
+Model is not saved! Current val Loss: 2975.2301
+count: 38
+Epoch 247: | Time(s): 56.427| Train Loss: 209.6984 | Val Loss: 2310.7723
+Model is not saved! Current val Loss: 2310.7723
+count: 39
+Epoch 248: | Time(s): 56.238| Train Loss: 219.9125 | Val Loss: 2499.0951
+Model is not saved! Current val Loss: 2499.0951
+count: 40
+Epoch 249: | Time(s): 56.144| Train Loss: 229.9957 | Val Loss: 662.5623
+Model is not saved! Current val Loss: 662.5623
+count: 41
+Epoch 250: | Time(s): 57.152| Train Loss: 221.6418 | Val Loss: 641.1436
+Model is not saved! Current val Loss: 641.1436
+count: 42
+Epoch 251: | Time(s): 57.075| Train Loss: 213.4799 | Val Loss: 1146.7195
+Model is not saved! Current val Loss: 1146.7195
+count: 43
+Epoch 252: | Time(s): 56.917| Train Loss: 203.0157 | Val Loss: 784.2226
+Model is not saved! Current val Loss: 784.2226
+count: 44
+Epoch 253: | Time(s): 57.135| Train Loss: 203.7146 | Val Loss: 558.7618
+Model is not saved! Current val Loss: 558.7618
+count: 45
+Epoch 254: | Time(s): 57.169| Train Loss: 212.7761 | Val Loss: 1705.2804
+Model is not saved! Current val Loss: 1705.2804
+count: 46
+Epoch 255: | Time(s): 56.658| Train Loss: 234.9772 | Val Loss: 3293.5746
+Model is not saved! Current val Loss: 3293.5746
+count: 47
+Epoch 256: | Time(s): 57.024| Train Loss: 228.2347 | Val Loss: 4225.2372
+Model is not saved! Current val Loss: 4225.2372
+count: 48
+Epoch 257: | Time(s): 56.353| Train Loss: 216.2793 | Val Loss: 5952.8698
+Model is not saved! Current val Loss: 5952.8698
+count: 49
+Epoch 258: | Time(s): 57.620| Train Loss: 216.8978 | Val Loss: 1949.2188
+Model is not saved! Current val Loss: 1949.2188
+count: 50
+Epoch 259: | Time(s): 58.452| Train Loss: 202.3661 | Val Loss: 1541.1081
+Model is not saved! Current val Loss: 1541.1081
+count: 51
+Epoch 260: | Time(s): 56.542| Train Loss: 205.9937 | Val Loss: 5143.7943
+Model is not saved! Current val Loss: 5143.7943
+count: 52
+Epoch 261: | Time(s): 57.022| Train Loss: 226.5057 | Val Loss: 4270.1874
+Model is not saved! Current val Loss: 4270.1874
+count: 53
+Epoch 262: | Time(s): 57.426| Train Loss: 218.4373 | Val Loss: 2806.5713
+Model is not saved! Current val Loss: 2806.5713
+count: 54
+Epoch 263: | Time(s): 57.311| Train Loss: 208.6938 | Val Loss: 2257.0945
+Model is not saved! Current val Loss: 2257.0945
+count: 55
+Epoch 264: | Time(s): 56.822| Train Loss: 223.5656 | Val Loss: 589.4063
+Model is not saved! Current val Loss: 589.4063
+count: 56
+Epoch 265: | Time(s): 56.884| Train Loss: 202.6292 | Val Loss: 506.6515
+Model is not saved! Current val Loss: 506.6515
+count: 57
+Epoch 266: | Time(s): 57.432| Train Loss: 202.2657 | Val Loss: 716.4068
+Model is not saved! Current val Loss: 716.4068
+count: 58
+Epoch 267: | Time(s): 55.660| Train Loss: 209.3896 | Val Loss: 835.5131
+Model is not saved! Current val Loss: 835.5131
+count: 59
+Epoch 268: | Time(s): 57.888| Train Loss: 219.5135 | Val Loss: 3742.8773
+Model is not saved! Current val Loss: 3742.8773
+count: 60
+Epoch 269: | Time(s): 56.155| Train Loss: 208.4345 | Val Loss: 2969.8047
+Model is not saved! Current val Loss: 2969.8047
+count: 61
+Epoch 270: | Time(s): 57.413| Train Loss: 205.9338 | Val Loss: 6013.6475
+Model is not saved! Current val Loss: 6013.6475
+count: 62
+Epoch 271: | Time(s): 57.017| Train Loss: 231.0062 | Val Loss: 1426.6520
+Model is not saved! Current val Loss: 1426.6520
+count: 63
+Epoch 272: | Time(s): 57.348| Train Loss: 207.0819 | Val Loss: 2027.5821
+Model is not saved! Current val Loss: 2027.5821
+count: 64
+Epoch 273: | Time(s): 58.923| Train Loss: 204.6151 | Val Loss: 791.2154
+Model is not saved! Current val Loss: 791.2154
+count: 65
+Epoch 274: | Time(s): 57.810| Train Loss: 206.3838 | Val Loss: 2278.9572
+Model is not saved! Current val Loss: 2278.9572
+count: 66
+Epoch 275: | Time(s): 57.265| Train Loss: 202.1604 | Val Loss: 884.0622
+Model is not saved! Current val Loss: 884.0622
+count: 67
+Epoch 276: | Time(s): 56.369| Train Loss: 207.0034 | Val Loss: 1246.1796
+Model is not saved! Current val Loss: 1246.1796
+count: 68
+Epoch 277: | Time(s): 57.768| Train Loss: 209.7635 | Val Loss: 609.3396
+Model is not saved! Current val Loss: 609.3396
+count: 69
+Epoch 278: | Time(s): 56.977| Train Loss: 200.6628 | Val Loss: 1940.5341
+Model is not saved! Current val Loss: 1940.5341
+count: 70
+Epoch 279: | Time(s): 57.434| Train Loss: 207.6230 | Val Loss: 1524.3097
+Model is not saved! Current val Loss: 1524.3097
+count: 71
+Epoch 280: | Time(s): 56.387| Train Loss: 219.4798 | Val Loss: 516.7074
+Model is not saved! Current val Loss: 516.7074
+count: 72
+Epoch 281: | Time(s): 56.188| Train Loss: 215.4765 | Val Loss: 2451.4777
+Model is not saved! Current val Loss: 2451.4777
+count: 73
+Epoch 282: | Time(s): 58.633| Train Loss: 204.2558 | Val Loss: 735.5839
+Model is not saved! Current val Loss: 735.5839
+count: 74
+Epoch 283: | Time(s): 57.189| Train Loss: 208.5688 | Val Loss: 1733.8769
+Model is not saved! Current val Loss: 1733.8769
+count: 75
+Epoch 284: | Time(s): 56.393| Train Loss: 204.4192 | Val Loss: 1660.8573
+Model is not saved! Current val Loss: 1660.8573
+count: 76
+Epoch 285: | Time(s): 56.596| Train Loss: 208.9726 | Val Loss: 457.6647
+Model is not saved! Current val Loss: 457.6647
+count: 77
+Epoch 286: | Time(s): 56.707| Train Loss: 201.8773 | Val Loss: 753.0733
+Model is not saved! Current val Loss: 753.0733
+count: 78
+Epoch 287: | Time(s): 56.601| Train Loss: 205.5978 | Val Loss: 2213.2238
+Model is not saved! Current val Loss: 2213.2238
+count: 79
+Epoch 288: | Time(s): 56.631| Train Loss: 199.5227 | Val Loss: 497.8165
+Model is not saved! Current val Loss: 497.8165
+count: 80
+Epoch 289: | Time(s): 56.827| Train Loss: 201.7511 | Val Loss: 472.3204
+Model is not saved! Current val Loss: 472.3204
+count: 81
+Epoch 290: | Time(s): 56.204| Train Loss: 200.6893 | Val Loss: 1278.3124
+Model is not saved! Current val Loss: 1278.3124
+count: 82
+Epoch 291: | Time(s): 57.063| Train Loss: 207.4497 | Val Loss: 421.8469
+Model is not saved! Current val Loss: 421.8469
+count: 83
+Epoch 292: | Time(s): 56.278| Train Loss: 199.6631 | Val Loss: 594.7594
+Model is not saved! Current val Loss: 594.7594
+count: 84
+Epoch 293: | Time(s): 56.688| Train Loss: 198.8959 | Val Loss: 1040.3782
+Model is not saved! Current val Loss: 1040.3782
+count: 85
+Epoch 294: | Time(s): 57.428| Train Loss: 210.4411 | Val Loss: 1829.8458
+Model is not saved! Current val Loss: 1829.8458
+count: 86
+Epoch 295: | Time(s): 58.737| Train Loss: 202.0895 | Val Loss: 2438.0864
+Model is not saved! Current val Loss: 2438.0864
+count: 87
+Epoch 296: | Time(s): 56.974| Train Loss: 205.0401 | Val Loss: 712.6071
+Model is not saved! Current val Loss: 712.6071
+count: 88
+Epoch 297: | Time(s): 55.315| Train Loss: 196.4031 | Val Loss: 3395.5983
+Model is not saved! Current val Loss: 3395.5983
+count: 89
+Epoch 298: | Time(s): 57.162| Train Loss: 197.7284 | Val Loss: 4983.0799
+Model is not saved! Current val Loss: 4983.0799
+count: 90
+Epoch 299: | Time(s): 57.317| Train Loss: 193.6791 | Val Loss: 1261.6167
+Model is not saved! Current val Loss: 1261.6167
+count: 91
+Epoch 300: | Time(s): 57.353| Train Loss: 201.2950 | Val Loss: 981.6007
+Model is not saved! Current val Loss: 981.6007
+count: 92
+Epoch 301: | Time(s): 58.468| Train Loss: 198.4825 | Val Loss: 1730.9479
+Model is not saved! Current val Loss: 1730.9479
+count: 93
+Epoch 302: | Time(s): 56.229| Train Loss: 195.2762 | Val Loss: 3308.2041
+Model is not saved! Current val Loss: 3308.2041
+count: 94
+Epoch 303: | Time(s): 57.331| Train Loss: 195.2659 | Val Loss: 3151.3123
+Model is not saved! Current val Loss: 3151.3123
+count: 95
+Epoch 304: | Time(s): 56.355| Train Loss: 195.8378 | Val Loss: 984.7340
+Model is not saved! Current val Loss: 984.7340
+count: 96
+Epoch 305: | Time(s): 56.626| Train Loss: 208.8160 | Val Loss: 603.5579
+Model is not saved! Current val Loss: 603.5579
+count: 97
+Epoch 306: | Time(s): 57.588| Train Loss: 202.5530 | Val Loss: 517.6712
+Model is not saved! Current val Loss: 517.6712
+count: 98
+Epoch 307: | Time(s): 56.855| Train Loss: 196.0686 | Val Loss: 1355.4876
+Model is not saved! Current val Loss: 1355.4876
+count: 99
+Epoch 308: | Time(s): 57.076| Train Loss: 209.7867 | Val Loss: 524.7237
+Model is not saved! Current val Loss: 524.7237
+count: 100
+Epoch 309: | Time(s): 56.831| Train Loss: 210.7951 | Val Loss: 523.4258
+Model is not saved! Current val Loss: 523.4258
+count: 101
+Epoch 310: | Time(s): 57.077| Train Loss: 218.3634 | Val Loss: 4800.5730
+Model is not saved! Current val Loss: 4800.5730
+count: 102
+Epoch 311: | Time(s): 56.164| Train Loss: 214.5468 | Val Loss: 1637.1315
+Model is not saved! Current val Loss: 1637.1315
+count: 103
+Epoch 312: | Time(s): 57.114| Train Loss: 203.9693 | Val Loss: 824.8132
+Model is not saved! Current val Loss: 824.8132
+count: 104
+Epoch 313: | Time(s): 57.204| Train Loss: 194.6057 | Val Loss: 545.8565
+Model is not saved! Current val Loss: 545.8565
+count: 105
+Epoch 314: | Time(s): 57.273| Train Loss: 199.5848 | Val Loss: 1501.5435
+Model is not saved! Current val Loss: 1501.5435
+count: 106
+Epoch 315: | Time(s): 57.429| Train Loss: 200.5331 | Val Loss: 857.4939
+Model is not saved! Current val Loss: 857.4939
+count: 107
+Epoch 316: | Time(s): 57.899| Train Loss: 192.0293 | Val Loss: 693.9574
+Model is not saved! Current val Loss: 693.9574
+count: 108
+Epoch 317: | Time(s): 56.479| Train Loss: 188.8836 | Val Loss: 562.8615
+Model is not saved! Current val Loss: 562.8615
+count: 109
+Epoch 318: | Time(s): 56.954| Train Loss: 192.7620 | Val Loss: 587.5283
+Model is not saved! Current val Loss: 587.5283
+count: 110
+Epoch 319: | Time(s): 57.329| Train Loss: 207.0860 | Val Loss: 1126.6176
+Model is not saved! Current val Loss: 1126.6176
+count: 111
+Epoch 320: | Time(s): 56.434| Train Loss: 199.3931 | Val Loss: 1052.2156
+Model is not saved! Current val Loss: 1052.2156
+count: 112
+Epoch 321: | Time(s): 57.152| Train Loss: 192.8290 | Val Loss: 829.2159
+Model is not saved! Current val Loss: 829.2159
+count: 113
+Epoch 322: | Time(s): 57.443| Train Loss: 195.9944 | Val Loss: 2115.8202
+Model is not saved! Current val Loss: 2115.8202
+count: 114
+Epoch 323: | Time(s): 56.840| Train Loss: 201.0852 | Val Loss: 563.1826
+Model is not saved! Current val Loss: 563.1826
+count: 115
+Epoch 324: | Time(s): 57.160| Train Loss: 199.5672 | Val Loss: 526.2058
+Model is not saved! Current val Loss: 526.2058
+count: 116
+Epoch 325: | Time(s): 55.985| Train Loss: 198.8852 | Val Loss: 837.0112
+Model is not saved! Current val Loss: 837.0112
+count: 117
+Epoch 326: | Time(s): 56.868| Train Loss: 200.0339 | Val Loss: 509.9188
+Model is not saved! Current val Loss: 509.9188
+count: 118
+Epoch 327: | Time(s): 56.808| Train Loss: 190.4744 | Val Loss: 1447.8904
+Model is not saved! Current val Loss: 1447.8904
+count: 119
+Epoch 328: | Time(s): 56.864| Train Loss: 204.8322 | Val Loss: 522.0645
+Model is not saved! Current val Loss: 522.0645
+count: 120
+Epoch 329: | Time(s): 57.731| Train Loss: 195.6446 | Val Loss: 638.7718
+Model is not saved! Current val Loss: 638.7718
+count: 121
+Epoch 330: | Time(s): 57.389| Train Loss: 191.9063 | Val Loss: 784.8969
+Model is not saved! Current val Loss: 784.8969
+count: 122
+Epoch 331: | Time(s): 57.215| Train Loss: 192.1696 | Val Loss: 1452.5942
+Model is not saved! Current val Loss: 1452.5942
+count: 123
+Epoch 332: | Time(s): 57.447| Train Loss: 193.9361 | Val Loss: 679.3211
+Model is not saved! Current val Loss: 679.3211
+count: 124
+Epoch 333: | Time(s): 57.905| Train Loss: 210.3598 | Val Loss: 476.0992
+Model is not saved! Current val Loss: 476.0992
+count: 125
+Epoch 334: | Time(s): 57.384| Train Loss: 198.7822 | Val Loss: 1714.0257
+Model is not saved! Current val Loss: 1714.0257
+count: 126
+Epoch 335: | Time(s): 57.731| Train Loss: 193.2835 | Val Loss: 461.1094
+Model is not saved! Current val Loss: 461.1094
+count: 127
+Epoch 336: | Time(s): 57.140| Train Loss: 192.1235 | Val Loss: 568.2653
+Model is not saved! Current val Loss: 568.2653
+count: 128
+Epoch 337: | Time(s): 58.244| Train Loss: 188.4332 | Val Loss: 1699.0980
+Model is not saved! Current val Loss: 1699.0980
+count: 129
+Epoch 338: | Time(s): 57.044| Train Loss: 187.9595 | Val Loss: 2091.9106
+Model is not saved! Current val Loss: 2091.9106
+count: 130
+Epoch 339: | Time(s): 58.239| Train Loss: 190.7053 | Val Loss: 1069.7634
+Model is not saved! Current val Loss: 1069.7634
+count: 131
+Epoch 340: | Time(s): 57.017| Train Loss: 195.5783 | Val Loss: 2103.5661
+Model is not saved! Current val Loss: 2103.5661
+count: 132
+Epoch 341: | Time(s): 58.155| Train Loss: 212.1717 | Val Loss: 779.7669
+Model is not saved! Current val Loss: 779.7669
+count: 133
+Epoch 342: | Time(s): 57.069| Train Loss: 195.6822 | Val Loss: 800.9411
+Model is not saved! Current val Loss: 800.9411
+count: 134
+Epoch 343: | Time(s): 57.529| Train Loss: 214.1059 | Val Loss: 2237.3457
+Model is not saved! Current val Loss: 2237.3457
+count: 135
+Epoch 344: | Time(s): 57.279| Train Loss: 197.4666 | Val Loss: 1730.5611
+Model is not saved! Current val Loss: 1730.5611
+count: 136
+Epoch 345: | Time(s): 56.581| Train Loss: 191.5842 | Val Loss: 692.2263
+Model is not saved! Current val Loss: 692.2263
+count: 137
+Epoch 346: | Time(s): 58.681| Train Loss: 192.7946 | Val Loss: 1933.3335
+Model is not saved! Current val Loss: 1933.3335
+count: 138
+Epoch 347: | Time(s): 57.334| Train Loss: 190.3913 | Val Loss: 1722.9480
+Model is not saved! Current val Loss: 1722.9480
+count: 139
+Epoch 348: | Time(s): 56.046| Train Loss: 192.6566 | Val Loss: 615.7434
+Model is not saved! Current val Loss: 615.7434
+count: 140
+Epoch 349: | Time(s): 56.432| Train Loss: 192.4703 | Val Loss: 1042.7798
+Model is not saved! Current val Loss: 1042.7798
+count: 141
+Epoch 350: | Time(s): 57.127| Train Loss: 189.5275 | Val Loss: 3289.3491
+Model is not saved! Current val Loss: 3289.3491
+count: 142
+Epoch 351: | Time(s): 55.930| Train Loss: 209.3508 | Val Loss: 364.0710
+Best model Saved! Val MSE: 364.0710
+W1:47.56|W2:37.24|W3:27.11|W4:21.89|W5:21.15|W6:20.60|W7:20.79|W8:20.90|W9:21.11|W10:21.02|W11:20.84|W12:20.08|W13:20.06|W14:21.09|W15:22.63
+count: 0
+Epoch 352: | Time(s): 56.963| Train Loss: 204.0135 | Val Loss: 1389.5646
+Model is not saved! Current val Loss: 1389.5646
+count: 1
+Epoch 353: | Time(s): 57.186| Train Loss: 194.6763 | Val Loss: 5355.5135
+Model is not saved! Current val Loss: 5355.5135
+count: 2
+Epoch 354: | Time(s): 57.353| Train Loss: 196.3071 | Val Loss: 4942.0552
+Model is not saved! Current val Loss: 4942.0552
+count: 3
+Epoch 355: | Time(s): 57.085| Train Loss: 205.1899 | Val Loss: 4086.2830
+Model is not saved! Current val Loss: 4086.2830
+count: 4
+Epoch 356: | Time(s): 58.342| Train Loss: 193.4101 | Val Loss: 930.1593
+Model is not saved! Current val Loss: 930.1593
+count: 5
+Epoch 357: | Time(s): 57.042| Train Loss: 191.2830 | Val Loss: 923.8883
+Model is not saved! Current val Loss: 923.8883
+count: 6
+Epoch 358: | Time(s): 57.305| Train Loss: 194.4548 | Val Loss: 1130.9880
+Model is not saved! Current val Loss: 1130.9880
+count: 7
+Epoch 359: | Time(s): 57.120| Train Loss: 211.8184 | Val Loss: 3045.2522
+Model is not saved! Current val Loss: 3045.2522
+count: 8
+Epoch 360: | Time(s): 56.660| Train Loss: 195.2938 | Val Loss: 2238.6874
+Model is not saved! Current val Loss: 2238.6874
+count: 9
+Epoch 361: | Time(s): 56.372| Train Loss: 189.5554 | Val Loss: 4207.4664
+Model is not saved! Current val Loss: 4207.4664
+count: 10
+Epoch 362: | Time(s): 56.578| Train Loss: 189.8616 | Val Loss: 1436.6666
+Model is not saved! Current val Loss: 1436.6666
+count: 11
+Epoch 363: | Time(s): 57.670| Train Loss: 189.2823 | Val Loss: 1502.3003
+Model is not saved! Current val Loss: 1502.3003
+count: 12
+Epoch 364: | Time(s): 57.257| Train Loss: 189.5354 | Val Loss: 1208.1126
+Model is not saved! Current val Loss: 1208.1126
+count: 13
+Epoch 365: | Time(s): 57.055| Train Loss: 191.9782 | Val Loss: 1523.4656
+Model is not saved! Current val Loss: 1523.4656
+count: 14
+Epoch 366: | Time(s): 56.471| Train Loss: 213.4400 | Val Loss: 2125.8788
+Model is not saved! Current val Loss: 2125.8788
+count: 15
+Epoch 367: | Time(s): 58.094| Train Loss: 200.5981 | Val Loss: 1332.0055
+Model is not saved! Current val Loss: 1332.0055
+count: 16
+Epoch 368: | Time(s): 56.444| Train Loss: 191.6258 | Val Loss: 1896.4189
+Model is not saved! Current val Loss: 1896.4189
+count: 17
+Epoch 369: | Time(s): 57.012| Train Loss: 186.1515 | Val Loss: 1582.5163
+Model is not saved! Current val Loss: 1582.5163
+count: 18
+Epoch 370: | Time(s): 57.416| Train Loss: 220.4441 | Val Loss: 810.6707
+Model is not saved! Current val Loss: 810.6707
+count: 19
+Epoch 371: | Time(s): 57.667| Train Loss: 188.5717 | Val Loss: 2278.3220
+Model is not saved! Current val Loss: 2278.3220
+count: 20
+Epoch 372: | Time(s): 56.656| Train Loss: 212.1718 | Val Loss: 476.8289
+Model is not saved! Current val Loss: 476.8289
+count: 21
+Epoch 373: | Time(s): 56.457| Train Loss: 210.2363 | Val Loss: 706.4776
+Model is not saved! Current val Loss: 706.4776
+count: 22
+Epoch 374: | Time(s): 56.159| Train Loss: 190.1805 | Val Loss: 3619.5589
+Model is not saved! Current val Loss: 3619.5589
+count: 23
+Epoch 375: | Time(s): 56.920| Train Loss: 192.6224 | Val Loss: 3067.1764
+Model is not saved! Current val Loss: 3067.1764
+count: 24
+Epoch 376: | Time(s): 56.879| Train Loss: 196.8747 | Val Loss: 1244.0485
+Model is not saved! Current val Loss: 1244.0485
+count: 25
+Epoch 377: | Time(s): 57.040| Train Loss: 188.7495 | Val Loss: 2536.8074
+Model is not saved! Current val Loss: 2536.8074
+count: 26
+Epoch 378: | Time(s): 56.496| Train Loss: 185.3280 | Val Loss: 4014.7141
+Model is not saved! Current val Loss: 4014.7141
+count: 27
+Epoch 379: | Time(s): 57.179| Train Loss: 194.2594 | Val Loss: 1573.5644
+Model is not saved! Current val Loss: 1573.5644
+count: 28
+Epoch 380: | Time(s): 58.884| Train Loss: 208.1168 | Val Loss: 962.2924
+Model is not saved! Current val Loss: 962.2924
+count: 29
+Epoch 381: | Time(s): 56.308| Train Loss: 186.2866 | Val Loss: 937.0293
+Model is not saved! Current val Loss: 937.0293
+count: 30
+Epoch 382: | Time(s): 56.310| Train Loss: 197.6159 | Val Loss: 1312.9071
+Model is not saved! Current val Loss: 1312.9071
+count: 31
+Epoch 383: | Time(s): 57.562| Train Loss: 191.8912 | Val Loss: 1375.7775
+Model is not saved! Current val Loss: 1375.7775
+count: 32
+Epoch 384: | Time(s): 56.676| Train Loss: 188.4970 | Val Loss: 2670.2022
+Model is not saved! Current val Loss: 2670.2022
+count: 33
+Epoch 385: | Time(s): 57.374| Train Loss: 189.7515 | Val Loss: 1155.0547
+Model is not saved! Current val Loss: 1155.0547
+count: 34
+Epoch 386: | Time(s): 55.691| Train Loss: 194.1021 | Val Loss: 1501.4203
+Model is not saved! Current val Loss: 1501.4203
+count: 35
+Epoch 387: | Time(s): 56.836| Train Loss: 190.6075 | Val Loss: 672.3342
+Model is not saved! Current val Loss: 672.3342
+count: 36
+Epoch 388: | Time(s): 56.541| Train Loss: 197.0105 | Val Loss: 1175.4189
+Model is not saved! Current val Loss: 1175.4189
+count: 37
+Epoch 389: | Time(s): 57.286| Train Loss: 202.6431 | Val Loss: 2185.9293
+Model is not saved! Current val Loss: 2185.9293
+count: 38
+Epoch 390: | Time(s): 58.490| Train Loss: 205.2884 | Val Loss: 1112.2586
+Model is not saved! Current val Loss: 1112.2586
+count: 39
+Epoch 391: | Time(s): 55.554| Train Loss: 189.5214 | Val Loss: 513.5183
+Model is not saved! Current val Loss: 513.5183
+count: 40
+Epoch 392: | Time(s): 56.744| Train Loss: 186.5157 | Val Loss: 568.4870
+Model is not saved! Current val Loss: 568.4870
+count: 41
+Epoch 393: | Time(s): 56.568| Train Loss: 188.1552 | Val Loss: 538.1507
+Model is not saved! Current val Loss: 538.1507
+count: 42
+Epoch 394: | Time(s): 56.959| Train Loss: 187.8902 | Val Loss: 2986.6197
+Model is not saved! Current val Loss: 2986.6197
+count: 43
+Epoch 395: | Time(s): 57.323| Train Loss: 186.1822 | Val Loss: 3759.5349
+Model is not saved! Current val Loss: 3759.5349
+count: 44
+Epoch 396: | Time(s): 57.987| Train Loss: 199.0399 | Val Loss: 593.8112
+Model is not saved! Current val Loss: 593.8112
+count: 45
+Epoch 397: | Time(s): 57.741| Train Loss: 201.3699 | Val Loss: 568.6955
+Model is not saved! Current val Loss: 568.6955
+count: 46
+Epoch 398: | Time(s): 56.391| Train Loss: 187.0670 | Val Loss: 602.7097
+Model is not saved! Current val Loss: 602.7097
+count: 47
+Epoch 399: | Time(s): 57.523| Train Loss: 191.5542 | Val Loss: 785.3593
+Model is not saved! Current val Loss: 785.3593
+count: 48
+Epoch 400: | Time(s): 56.827| Train Loss: 197.1152 | Val Loss: 2779.4361
+Model is not saved! Current val Loss: 2779.4361
+count: 49
+Epoch 401: | Time(s): 56.793| Train Loss: 196.9401 | Val Loss: 1758.5831
+Model is not saved! Current val Loss: 1758.5831
+count: 50
+Epoch 402: | Time(s): 57.261| Train Loss: 190.4532 | Val Loss: 1063.6055
+Model is not saved! Current val Loss: 1063.6055
+count: 51
+Epoch 403: | Time(s): 57.919| Train Loss: 186.2671 | Val Loss: 2179.3959
+Model is not saved! Current val Loss: 2179.3959
+count: 52
+Epoch 404: | Time(s): 56.616| Train Loss: 184.2877 | Val Loss: 2087.7776
+Model is not saved! Current val Loss: 2087.7776
+count: 53
+Epoch 405: | Time(s): 57.302| Train Loss: 184.5679 | Val Loss: 2149.9581
+Model is not saved! Current val Loss: 2149.9581
+count: 54
+Epoch 406: | Time(s): 57.197| Train Loss: 189.3346 | Val Loss: 834.5551
+Model is not saved! Current val Loss: 834.5551
+count: 55
+Epoch 407: | Time(s): 56.493| Train Loss: 189.9047 | Val Loss: 791.7307
+Model is not saved! Current val Loss: 791.7307
+count: 56
+Epoch 408: | Time(s): 57.137| Train Loss: 190.8036 | Val Loss: 3432.1000
+Model is not saved! Current val Loss: 3432.1000
+count: 57
+Epoch 409: | Time(s): 57.352| Train Loss: 188.2815 | Val Loss: 2088.6274
+Model is not saved! Current val Loss: 2088.6274
+count: 58
+Epoch 410: | Time(s): 56.871| Train Loss: 187.3730 | Val Loss: 2349.6131
+Model is not saved! Current val Loss: 2349.6131
+count: 59
+Epoch 411: | Time(s): 56.571| Train Loss: 199.0512 | Val Loss: 576.5042
+Model is not saved! Current val Loss: 576.5042
+count: 60
+Epoch 412: | Time(s): 58.007| Train Loss: 225.5219 | Val Loss: 3748.3033
+Model is not saved! Current val Loss: 3748.3033
+count: 61
+Epoch 413: | Time(s): 56.255| Train Loss: 196.9359 | Val Loss: 1968.6152
+Model is not saved! Current val Loss: 1968.6152
+count: 62
+Epoch 414: | Time(s): 57.578| Train Loss: 190.3010 | Val Loss: 4397.7661
+Model is not saved! Current val Loss: 4397.7661
+count: 63
+Epoch 415: | Time(s): 55.994| Train Loss: 193.4759 | Val Loss: 2818.7648
+Model is not saved! Current val Loss: 2818.7648
+count: 64
+Epoch 416: | Time(s): 57.117| Train Loss: 183.6956 | Val Loss: 2599.0075
+Model is not saved! Current val Loss: 2599.0075
+count: 65
+Epoch 417: | Time(s): 56.912| Train Loss: 182.9303 | Val Loss: 805.7967
+Model is not saved! Current val Loss: 805.7967
+count: 66
+Epoch 418: | Time(s): 56.632| Train Loss: 181.8024 | Val Loss: 872.1335
+Model is not saved! Current val Loss: 872.1335
+count: 67
+Epoch 419: | Time(s): 55.995| Train Loss: 209.7096 | Val Loss: 1423.9122
+Model is not saved! Current val Loss: 1423.9122
+count: 68
+Epoch 420: | Time(s): 57.002| Train Loss: 187.0864 | Val Loss: 1010.7575
+Model is not saved! Current val Loss: 1010.7575
+count: 69
+Epoch 421: | Time(s): 56.811| Train Loss: 186.9956 | Val Loss: 796.6320
+Model is not saved! Current val Loss: 796.6320
+count: 70
+Epoch 422: | Time(s): 57.575| Train Loss: 195.5238 | Val Loss: 2566.4532
+Model is not saved! Current val Loss: 2566.4532
+count: 71
+Epoch 423: | Time(s): 57.480| Train Loss: 204.4726 | Val Loss: 840.5694
+Model is not saved! Current val Loss: 840.5694
+count: 72
+Epoch 424: | Time(s): 56.359| Train Loss: 194.2045 | Val Loss: 449.7022
+Model is not saved! Current val Loss: 449.7022
+count: 73
+Epoch 425: | Time(s): 56.574| Train Loss: 188.6454 | Val Loss: 1185.2335
+Model is not saved! Current val Loss: 1185.2335
+count: 74
+Epoch 426: | Time(s): 56.815| Train Loss: 189.7452 | Val Loss: 625.8633
+Model is not saved! Current val Loss: 625.8633
+count: 75
+Epoch 427: | Time(s): 56.958| Train Loss: 182.7745 | Val Loss: 784.5076
+Model is not saved! Current val Loss: 784.5076
+count: 76
+Epoch 428: | Time(s): 55.945| Train Loss: 183.6841 | Val Loss: 2420.4657
+Model is not saved! Current val Loss: 2420.4657
+count: 77
+Epoch 429: | Time(s): 57.501| Train Loss: 184.8494 | Val Loss: 638.5034
+Model is not saved! Current val Loss: 638.5034
+count: 78
+Epoch 430: | Time(s): 57.652| Train Loss: 186.7926 | Val Loss: 2005.3860
+Model is not saved! Current val Loss: 2005.3860
+count: 79
+Epoch 431: | Time(s): 56.651| Train Loss: 182.1340 | Val Loss: 3002.9686
+Model is not saved! Current val Loss: 3002.9686
+count: 80
+Epoch 432: | Time(s): 56.528| Train Loss: 185.7616 | Val Loss: 820.9637
+Model is not saved! Current val Loss: 820.9637
+count: 81
+Epoch 433: | Time(s): 57.478| Train Loss: 185.9760 | Val Loss: 1447.5122
+Model is not saved! Current val Loss: 1447.5122
+count: 82
+Epoch 434: | Time(s): 56.723| Train Loss: 191.0932 | Val Loss: 665.2640
+Model is not saved! Current val Loss: 665.2640
+count: 83
+Epoch 435: | Time(s): 57.617| Train Loss: 183.0020 | Val Loss: 1357.1540
+Model is not saved! Current val Loss: 1357.1540
+count: 84
+Epoch 436: | Time(s): 57.690| Train Loss: 198.2836 | Val Loss: 678.8925
+Model is not saved! Current val Loss: 678.8925
+count: 85
+Epoch 437: | Time(s): 57.268| Train Loss: 198.9602 | Val Loss: 2436.4467
+Model is not saved! Current val Loss: 2436.4467
+count: 86
+Epoch 438: | Time(s): 57.580| Train Loss: 188.6377 | Val Loss: 1266.2849
+Model is not saved! Current val Loss: 1266.2849
+count: 87
+Epoch 439: | Time(s): 57.974| Train Loss: 185.3323 | Val Loss: 1174.9397
+Model is not saved! Current val Loss: 1174.9397
+count: 88
+Epoch 440: | Time(s): 56.592| Train Loss: 196.9219 | Val Loss: 1710.5664
+Model is not saved! Current val Loss: 1710.5664
+count: 89
+Epoch 441: | Time(s): 57.165| Train Loss: 212.8128 | Val Loss: 2086.2902
+Model is not saved! Current val Loss: 2086.2902
+count: 90
+Epoch 442: | Time(s): 57.732| Train Loss: 194.3624 | Val Loss: 492.0288
+Model is not saved! Current val Loss: 492.0288
+count: 91
+Epoch 443: | Time(s): 56.736| Train Loss: 189.8157 | Val Loss: 600.4133
+Model is not saved! Current val Loss: 600.4133
+count: 92
+Epoch 444: | Time(s): 56.652| Train Loss: 186.6802 | Val Loss: 3635.1207
+Model is not saved! Current val Loss: 3635.1207
+count: 93
+Epoch 445: | Time(s): 57.030| Train Loss: 188.4404 | Val Loss: 2575.6037
+Model is not saved! Current val Loss: 2575.6037
+count: 94
+Epoch 446: | Time(s): 56.169| Train Loss: 185.9304 | Val Loss: 740.6019
+Model is not saved! Current val Loss: 740.6019
+count: 95
+Epoch 447: | Time(s): 56.281| Train Loss: 182.5168 | Val Loss: 1208.1926
+Model is not saved! Current val Loss: 1208.1926
+count: 96
+Epoch 448: | Time(s): 57.174| Train Loss: 195.8183 | Val Loss: 462.1660
+Model is not saved! Current val Loss: 462.1660
+count: 97
+Epoch 449: | Time(s): 58.156| Train Loss: 193.5384 | Val Loss: 830.0260
+Model is not saved! Current val Loss: 830.0260
+count: 98
+Epoch 450: | Time(s): 56.981| Train Loss: 195.9963 | Val Loss: 2260.6189
+Model is not saved! Current val Loss: 2260.6189
+count: 99
+Epoch 451: | Time(s): 56.039| Train Loss: 187.3193 | Val Loss: 2082.7822
+Model is not saved! Current val Loss: 2082.7822
+count: 100
+Epoch 452: | Time(s): 56.957| Train Loss: 184.4118 | Val Loss: 815.7975
+Model is not saved! Current val Loss: 815.7975
+count: 101
+Epoch 453: | Time(s): 56.760| Train Loss: 185.2496 | Val Loss: 1493.1823
+Model is not saved! Current val Loss: 1493.1823
+count: 102
+Epoch 454: | Time(s): 57.892| Train Loss: 181.4899 | Val Loss: 724.7942
+Model is not saved! Current val Loss: 724.7942
+count: 103
+Epoch 455: | Time(s): 56.793| Train Loss: 184.0976 | Val Loss: 780.7946
+Model is not saved! Current val Loss: 780.7946
+count: 104
+Epoch 456: | Time(s): 57.800| Train Loss: 183.3201 | Val Loss: 2237.6832
+Model is not saved! Current val Loss: 2237.6832
+count: 105
+Epoch 457: | Time(s): 56.871| Train Loss: 180.6400 | Val Loss: 2387.9822
+Model is not saved! Current val Loss: 2387.9822
+count: 106
+Epoch 458: | Time(s): 58.348| Train Loss: 177.0163 | Val Loss: 2147.0445
+Model is not saved! Current val Loss: 2147.0445
+count: 107
+Epoch 459: | Time(s): 56.587| Train Loss: 184.0858 | Val Loss: 731.6189
+Model is not saved! Current val Loss: 731.6189
+count: 108
+Epoch 460: | Time(s): 57.051| Train Loss: 189.8743 | Val Loss: 1085.3812
+Model is not saved! Current val Loss: 1085.3812
+count: 109
+Epoch 461: | Time(s): 58.249| Train Loss: 196.5347 | Val Loss: 1805.0295
+Model is not saved! Current val Loss: 1805.0295
+count: 110
+Epoch 462: | Time(s): 56.986| Train Loss: 200.8435 | Val Loss: 1386.0830
+Model is not saved! Current val Loss: 1386.0830
+count: 111
+Epoch 463: | Time(s): 56.669| Train Loss: 192.3097 | Val Loss: 3719.3426
+Model is not saved! Current val Loss: 3719.3426
+count: 112
+Epoch 464: | Time(s): 56.910| Train Loss: 202.0486 | Val Loss: 1280.0422
+Model is not saved! Current val Loss: 1280.0422
+count: 113
+Epoch 465: | Time(s): 57.220| Train Loss: 190.6487 | Val Loss: 3858.2726
+Model is not saved! Current val Loss: 3858.2726
+count: 114
+Epoch 466: | Time(s): 59.585| Train Loss: 183.5767 | Val Loss: 2338.1055
+Model is not saved! Current val Loss: 2338.1055
+count: 115
+Epoch 467: | Time(s): 57.026| Train Loss: 187.1391 | Val Loss: 3476.6737
+Model is not saved! Current val Loss: 3476.6737
+count: 116
+Epoch 468: | Time(s): 58.052| Train Loss: 188.9224 | Val Loss: 2489.2494
+Model is not saved! Current val Loss: 2489.2494
+count: 117
+Epoch 469: | Time(s): 56.383| Train Loss: 183.8475 | Val Loss: 732.5413
+Model is not saved! Current val Loss: 732.5413
+count: 118
+Epoch 470: | Time(s): 56.619| Train Loss: 183.8854 | Val Loss: 1231.6901
+Model is not saved! Current val Loss: 1231.6901
+count: 119
+Epoch 471: | Time(s): 58.901| Train Loss: 190.6784 | Val Loss: 1694.8911
+Model is not saved! Current val Loss: 1694.8911
+count: 120
+Epoch 472: | Time(s): 56.192| Train Loss: 190.5216 | Val Loss: 2631.7848
+Model is not saved! Current val Loss: 2631.7848
+count: 121
+Epoch 473: | Time(s): 57.096| Train Loss: 204.7766 | Val Loss: 911.2031
+Model is not saved! Current val Loss: 911.2031
+count: 122
+Epoch 474: | Time(s): 56.367| Train Loss: 186.2753 | Val Loss: 1411.6623
+Model is not saved! Current val Loss: 1411.6623
+count: 123
+Epoch 475: | Time(s): 57.749| Train Loss: 182.6260 | Val Loss: 912.7656
+Model is not saved! Current val Loss: 912.7656
+count: 124
+Epoch 476: | Time(s): 57.685| Train Loss: 180.4529 | Val Loss: 2656.1041
+Model is not saved! Current val Loss: 2656.1041
+count: 125
+Epoch 477: | Time(s): 56.762| Train Loss: 182.8234 | Val Loss: 1276.1543
+Model is not saved! Current val Loss: 1276.1543
+count: 126
+Epoch 478: | Time(s): 57.580| Train Loss: 186.6803 | Val Loss: 3262.9658
+Model is not saved! Current val Loss: 3262.9658
+count: 127
+Epoch 479: | Time(s): 57.141| Train Loss: 206.6612 | Val Loss: 1433.1022
+Model is not saved! Current val Loss: 1433.1022
+count: 128
+Epoch 480: | Time(s): 56.307| Train Loss: 188.9017 | Val Loss: 628.4532
+Model is not saved! Current val Loss: 628.4532
+count: 129
+Epoch 481: | Time(s): 56.658| Train Loss: 187.7428 | Val Loss: 770.2008
+Model is not saved! Current val Loss: 770.2008
+count: 130
+Epoch 482: | Time(s): 56.818| Train Loss: 187.2178 | Val Loss: 1810.7769
+Model is not saved! Current val Loss: 1810.7769
+count: 131
+Epoch 483: | Time(s): 56.281| Train Loss: 187.4934 | Val Loss: 910.9375
+Model is not saved! Current val Loss: 910.9375
+count: 132
+Epoch 484: | Time(s): 55.756| Train Loss: 198.1656 | Val Loss: 962.5585
+Model is not saved! Current val Loss: 962.5585
+count: 133
+Epoch 485: | Time(s): 57.443| Train Loss: 200.5263 | Val Loss: 3448.7013
+Model is not saved! Current val Loss: 3448.7013
+count: 134
+Epoch 486: | Time(s): 57.374| Train Loss: 185.9597 | Val Loss: 1216.7770
+Model is not saved! Current val Loss: 1216.7770
+count: 135
+Epoch 487: | Time(s): 58.042| Train Loss: 189.1518 | Val Loss: 1754.2573
+Model is not saved! Current val Loss: 1754.2573
+count: 136
+Epoch 488: | Time(s): 57.324| Train Loss: 184.2280 | Val Loss: 1777.7186
+Model is not saved! Current val Loss: 1777.7186
+count: 137
+Epoch 489: | Time(s): 57.757| Train Loss: 189.5459 | Val Loss: 767.1529
+Model is not saved! Current val Loss: 767.1529
+count: 138
+Epoch 490: | Time(s): 56.881| Train Loss: 188.5750 | Val Loss: 1259.9175
+Model is not saved! Current val Loss: 1259.9175
+count: 139
+Epoch 491: | Time(s): 57.038| Train Loss: 186.3444 | Val Loss: 685.7211
+Model is not saved! Current val Loss: 685.7211
+count: 140
+Epoch 492: | Time(s): 56.363| Train Loss: 189.8628 | Val Loss: 1416.8821
+Model is not saved! Current val Loss: 1416.8821
+count: 141
+Epoch 493: | Time(s): 55.753| Train Loss: 179.3066 | Val Loss: 5036.5119
+Model is not saved! Current val Loss: 5036.5119
+count: 142
+Epoch 494: | Time(s): 56.999| Train Loss: 179.1181 | Val Loss: 2769.6458
+Model is not saved! Current val Loss: 2769.6458
+count: 143
+Epoch 495: | Time(s): 56.238| Train Loss: 193.7874 | Val Loss: 5158.9634
+Model is not saved! Current val Loss: 5158.9634
+count: 144
+Epoch 496: | Time(s): 56.929| Train Loss: 188.9166 | Val Loss: 6250.1584
+Model is not saved! Current val Loss: 6250.1584
+count: 145
+Epoch 497: | Time(s): 57.357| Train Loss: 185.2379 | Val Loss: 1984.5115
+Model is not saved! Current val Loss: 1984.5115
+count: 146
+Epoch 498: | Time(s): 57.742| Train Loss: 187.8171 | Val Loss: 1709.9106
+Model is not saved! Current val Loss: 1709.9106
+count: 147
+Epoch 499: | Time(s): 57.477| Train Loss: 190.1452 | Val Loss: 2973.7071
+Model is not saved! Current val Loss: 2973.7071
+count: 148
+Epoch 500: | Time(s): 56.465| Train Loss: 190.0680 | Val Loss: 4576.8833
+Model is not saved! Current val Loss: 4576.8833
+count: 149

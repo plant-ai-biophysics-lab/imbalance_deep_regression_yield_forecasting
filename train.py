@@ -19,7 +19,7 @@ print(torch.cuda.is_available())
 def train(patch_size: int, dropout: int, 
             batch_size: int, learning_rate: float, weight_decay: float,
             in_channel: int, emb_channel: int, epochs: int, loss_stop_tolerance: int, 
-            lds_ks: int, lds_sigma: int, dw_alpha :float, 
+            lds_ks: int, lds_sigma: int, dw_alpha :float, betha: int,
             re_weighting_method: str,
             exp_name: str):
 
@@ -81,7 +81,8 @@ def train(patch_size: int, dropout: int,
                                         lds_ks = lds_ks,
                                         lds_sigma = lds_sigma, 
                                         dw_alpha = dw_alpha, 
-                                        re_weighting_method = 'dw')
+                                        betha = betha,
+                                        re_weighting_method = re_weighting_method)
 
     dataset_validate = dataloader_RGB(data_dir, 
                                         exp_output_dir, 
@@ -91,7 +92,8 @@ def train(patch_size: int, dropout: int,
                                         lds_ks = lds_ks,
                                         lds_sigma = lds_sigma,
                                         dw_alpha = dw_alpha, 
-                                        re_weighting_method = 'dw')
+                                        betha = betha,
+                                        re_weighting_method = re_weighting_method)
     
 
     dataset_test     = dataloader_RGB(data_dir, 
@@ -102,7 +104,8 @@ def train(patch_size: int, dropout: int,
                                         lds_ks = lds_ks,
                                         lds_sigma = lds_sigma,
                                         dw_alpha = dw_alpha, 
-                                        re_weighting_method = 'dw')     
+                                        betha = betha,
+                                        re_weighting_method = re_weighting_method)     
     #==============================================================================================================#
     #=============================================      Data Loader               =================================#
     #==============================================================================================================#                      
@@ -406,12 +409,13 @@ if __name__ == "__main__":
     
     #for kd in lds_kds: 
     #   for sigma in lds_sigmas: 
-    alpha_list = [2, 3, 4, 5, 10]
-    for a in alpha_list: 
-        ExpName = '012_64_001_05_RGB_DW_Alpha_' + str(a)
-        train(patch_size = 16, dropout = 0.3, 
-            batch_size = 64, learning_rate = 0.001, weight_decay = 0.05,
-            in_channel = 6, emb_channel = 4, epochs = 500, loss_stop_tolerance = 200, 
-            lds_ks = 10, lds_sigma = 8, dw_alpha = a, 
-            re_weighting_method = 'dw',
-            exp_name = ExpName) 
+    alpha_list = [3, 4, 5, 10]
+    b = 4
+    #for a in alpha_list: 
+    ExpName = '013_64_001_05_RGB_CB_' + str(4)
+    train(patch_size = 16, dropout = 0.3, 
+        batch_size = 64, learning_rate = 0.001, weight_decay = 0.05,
+        in_channel = 6, emb_channel = 4, epochs = 500, loss_stop_tolerance = 200, 
+        lds_ks = 10, lds_sigma = 8, dw_alpha = 3, betha = b,
+        re_weighting_method = 'cb',
+        exp_name = ExpName) 

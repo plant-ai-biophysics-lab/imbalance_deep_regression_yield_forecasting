@@ -48,12 +48,12 @@ def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
     #for i in range(30):
 
     #if i < th1: 
-    true_label_C1 = true_labels[np.where((true_labels > 0) & (true_labels < th1))]
-    pred_label_C1 = pred_labels[np.where((true_labels > 0) & (true_labels < th1))]
+    true_label_C1 = true_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
+    pred_label_C1 = pred_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
 
     #elif (i >= th1) & (i < th2):
-    true_label_C2 = true_labels[np.where((true_labels >= th1) & (true_labels < th2))]
-    pred_label_C2 = pred_labels[np.where((true_labels >= th1) & (true_labels < th2))]
+    true_label_C2 = true_labels[np.where((true_labels > th1) & (true_labels < th2))]
+    pred_label_C2 = pred_labels[np.where((true_labels > th1) & (true_labels < th2))]
 
     #elif i >= th2: 
     true_label_C3 = true_labels[np.where(true_labels >= th2)]
@@ -80,8 +80,8 @@ def eval_on_extreme_main_label_range_pred(df, th1: int, th2: int):
     #for i in range(30):
 
     #if i < th1: 
-    true_label_C1 = true_labels[np.where(true_labels < th1)]
-    pred_label_C1 = pred_labels[np.where(true_labels < th1)]
+    true_label_C1 = true_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
+    pred_label_C1 = pred_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
 
     #elif i >= th2: 
     true_label_C3 = true_labels[np.where(true_labels >= th2)]
@@ -89,8 +89,8 @@ def eval_on_extreme_main_label_range_pred(df, th1: int, th2: int):
 
 
     #elif (i >= th1) & (i < th2):
-    true_label_Cm = true_labels[np.where((true_labels >= th1) & (true_labels < th2))]
-    pred_label_Cm = pred_labels[np.where((true_labels >= th1) & (true_labels < th2))]
+    true_label_Cm = true_labels[np.where((true_labels > th1) & (true_labels < th2))]
+    pred_label_Cm = pred_labels[np.where((true_labels > th1) & (true_labels < th2))]
 
     true_label_ex = []
     true_label_ex.append(true_label_C1)

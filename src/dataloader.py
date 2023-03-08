@@ -12,6 +12,98 @@ from src.RWSampler import lds_prepare_weights, cb_prepare_weights, TargetRelevan
 
     
 
+def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method: str, exp_name: str): 
+
+    data_dir       = '/data2/hkaman/Livingston/data/10m/'
+    botneck_size   = 2
+    exp_output_dir = '/data2/hkaman/Imbalance/EXPs/' + 'EXP_' + exp_name
+
+    
+    isExist  = os.path.isdir(exp_output_dir)
+
+    if not isExist:
+        os.makedirs(exp_output_dir)
+        os.makedirs(exp_output_dir + '/coords')
+        os.makedirs(exp_output_dir + '/loss')
+
+    train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
+    train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
+    valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/val.csv', index_col= 0)
+    valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
+    test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
+    test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
+    print(f"{train_csv.shape} | {valid_csv.shape} | {test_csv.shape}")
+    #==============================================================================================================#
+    #============================================ Imprical Data Weight Generation =================================#
+    #==============================================================================================================#
+    '''train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
+
+    train_weights = train_csv['NormWeight'].to_numpy() 
+    train_weights = torch.DoubleTensor(train_weights)
+    train_sampler = torch.utils.data.sampler.WeightedRandomSampler(train_weights, 
+                                                                   len(train_weights), replacement=True)    
+
+    val_weights   = valid_csv['NormWeight'].to_numpy() 
+    val_weights   = torch.DoubleTensor(val_weights)
+    val_sampler   = torch.utils.data.sampler.WeightedRandomSampler(val_weights, 
+                                                                   len(val_weights), replacement=True)    
+
+    test_weights = test_csv['NormWeight'].to_numpy() 
+    test_weights = torch.DoubleTensor(test_weights)
+    test_sampler = torch.utils.data.sampler.WeightedRandomSampler(test_weights, len(test_weights))'''
+
+    #==============================================================================================================#
+    #============================================     Reading Data                =================================#
+    #==============================================================================================================#
+    #csv_coord_dir = '/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/'
+    dataset_training = dataloader_RGB(data_dir, exp_output_dir, 
+                                        category = 'train', 
+                                        patch_size = 16, 
+                                        in_channels = 6,
+                                        lds_ks = lds_ks,
+                                        lds_sigma = lds_sigma, 
+                                        dw_alpha = dw_alpha, 
+                                        betha = betha,
+                                        re_weighting_method = re_weighting_method)
+
+    dataset_validate = dataloader_RGB(data_dir, 
+                                        exp_output_dir, 
+                                        category = 'val',  
+                                        patch_size = 16, 
+                                        in_channels = 6,
+                                        lds_ks = lds_ks,
+                                        lds_sigma = lds_sigma,
+                                        dw_alpha = dw_alpha, 
+                                        betha = betha,
+                                        re_weighting_method = re_weighting_method)
+    
+
+    dataset_test     = dataloader_RGB(data_dir, 
+                                        exp_output_dir, 
+                                        category = 'test',  
+                                        patch_size = 16, 
+                                        in_channels = 6,
+                                        lds_ks = lds_ks,
+                                        lds_sigma = lds_sigma,
+                                        dw_alpha = dw_alpha, 
+                                        betha = betha,
+                                        re_weighting_method = re_weighting_method)     
+
+    #==============================================================================================================#
+    #=============================================      Data Loader               =================================#
+    #==============================================================================================================#                      
+    # define training and validation data loaders
+    data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
+                                                    shuffle=True, num_workers=8) #   sampler=train_sampler, 
+    data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
+                                                    shuffle=False,  num_workers=8) #sampler=val_sampler,
+    data_loader_test     = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, 
+                                                    shuffle=False,  num_workers=8) #sampler=test_sampler,
+
+    return data_loader_training, data_loader_validate, data_loader_test
+
+
+
 class dataloader_RGB(object):
     def __init__(self, npy_dir, csv_dir, 
                                 category: str, 
@@ -28,6 +120,7 @@ class dataloader_RGB(object):
         self.csv_dir      = csv_dir
         self.wsize        = patch_size
         self.in_channels  = in_channels
+        self.re_weighting_method = re_weighting_method
 
 
         if category    == 'train': 
@@ -50,7 +143,8 @@ class dataloader_RGB(object):
             #self.weights = np.where(self.weights >= 1, self.weights, 1)
         elif re_weighting_method == 'cb':
             self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
-            self.weights = np.where(self.weights >= 1, self.weights, 1)
+            #self.weights = np.where(self.weights >= 1, self.weights, 1)
+
 
     def __getitem__(self, idx):
 
@@ -101,10 +195,10 @@ class dataloader_RGB(object):
         weight_mtx = np.expand_dims(weight_mtx, axis = 0)
         weight_mtx = torch.as_tensor(weight_mtx)
 
-        
+
         sample = {"image": image, "mask": mask, "EmbMatrix": EmbMat, "block": block_id, "cultivar": cultivar, 
-                  "X": xcoord, "Y": ycoord, "win_block_mean":WithinBlockMean,  "weight": weight_mtx}
-             
+                "X": xcoord, "Y": ycoord, "win_block_mean":WithinBlockMean,  "weight": weight_mtx}
+        
         return sample
 
     def __len__(self):
@@ -152,14 +246,11 @@ class dataloader_RGB(object):
                 masks = mask
             else: 
                 masks = np.concatenate([masks, mask], axis = 0)
-
-
         reshaped_masks = np.reshape(masks, (masks.shape[0]*masks.shape[1]*masks.shape[2]))
         weights =  cb_prepare_weights(reshaped_masks, lds_kernel='gaussian', lds_ks=lds_ks, lds_sigma=lds_sigma, betha=betha)
 
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
-        return weights
-
+        return weights  
     def return_pixelwise_weight_dw(self, dw_alpha):
 
         masks = None
@@ -190,7 +281,6 @@ class dataloader_RGB(object):
         crop_src = src[:, xcoord:xcoord + self.wsize, ycoord:ycoord + self.wsize, :]
         return crop_src 
   
-    
     def patch_cultivar_matrix(self, cul_id):
         zeros_matrix       = np.full(4, (1/cul_id))
         cultivar_matrix    = zeros_matrix.reshape(1, int(self.wsize/8), int(self.wsize/8))
@@ -220,7 +310,6 @@ class dataloader_RGB(object):
         
         return fill_matrix_bmean
     
-
     def time_series_encoding(self, block_id):
         timeseries = None
 

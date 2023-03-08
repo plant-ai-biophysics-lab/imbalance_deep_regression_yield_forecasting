@@ -5,10 +5,10 @@ import time
 import torch
 import torch.nn as nn
 from src.models import UNet2DConvLSTM
-from src.dataloader import dataloader_RGB
-from src import utils, ModelEngine
-from src.RWSampler import lds_prepare_weights, return_cost_sensitive_weight_sampler
 
+from src import utils, ModelEngine, dataloader
+from src.RWSampler import lds_prepare_weights, return_cost_sensitive_weight_sampler
+from src.losses import *
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -16,347 +16,72 @@ print(torch.cuda.is_available())
 #==============================================================================================================#
 #==================================================Initialization =============================================#
 #==============================================================================================================#
-def train(patch_size: int, dropout: int, 
-            batch_size: int, learning_rate: float, weight_decay: float,
-            in_channel: int, emb_channel: int, epochs: int, loss_stop_tolerance: int, 
-            lds_ks: int, lds_sigma: int, dw_alpha :float, betha: int,
-            re_weighting_method: str,
-            exp_name: str):
+def adjust_learning_rate(optimizer, epoch, lr):
+    lr = lr * (0.1 ** (epoch // 5))
+
+    for param_group in optimizer.param_groups:
+        if 'name' in param_group and param_group['name'] == 'noise_sigma':
+            continue
+        param_group['lr'] = lr
 
 
-    data_dir       = '/data2/hkaman/Livingston/data/10m/'
-    botneck_size   = 2
-    exp_output_dir = '/data2/hkaman/Imbalance/EXPs/' + 'EXP_' + exp_name
 
-    
-    isExist  = os.path.isdir(exp_output_dir)
-
-    if not isExist:
-        os.makedirs(exp_output_dir)
-        os.makedirs(exp_output_dir + '/coords')
-        os.makedirs(exp_output_dir + '/loss')
-
-    best_model_name      = exp_output_dir + '/best_model' + exp_name + '.pth'
-    loss_fig_name        = exp_output_dir + '/loss/loss'  + exp_name + '.png'
-    loss_df_name         = exp_output_dir + '/loss/loss'  + exp_name + '.csv' 
-    loss_weekly_fig_name = exp_output_dir + '/loss/loss'  + exp_name + '_w.png'
-    loss_weekly_df_name  = exp_output_dir + '/loss/loss'  + exp_name + '_w.csv' 
-    #==============================================================================================================#
-    #================================================== csv file generator=========================================#
-    #==============================================================================================================#
-    train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
-    train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
-    valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/val.csv', index_col= 0)
-    valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
-    test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
-    test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
-    
-    #==============================================================================================================#
-    #============================================ Imprical Data Weight Generation =================================#
-    #==============================================================================================================#
-    '''train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
-
-    train_weights = train_csv['NormWeight'].to_numpy() 
-    train_weights = torch.DoubleTensor(train_weights)
-    train_sampler = torch.utils.data.sampler.WeightedRandomSampler(train_weights, 
-                                                                   len(train_weights), replacement=True)    
-
-    val_weights   = valid_csv['NormWeight'].to_numpy() 
-    val_weights   = torch.DoubleTensor(val_weights)
-    val_sampler   = torch.utils.data.sampler.WeightedRandomSampler(val_weights, 
-                                                                   len(val_weights), replacement=True)    
-
-    test_weights = test_csv['NormWeight'].to_numpy() 
-    test_weights = torch.DoubleTensor(test_weights)
-    test_sampler = torch.utils.data.sampler.WeightedRandomSampler(test_weights, len(test_weights))'''
-
-    #==============================================================================================================#
-    #============================================     Reading Data                =================================#
-    #==============================================================================================================#
-    #csv_coord_dir = '/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/'
-    dataset_training = dataloader_RGB(data_dir, exp_output_dir, 
-                                        category = 'train', 
-                                        patch_size = patch_size, 
-                                        in_channels = in_channel,
-                                        lds_ks = lds_ks,
-                                        lds_sigma = lds_sigma, 
-                                        dw_alpha = dw_alpha, 
-                                        betha = betha,
-                                        re_weighting_method = re_weighting_method)
-
-    dataset_validate = dataloader_RGB(data_dir, 
-                                        exp_output_dir, 
-                                        category = 'val',  
-                                        patch_size = patch_size, 
-                                        in_channels = in_channel,
-                                        lds_ks = lds_ks,
-                                        lds_sigma = lds_sigma,
-                                        dw_alpha = dw_alpha, 
-                                        betha = betha,
-                                        re_weighting_method = re_weighting_method)
-    
-
-    dataset_test     = dataloader_RGB(data_dir, 
-                                        exp_output_dir, 
-                                        category = 'test',  
-                                        patch_size = patch_size, 
-                                        in_channels = in_channel,
-                                        lds_ks = lds_ks,
-                                        lds_sigma = lds_sigma,
-                                        dw_alpha = dw_alpha, 
-                                        betha = betha,
-                                        re_weighting_method = re_weighting_method)     
-    #==============================================================================================================#
-    #=============================================      Data Loader               =================================#
-    #==============================================================================================================#                      
-    # define training and validation data loaders
-    data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
-                                                    shuffle=True, num_workers=8) #   sampler=train_sampler, 
-    data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
-                                                    shuffle=False,  num_workers=8) #sampler=val_sampler,
-    data_loader_test     = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, 
-                                                    shuffle=False,  num_workers=8) #sampler=test_sampler,
-    #==============================================================================================================#
-    #================================================ Model Calling ===============================================#
-    #==============================================================================================================#
-
-    model = UNet2DConvLSTM(in_channels = in_channel, out_channels = 1, 
-                                                    num_filters   = 16, 
-                                                    dropout       = dropout, 
-                                                    Emb_Channels  = emb_channel, 
-                                                    batch_size    = batch_size, 
-                                                    botneck_size  = botneck_size).to(device)
-
-    #================================================ Loss Function ===============================================#
-    loss_fn = nn.MSELoss()
-    from src.losses import weighted_mse_loss
-    #================================================ Optimizer ===================================================#
-    ### ADAM
-    params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.Adam(params, lr=learning_rate, weight_decay = weight_decay)
-    #================================================= Training ===================================================#
+def train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, lr, criterion, best_model_name):
     best_val_loss = 100000 # initial dummy value
-    early_stopping = ModelEngine.EarlyStopping(tolerance=loss_stop_tolerance, min_delta=50)
-    #==============================================================================================================#
-    #==============================================================================================================#
+    early_stopping = ModelEngine.EarlyStopping(tolerance = loss_stop_tolerance, min_delta=50)
+    
     loss_stats = {'train': [],"val": []}
-
-    loss_week_stats = {
-        'train_w1': [], 'train_w2': [], 'train_w3': [], 'train_w4': [], 'train_w5': [],'train_w6': [],'train_w7': [],'train_w8': [], 'train_w9': [], 
-        'train_w10': [], 'train_w11': [], 'train_w12': [], 'train_w13': [], 'train_w14': [], 'train_w15': [],
-        "val_w1": [], "val_w2": [], "val_w3": [], "val_w4": [], "val_w5": [], "val_w6": [], "val_w7": [], "val_w8": [], "val_w9": [], "val_w10": [],
-        "val_w11": [],"val_w12": [], "val_w13": [], "val_w14": [], "val_w15": []}
-
-
     for epoch in range(1, epochs+1):
-        training_start_time = time.time()
-        # TRAINING
-        train_epoch_loss = 0
-        tplw1, tplw2, tplw3, tplw4, tplw5, tplw6, tplw7, tplw8, tplw9, tplw10, tplw11, tplw12, tplw13, tplw14, tplw15 = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
+        training_start_time = time.time()
+        train_epoch_loss = 0
         model.train()
 
         for batch, sample in enumerate(data_loader_training):
             
-            X_train_batch         = sample['image']
-            y_train_batch         = sample['mask']
-            y_train_batch         = y_train_batch[:,:,:,:,0]
-            E_train_batch         = sample['EmbMatrix']
-            weights               = sample['weight'].to(device)
-
-            X_train_batch, E_train_batch = X_train_batch.to(device), E_train_batch.to(device)
-            y_train_batch  = y_train_batch.to(device)
+            Xtrain         = sample['image'].to(device)
+            ytrain_true    = sample['mask'][:,:,:,:,0].to(device)
+            EmbTrain       = sample['EmbMatrix'].to(device)
+            WgTrain        = sample['weight'].to(device)
                 
-            list_y_train_pred  = model(X_train_batch, E_train_batch)
-            
+            list_ytrain_pred  = model(Xtrain, EmbTrain)
+            train_loss_w = 0
             optimizer.zero_grad()
+            for l in range(15):
+                #val_loss = criterion(ytrain_true, list_ytrain_pred[l])
+                train_loss_ = weighted_huber_mse_loss(ytrain_true, list_ytrain_pred[l], WgTrain)
+                train_loss_w += train_loss_
 
-            
-            train_loss_w1  = weighted_mse_loss(y_train_batch, list_y_train_pred[0], weights)
-            #train_loss_w1  = loss_fn(y_train_batch, list_y_train_pred[0])
-            tplw1 += train_loss_w1.item()
-
-            train_loss_w2  = weighted_mse_loss(y_train_batch, list_y_train_pred[1], weights)
-            #train_loss_w2  = loss_fn(y_train_batch, list_y_train_pred[1])
-            tplw2 += train_loss_w2.item()
-            
-            train_loss_w3  = weighted_mse_loss(y_train_batch, list_y_train_pred[2], weights)
-            #train_loss_w3  = loss_fn(y_train_batch, list_y_train_pred[2])
-            tplw3 += train_loss_w3.item()
-            
-            train_loss_w4  = weighted_mse_loss(y_train_batch, list_y_train_pred[3], weights)
-            #train_loss_w4  = loss_fn(y_train_batch, list_y_train_pred[3])
-            tplw4 += train_loss_w4.item()
-            
-            train_loss_w5  = weighted_mse_loss(y_train_batch, list_y_train_pred[4], weights)
-            #train_loss_w5  = loss_fn(y_train_batch, list_y_train_pred[4])
-            tplw5 += train_loss_w5.item()
-            
-            train_loss_w6  = weighted_mse_loss(y_train_batch, list_y_train_pred[5], weights)
-            #train_loss_w6  = loss_fn(y_train_batch, list_y_train_pred[5])
-            tplw6 += train_loss_w6.item()
-            
-            train_loss_w7  = weighted_mse_loss(y_train_batch, list_y_train_pred[6], weights)
-            #train_loss_w7  = loss_fn(y_train_batch, list_y_train_pred[6])
-            tplw7 += train_loss_w7.item()
-            
-            train_loss_w8  = weighted_mse_loss(y_train_batch, list_y_train_pred[7], weights)
-            #train_loss_w8  = loss_fn(y_train_batch, list_y_train_pred[7])
-            tplw8 += train_loss_w8.item()
-            
-            train_loss_w9  = weighted_mse_loss(y_train_batch, list_y_train_pred[8], weights)
-            #train_loss_w9  = loss_fn(y_train_batch, list_y_train_pred[8])
-            tplw9 += train_loss_w9.item()
-            
-            train_loss_w10 = weighted_mse_loss(y_train_batch, list_y_train_pred[9], weights)
-            #train_loss_w10 = loss_fn(y_train_batch, list_y_train_pred[9])
-            tplw10 += train_loss_w10.item()
-            
-            train_loss_w11 = weighted_mse_loss(y_train_batch, list_y_train_pred[10], weights)
-            #train_loss_w11 = loss_fn(y_train_batch, list_y_train_pred[10])
-            tplw11 += train_loss_w11.item()
-            
-            train_loss_w12 = weighted_mse_loss(y_train_batch, list_y_train_pred[11], weights)
-            #train_loss_w12 = loss_fn(y_train_batch, list_y_train_pred[11])
-            tplw12 += train_loss_w12.item()
-            
-            train_loss_w13 = weighted_mse_loss(y_train_batch, list_y_train_pred[12], weights)
-            #train_loss_w13 = loss_fn(y_train_batch, list_y_train_pred[12])
-            tplw13 += train_loss_w13.item()
-            
-            train_loss_w14 = weighted_mse_loss(y_train_batch, list_y_train_pred[13], weights)
-            #train_loss_w14 = loss_fn(y_train_batch, list_y_train_pred[13])
-            tplw14 += train_loss_w14.item()
-            
-            train_loss_w15 = weighted_mse_loss(y_train_batch, list_y_train_pred[14], weights)
-            #train_loss_w15 = loss_fn(y_train_batch, list_y_train_pred[14])
-            tplw15 += train_loss_w15.item()
-            
-            
-            train_loss = train_loss_w1 + train_loss_w2 + train_loss_w3 + train_loss_w4 + train_loss_w5 + train_loss_w6 + train_loss_w7 + train_loss_w8 + train_loss_w9+ train_loss_w10+train_loss_w11+train_loss_w12+train_loss_w13+train_loss_w14+train_loss_w15
-                
-            train_loss.backward()
+            train_loss_w.backward()
             optimizer.step()
             
-            train_epoch_loss += train_loss.item()
-            
+            train_epoch_loss += train_loss_w.item()
 
         # VALIDATION    
         with torch.no_grad():
             
             val_epoch_loss = 0
-            vplw1, vplw2, vplw3, vplw4, vplw5, vplw6, vplw7, vplw8, vplw9, vplw10, vplw11, vplw12, vplw13, vplw14, vplw15 = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            
             model.eval()
             for batch, sample in enumerate(data_loader_validate):
                 
-                X_val_batch      = sample['image']
-                y_val_batch      = sample['mask']
-                y_val_batch      = y_val_batch[:,:,:,:,0]
-                E_val_batch      = sample['EmbMatrix']
-                Val_weights      = sample['weight'].to(device)
-                
-                X_val_batch, E_val_batch = X_val_batch.to(device), E_val_batch.to(device)
-                y_val_batch = y_val_batch.to(device)
+                Xvalid      = sample['image'].to(device)
+                yvalid_true = sample['mask'][:,:,:,:,0].to(device)
+                EmbValid    = sample['EmbMatrix'].to(device)
+                WgValid     = sample['weight'].to(device)
+        
+                list_yvalid_pred   = model(Xvalid, EmbValid)
+                val_loss_sum_week = 0
+                for l in range(len(list_yvalid_pred)):
+                    #val_loss = criterion(yvalid_true, list_yvalid_pred[l])
+                    val_loss_w = weighted_huber_mse_loss(yvalid_true, list_yvalid_pred[l], WgValid)
+                    val_loss_sum_week += val_loss_w
 
-                list_y_val_pred   = model(X_val_batch, E_val_batch)
-                
-                vl_w1 = weighted_mse_loss(y_val_batch, list_y_val_pred[0], Val_weights)
-                #vl_w1 = loss_fn(y_val_batch, list_y_val_pred[0])
-                vplw1 += vl_w1.item()
-
-                vl_w2 = weighted_mse_loss(y_val_batch, list_y_val_pred[1], Val_weights)
-                #vl_w2 = loss_fn(y_val_batch, list_y_val_pred[1])
-                vplw2 += vl_w2.item()
-
-                vl_w3 = weighted_mse_loss(y_val_batch, list_y_val_pred[2], Val_weights)
-                #vl_w3 = loss_fn(y_val_batch, list_y_val_pred[2])
-                vplw3 += vl_w3.item()
-
-                vl_w4 = weighted_mse_loss(y_val_batch, list_y_val_pred[3], Val_weights)
-                #vl_w4 = loss_fn(y_val_batch, list_y_val_pred[3])
-                vplw4 += vl_w4.item()
-
-                vl_w5 = weighted_mse_loss(y_val_batch, list_y_val_pred[4], Val_weights)
-                #vl_w5 = loss_fn(y_val_batch, list_y_val_pred[4])
-                vplw5 += vl_w5.item()
-
-                vl_w6 = weighted_mse_loss(y_val_batch, list_y_val_pred[5], Val_weights)
-                #vl_w6 = loss_fn(y_val_batch, list_y_val_pred[5])
-                vplw6 += vl_w6.item()
-
-                vl_w7 = weighted_mse_loss(y_val_batch, list_y_val_pred[6], Val_weights)
-                #vl_w7 = loss_fn(y_val_batch, list_y_val_pred[6])
-                vplw7 += vl_w7.item()
-
-                vl_w8 = weighted_mse_loss(y_val_batch, list_y_val_pred[7], Val_weights)
-                #vl_w8 = loss_fn(y_val_batch, list_y_val_pred[7])
-                vplw8 += vl_w8.item() 
-
-                vl_w9 = weighted_mse_loss(y_val_batch, list_y_val_pred[8], Val_weights)
-                #vl_w9 = loss_fn(y_val_batch, list_y_val_pred[8])
-                vplw9 += vl_w9.item()
-
-                vl_w10 = weighted_mse_loss(y_val_batch, list_y_val_pred[9], Val_weights)
-                #vl_w10 = loss_fn(y_val_batch, list_y_val_pred[9])
-                vplw10 += vl_w10.item()
-
-                vl_w11 = weighted_mse_loss(y_val_batch, list_y_val_pred[10], Val_weights)
-                #vl_w11 = loss_fn(y_val_batch, list_y_val_pred[10])
-                vplw11 += vl_w11.item()
-
-                vl_w12 = weighted_mse_loss(y_val_batch, list_y_val_pred[11], Val_weights)
-                #vl_w12 = loss_fn(y_val_batch, list_y_val_pred[11])
-                vplw12 += vl_w12.item()
-
-                vl_w13 = weighted_mse_loss(y_val_batch, list_y_val_pred[12], Val_weights)
-                #vl_w13 = loss_fn(y_val_batch, list_y_val_pred[12])
-                vplw13 += vl_w13.item()
-
-                vl_w14 = weighted_mse_loss(y_val_batch, list_y_val_pred[13], Val_weights)
-                #vl_w14 = loss_fn(y_val_batch, list_y_val_pred[13])
-                vplw14 += vl_w14.item()
-
-                vl_w15 = weighted_mse_loss(y_val_batch, list_y_val_pred[14], Val_weights)
-                #vl_w15 = loss_fn(y_val_batch, list_y_val_pred[14])
-                vplw15 += vl_w15.item()
-
-                val_loss = vl_w1 + vl_w2 + vl_w3 + vl_w4 + vl_w5 + vl_w6 + vl_w7 + vl_w8 + vl_w9 + vl_w10 + vl_w11 + vl_w12 + vl_w13 + vl_w14 + vl_w15
-                
-                val_epoch_loss += val_loss.item()
+                val_epoch_loss += val_loss_sum_week.item()
 
         loss_stats['train'].append(train_epoch_loss/len(data_loader_training))
-        loss_week_stats['train_w1'].append(tplw1/len(data_loader_training))
-        loss_week_stats['train_w2'].append(tplw2/len(data_loader_training))
-        loss_week_stats['train_w3'].append(tplw3/len(data_loader_training))
-        loss_week_stats['train_w4'].append(tplw4/len(data_loader_training))
-        loss_week_stats['train_w5'].append(tplw5/len(data_loader_training))
-        loss_week_stats['train_w6'].append(tplw6/len(data_loader_training))
-        loss_week_stats['train_w7'].append(tplw7/len(data_loader_training))
-        loss_week_stats['train_w8'].append(tplw8/len(data_loader_training))
-        loss_week_stats['train_w9'].append(tplw9/len(data_loader_training))
-        loss_week_stats['train_w10'].append(tplw10/len(data_loader_training))
-        loss_week_stats['train_w11'].append(tplw11/len(data_loader_training))
-        loss_week_stats['train_w12'].append(tplw12/len(data_loader_training))
-        loss_week_stats['train_w13'].append(tplw13/len(data_loader_training))
-        loss_week_stats['train_w14'].append(tplw14/len(data_loader_training))
-        loss_week_stats['train_w15'].append(tplw15/len(data_loader_training))
-        
         loss_stats['val'].append(val_epoch_loss/len(data_loader_validate))
-        loss_week_stats['val_w1'].append(vplw1/len(data_loader_validate))
-        loss_week_stats['val_w2'].append(vplw2/len(data_loader_validate))
-        loss_week_stats['val_w3'].append(vplw3/len(data_loader_validate))
-        loss_week_stats['val_w4'].append(vplw4/len(data_loader_validate))
-        loss_week_stats['val_w5'].append(vplw5/len(data_loader_validate))
-        loss_week_stats['val_w6'].append(vplw6/len(data_loader_validate))
-        loss_week_stats['val_w7'].append(vplw7/len(data_loader_validate))
-        loss_week_stats['val_w8'].append(vplw8/len(data_loader_validate))
-        loss_week_stats['val_w9'].append(vplw9/len(data_loader_validate))
-        loss_week_stats['val_w10'].append(vplw10/len(data_loader_validate))
-        loss_week_stats['val_w11'].append(vplw11/len(data_loader_validate))
-        loss_week_stats['val_w12'].append(vplw12/len(data_loader_validate))
-        loss_week_stats['val_w13'].append(vplw13/len(data_loader_validate))
-        loss_week_stats['val_w14'].append(vplw14/len(data_loader_validate))
-        loss_week_stats['val_w15'].append(vplw15/len(data_loader_validate))
+
 
         training_duration_time = (time.time() - training_start_time)        
         print(f'Epoch {epoch+0:03}: | Time(s): {training_duration_time:.3f}| Train Loss: {train_epoch_loss/len(data_loader_training):.4f} | Val Loss: {val_epoch_loss/len(data_loader_validate):.4f}') 
@@ -367,25 +92,9 @@ def train(patch_size: int, dropout: int,
             torch.save(model.state_dict(), best_model_name)
             
             status = True
-            
-            bw1  = (vplw1/len(data_loader_validate))
-            bw2  = (vplw2/len(data_loader_validate))
-            bw3  = (vplw3/len(data_loader_validate))
-            bw4  = (vplw4/len(data_loader_validate))
-            bw5  = (vplw5/len(data_loader_validate))
-            bw6  = (vplw6/len(data_loader_validate))
-            bw7  = (vplw7/len(data_loader_validate))
-            bw8  = (vplw8/len(data_loader_validate))
-            bw9  = (vplw9/len(data_loader_validate))
-            bw10 = (vplw10/len(data_loader_validate))
-            bw11 = (vplw11/len(data_loader_validate))
-            bw12 = (vplw12/len(data_loader_validate))
-            bw13 = (vplw13/len(data_loader_validate))
-            bw14 = (vplw14/len(data_loader_validate))
-            bw15 = (vplw15/len(data_loader_validate))
+
             
             print(f'Best model Saved! Val MSE: {best_val_loss:.4f}')
-            print(f'W1:{bw1:.2f}|W2:{bw2:.2f}|W3:{bw3:.2f}|W4:{bw4:.2f}|W5:{bw5:.2f}|W6:{bw6:.2f}|W7:{bw7:.2f}|W8:{bw8:.2f}|W9:{bw9:.2f}|W10:{bw10:.2f}|W11:{bw11:.2f}|W12:{bw12:.2f}|W13:{bw13:.2f}|W14:{bw14:.2f}|W15:{bw15:.2f}')
         else:
             print(f'Model is not saved! Current val Loss: {(val_epoch_loss/len(data_loader_validate)):.4f}') 
                 
@@ -395,27 +104,73 @@ def train(patch_size: int, dropout: int,
         if early_stopping.early_stop:
             print("We are at epoch:", epoch)
             break
+    return loss_stats
+
+
+def run(batch_size: int, dropout: int, 
+            learning_rate: float, weight_decay: float,
+            epochs: int, loss_stop_tolerance: int, 
+            lds_ks: int, lds_sigma: int, dw_alpha :float, betha: int, init_noise_sigma: float, sigma_lr: float,
+            re_weighting_method: str,
+            exp_name: str):
+
+    exp_output_dir = '/data2/hkaman/Imbalance/EXPs/' + 'EXP_' + exp_name
+    isExist  = os.path.isdir(exp_output_dir)
+
+    if not isExist:
+        os.makedirs(exp_output_dir)
+        os.makedirs(exp_output_dir + '/coords')
+        os.makedirs(exp_output_dir + '/loss')
+
+    best_model_name      = exp_output_dir + '/best_model' + exp_name + '.pth'
+    loss_fig_name        = exp_output_dir + '/loss/loss'  + exp_name + '.png'
+    loss_df_name         = exp_output_dir + '/loss/loss'  + exp_name + '.csv' 
+
+
+    data_loader_training, data_loader_validate, data_loader_test  = dataloader.getData(batch_size, 
+                                                                                                  lds_ks, 
+                                                                                                  lds_sigma, 
+                                                                                                  dw_alpha, 
+                                                                                                  betha, 
+                                                                                                  re_weighting_method = re_weighting_method, 
+                                                                                                  exp_name= exp_name)
+
+
+    model = UNet2DConvLSTM(in_channels = 6, out_channels = 1, 
+                                num_filters   = 16, 
+                                dropout       = dropout, 
+                                Emb_Channels  = 4, 
+                                batch_size    = batch_size, 
+                                botneck_size  = 2).to(device)
+
+
+    #criterion = nn.MSELoss()
+    criterion = BMCLoss(init_noise_sigma)
+    
+
+    ### ADAM
+    params = [p for p in model.parameters() if p.requires_grad]
+    optimizer = torch.optim.Adam(params, lr=learning_rate, weight_decay = weight_decay)
+    optimizer.add_param_group({'params': criterion.noise_sigma, 'lr': sigma_lr, 'name': 'noise_sigma'})
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+   
+
+    loss_stats = train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, learning_rate, criterion, best_model_name)
 
     _ = ModelEngine.save_loss_df(loss_stats, loss_df_name, loss_fig_name)
-    _ = ModelEngine.save_loss_df(loss_week_stats, loss_weekly_df_name, loss_weekly_fig_name)
-
     _ = ModelEngine.predict(model, data_loader_training, data_loader_validate, data_loader_test, Exp_name = exp_name)
 
 
 if __name__ == "__main__":
     #lds_kds = [5, 10, 15, 20]
     #lds_sigmas = [2, 4, 6, 8]
+    alpha_list = [3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
 
-    
-    #for kd in lds_kds: 
-    #   for sigma in lds_sigmas: 
-    alpha_list = [3, 4, 5, 10]
-    b = 4
-    #for a in alpha_list: 
-    ExpName = '013_64_001_05_RGB_CB_' + str(4)
-    train(patch_size = 16, dropout = 0.3, 
-        batch_size = 64, learning_rate = 0.001, weight_decay = 0.05,
-        in_channel = 6, emb_channel = 4, epochs = 500, loss_stop_tolerance = 200, 
-        lds_ks = 10, lds_sigma = 8, dw_alpha = 3, betha = b,
-        re_weighting_method = 'cb',
-        exp_name = ExpName) 
+    for a in alpha_list: 
+        ExpName = '015_64_001_05_RGB_DW_M_' + str(a)
+        run(batch_size = 64, dropout = 0.3, 
+            learning_rate = 0.001, weight_decay = 0.05,
+            epochs = 500, loss_stop_tolerance = 100, 
+            lds_ks = 10, lds_sigma = 8, dw_alpha = a, betha = 4, init_noise_sigma = 1.0, sigma_lr = 1e-2,
+            re_weighting_method = 'dw',
+            exp_name = ExpName) 

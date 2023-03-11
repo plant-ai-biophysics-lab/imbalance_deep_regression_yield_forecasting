@@ -27,7 +27,7 @@ def adjust_learning_rate(optimizer, epoch, lr):
 
 
 def train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, lr, criterion, best_model_name):
-    best_val_loss = 100000 # initial dummy value
+    best_val_loss = 100000000 # initial dummy value
     early_stopping = ModelEngine.EarlyStopping(tolerance = loss_stop_tolerance, min_delta=50)
     
     loss_stats = {'train': [],"val": []}
@@ -49,13 +49,14 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
             optimizer.zero_grad()
             for l in range(15):
                 #val_loss = criterion(ytrain_true, list_ytrain_pred[l])
-                train_loss_ = weighted_huber_mse_loss(ytrain_true, list_ytrain_pred[l], WgTrain)
+                train_loss_ = weighted_integral_mse_loss(ytrain_true, list_ytrain_pred[l], WgTrain)
                 train_loss_w += train_loss_
-
+            train_loss_w = torch.div(train_loss_w, 15)
+            train_loss_w.requires_grad = True
             train_loss_w.backward()
             optimizer.step()
             
-            train_epoch_loss += train_loss_w.item()
+            train_epoch_loss += train_loss_w.item() 
 
         # VALIDATION    
         with torch.no_grad():
@@ -74,9 +75,9 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
                 val_loss_sum_week = 0
                 for l in range(len(list_yvalid_pred)):
                     #val_loss = criterion(yvalid_true, list_yvalid_pred[l])
-                    val_loss_w = weighted_huber_mse_loss(yvalid_true, list_yvalid_pred[l], WgValid)
+                    val_loss_w = weighted_integral_mse_loss(yvalid_true, list_yvalid_pred[l], WgValid)
                     val_loss_sum_week += val_loss_w
-
+                val_loss_sum_week = torch.div(val_loss_sum_week, 15)
                 val_epoch_loss += val_loss_sum_week.item()
 
         loss_stats['train'].append(train_epoch_loss/len(data_loader_training))
@@ -155,9 +156,9 @@ def run(batch_size: int, dropout: int,
     #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
    
 
-    loss_stats = train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, learning_rate, criterion, best_model_name)
+    #loss_stats = train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, learning_rate, criterion, best_model_name)
 
-    _ = ModelEngine.save_loss_df(loss_stats, loss_df_name, loss_fig_name)
+    #_ = ModelEngine.save_loss_df(loss_stats, loss_df_name, loss_fig_name)
     _ = ModelEngine.predict(model, data_loader_training, data_loader_validate, data_loader_test, Exp_name = exp_name)
 
 
@@ -166,11 +167,11 @@ if __name__ == "__main__":
     #lds_sigmas = [2, 4, 6, 8]
     alpha_list = [3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
 
-    for a in alpha_list: 
-        ExpName = '015_64_001_05_RGB_DW_M_' + str(a)
-        run(batch_size = 64, dropout = 0.3, 
-            learning_rate = 0.001, weight_decay = 0.05,
-            epochs = 500, loss_stop_tolerance = 100, 
-            lds_ks = 10, lds_sigma = 8, dw_alpha = a, betha = 4, init_noise_sigma = 1.0, sigma_lr = 1e-2,
-            re_weighting_method = 'dw',
-            exp_name = ExpName) 
+    #for a in alpha_list: 
+    ExpName = '015_64_001_05_RGB_DW_IntegralLoss_' + str(3.9)
+    run(batch_size = 64, dropout = 0.3, 
+        learning_rate = 0.005, weight_decay = 0.05,
+        epochs = 500, loss_stop_tolerance = 100, 
+        lds_ks = 10, lds_sigma = 8, dw_alpha = 3.9, betha = 4, init_noise_sigma = 1.0, sigma_lr = 1e-2,
+        re_weighting_method = 'dw',
+        exp_name = ExpName) 

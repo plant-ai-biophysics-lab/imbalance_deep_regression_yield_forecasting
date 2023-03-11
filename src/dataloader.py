@@ -140,7 +140,9 @@ class dataloader_RGB(object):
             self.weights = self.return_pixelwise_weight_lds(lds_ks, lds_sigma)
         elif re_weighting_method == 'dw':
             self.weights = self.return_pixelwise_weight_dw(dw_alpha)
+            self.weights = self.weights / np.max(self.weights)
             #self.weights = np.where(self.weights >= 1, self.weights, 1)
+            print(f"Min weight {np.min(self.weights)} | Max weight {np.max(self.weights)}")
         elif re_weighting_method == 'cb':
             self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
             #self.weights = np.where(self.weights >= 1, self.weights, 1)

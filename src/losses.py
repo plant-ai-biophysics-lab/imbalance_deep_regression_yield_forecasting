@@ -3,6 +3,10 @@ import torch.nn.functional as F
 from torch.nn.modules.loss import _Loss
 from torch.distributions import MultivariateNormal as MVN
 import time
+import pandas as pd
+from scipy.integrate import simps
+from sklearn.metrics import make_scorer
+import numpy as np
 
 def weighted_mse_loss(inputs, targets, weights=None):
     loss = (inputs - targets) ** 2
@@ -10,6 +14,33 @@ def weighted_mse_loss(inputs, targets, weights=None):
         loss *= weights.expand_as(loss)
     loss = torch.mean(loss)
     return loss
+
+
+def weighted_integral_mse_loss(inputs, targets, weights=None):
+    input_flat    = torch.flatten(inputs)
+    target_flat   = torch.flatten(targets)
+    weights_flat  = torch.flatten(weights)
+
+
+    intervals = np.arange(0, 30)
+    intervals = torch.as_tensor(intervals)
+    ser = []
+
+    for phi in intervals:
+        ytrue  = input_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]  #df['true'][(df['true'] >= phi) & (df['true'] < phi + 1)]
+        ypred  = target_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]
+        im_    = weights_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]
+
+        loss = (ytrue - ypred) ** 2
+        loss = loss * im_
+        loss = torch.sum(loss) 
+
+        ser.append(loss)
+
+    loss = torch.trapz(torch.as_tensor(ser), intervals) 
+    return loss
+
+
 
 def weighted_huber_mse_loss(inputs, targets, weights=None):
 
@@ -153,3 +184,40 @@ def bmc_loss(pred, target, noise_var):
 
     return loss
 
+
+
+
+'''
+def calc_sera(y_true, y_pred,x_relevance=None):
+    # creating a list from 0 to 1 with 0.001 interval
+    start_range = 0
+    end_range = 1
+    interval_size = 0.001
+
+    list_1 = [round(val * interval_size, 3) for val in range(1, 1000)]
+    list_1.append(start_range)
+    list_1.append(end_range)
+    epsilon = sorted(list_1, key=lambda x: float(x))
+    
+    df = pd.concat([y_true,y_pred,x_relevance],axis=1,keys= ['true', 'pred', 'phi'])
+    # Initiating lists to store relevance(phi) and squared-error relevance (ser)
+    relevance = []
+    ser = []
+
+    # Converting the dataframe to a numpy array
+    rel_arr = x_relevance
+    # selecting a phi value
+    for phi in epsilon:
+        relevance.append(phi)
+        error_squared_sum = 0
+        error_squared_sum = sum((df[df.phi>=phi]['true'] - df[df.phi>=phi]['pred'])**2)
+        ser.append(error_squared_sum)
+
+    # squared-error relevance area (sera)
+#     numerical integration using simps(y, x)
+
+    sera = simps(ser, relevance)
+
+    return sera
+
+sera = make_scorer(calc_sera, x_relevance=X['relevance'], greater_is_better=False)'''

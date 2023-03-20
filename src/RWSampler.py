@@ -406,11 +406,11 @@ class TargetRelevance():
 
     def __init__(self, y, alpha=1.0):
         self.alpha = alpha
-        print('TargetRelevance alpha:', self.alpha)
+       #print('TargetRelevance alpha:', self.alpha)
 
         silverman_bandwidth = 1.06*np.std(y)*np.power(len(y), (-1.0/5.0))
 
-        print('Using Silverman Bandwidth', silverman_bandwidth)
+        #print('Using Silverman Bandwidth', silverman_bandwidth)
         best_bandwidth = silverman_bandwidth
 
         self.kernel = FFTKDE(bw=best_bandwidth).fit(y, weights=None)

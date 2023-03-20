@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 from KDEpy import FFTKDE
 from sklearn.preprocessing import MinMaxScaler
-from src.RWSampler import lds_prepare_weights, cb_prepare_weights, TargetRelevance
+from src.RWSampler import lds_prepare_weights, cb_prepare_weights, TargetRelevance, return_cost_sensitive_weight_sampler
 
     
 
@@ -33,10 +33,13 @@ def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method:
     test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
     test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
     print(f"{train_csv.shape} | {valid_csv.shape} | {test_csv.shape}")
+
+    
     #==============================================================================================================#
     #============================================ Imprical Data Weight Generation =================================#
     #==============================================================================================================#
-    '''train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
+    
+    #train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
 
     train_weights = train_csv['NormWeight'].to_numpy() 
     train_weights = torch.DoubleTensor(train_weights)
@@ -50,7 +53,7 @@ def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method:
 
     test_weights = test_csv['NormWeight'].to_numpy() 
     test_weights = torch.DoubleTensor(test_weights)
-    test_sampler = torch.utils.data.sampler.WeightedRandomSampler(test_weights, len(test_weights))'''
+    test_sampler = torch.utils.data.sampler.WeightedRandomSampler(test_weights, len(test_weights), replacement=True)
 
     #==============================================================================================================#
     #============================================     Reading Data                =================================#
@@ -94,11 +97,11 @@ def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method:
     #==============================================================================================================#                      
     # define training and validation data loaders
     data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
-                                                    shuffle=True, num_workers=8) #   sampler=train_sampler, 
+                                                    shuffle=False, sampler=train_sampler, num_workers=8) # 
     data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
-                                                    shuffle=False,  num_workers=8) #sampler=val_sampler,
+                                                    shuffle=False, sampler=val_sampler, num_workers=8) # 
     data_loader_test     = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, 
-                                                    shuffle=False,  num_workers=8) #sampler=test_sampler,
+                                                    shuffle=False, sampler=test_sampler, num_workers=8) # 
 
     return data_loader_training, data_loader_validate, data_loader_test
 
@@ -140,9 +143,10 @@ class dataloader_RGB(object):
             self.weights = self.return_pixelwise_weight_lds(lds_ks, lds_sigma)
         elif re_weighting_method == 'dw':
             self.weights = self.return_pixelwise_weight_dw(dw_alpha)
-            self.weights = self.weights / np.max(self.weights)
+            assert not np.isnan(self.weights).any()
+            #self.weights = self.weights / np.max(self.weights)
             #self.weights = np.where(self.weights >= 1, self.weights, 1)
-            print(f"Min weight {np.min(self.weights)} | Max weight {np.max(self.weights)}")
+            #print(f"Min weight {np.min(self.weights)} | Max weight {np.max(self.weights)}")
         elif re_weighting_method == 'cb':
             self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
             #self.weights = np.where(self.weights >= 1, self.weights, 1)
@@ -275,14 +279,11 @@ class dataloader_RGB(object):
         weights = TargetRelevance(reshaped_masks, alpha = dw_alpha).__call__(reshaped_masks)
 
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
-        return weights
-    
-
+        return weights  
     def crop_gen(self, src, xcoord, ycoord):
         src = np.load(src, allow_pickle=True)
         crop_src = src[:, xcoord:xcoord + self.wsize, ycoord:ycoord + self.wsize, :]
         return crop_src 
-  
     def patch_cultivar_matrix(self, cul_id):
         zeros_matrix       = np.full(4, (1/cul_id))
         cultivar_matrix    = zeros_matrix.reshape(1, int(self.wsize/8), int(self.wsize/8))

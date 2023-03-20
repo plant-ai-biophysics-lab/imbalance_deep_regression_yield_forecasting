@@ -25,19 +25,44 @@ def weighted_integral_mse_loss(inputs, targets, weights=None):
     intervals = np.arange(0, 30)
     intervals = torch.as_tensor(intervals)
     ser = []
+    trues, preds = [], []
+    weights = []
 
     for phi in intervals:
-        ytrue  = input_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]  #df['true'][(df['true'] >= phi) & (df['true'] < phi + 1)]
+        ytrue  = input_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]  
         ypred  = target_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]
         im_    = weights_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]
 
-        loss = (ytrue - ypred) ** 2
-        loss = loss * im_
-        loss = torch.sum(loss) 
+        if len(ytrue) > 0: 
+            #loss = (ytrue - ypred) ** 2
+            #loss = loss * im_
+            #loss = torch.trapz(torch.as_tensor(loss), dx=1) 
+            #loss = torch.trapz(torch.as_tensor(loss), torch.as_tensor((phi, phi +1))) 
+            #loss = torch.mean(loss) 
+            #assert not torch.isnan(loss).any()
+            true_mean = torch.sum(ytrue) 
+            pred_mean = torch.sum(ypred) 
+            #w_mean    = torch.mean(im_) 
+        else: 
+            X = 0.0
+            #true_mean = 0.0
+            #pred_mean = 0.0
+            #w_mean    = 0.0
+        
+        #ser.append(loss)
+        trues.append(true_mean)
+        preds.append(pred_mean)
+        #weights.append(w_mean)
+    t = torch.as_tensor(trues)
+    p = torch.as_tensor(preds)
 
-        ser.append(loss)
-
-    loss = torch.trapz(torch.as_tensor(ser), intervals) 
+    k = torch.argmax(torch.abs(t - p))
+    loss = torch.abs(t[k] -p[k])
+    #mul = torch.as_tensor(ser)*torch.as_tensor(weights)
+    #loss = torch.sum((torch.as_tensor(trues)-torch.as_tensor(preds)) * torch.as_tensor(weights))
+    #print(ser)
+    #loss = torch.mean(torch.as_tensor(ser)) 
+    #loss = torch.trapz(torch.as_tensor(ser), intervals) 
     return loss
 
 

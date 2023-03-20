@@ -6,7 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 from src import Inference 
+from src.RWSampler import lds_prepare_weights, return_cost_sensitive_weight_sampler
+from src.losses import *
 #======================================================================================================================================#
 #=========================================================== 2D Config =================================================================
 #======================================================================================================================================#
@@ -21,7 +24,6 @@ def Encoder2D(in_channels, middle_channels, out_channels, dropout):
         nn.BatchNorm2d(out_channels),
         nn.PReLU(),
         nn.Dropout2d(p=dropout),)
-
 # Decoder Block: 
 def Decoder2D(in_channels, out_channels, dropout):
     return nn.Sequential(
@@ -305,8 +307,7 @@ class ConvLSTM(nn.Module):
         if self.bidirectional is True:
             init_states_bw = self.cell_bw.init_hidden(batch_size)
         return init_states_fw, init_states_bw  
-    
-    
+
 #======================================================================================================================================#
 #====================================================== Training Config ===============================================================#
 #======================================================================================================================================#   
@@ -330,8 +331,6 @@ class EarlyStopping():
         if self.counter >= self.tolerance:  
                 self.early_stop = True
 
-
-
 def save_loss_df(loss_stat, loss_df_name, loss_fig_name):
 
     df = pd.DataFrame.from_dict(loss_stat).reset_index().melt(id_vars=['index']).rename(columns={"index":"epochs"})
@@ -340,7 +339,6 @@ def save_loss_df(loss_stat, loss_df_name, loss_fig_name):
     sns.lineplot(data=df, x = "epochs", y="value", hue="variable").set_title('Train-Val Loss/Epoch')
     plt.ylim(0, df['value'].max())
     plt.savefig(loss_fig_name, dpi = 300)
-
 
 def predict(model, data_loader_training, data_loader_validate, data_loader_testing, Exp_name = None,): 
 
@@ -373,7 +371,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
         
         model.eval()
         #================ Train===========================
-        for batch, sample in enumerate(data_loader_training):
+        '''for batch, sample in enumerate(data_loader_training):
             
             X_batch_train       = sample['image'].to(device)
             y_batch_train       = sample['mask'].to(device)
@@ -460,11 +458,11 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
                                 "ypred_w9": yvpw9, "ypred_w10": yvpw10, "ypred_w11": yvpw11, "ypred_w12": yvpw12, "ypred_w13": yvpw13, "ypred_w14": yvpw14, "ypred_w15": yvpw15} 
 
                 
-            valid_output_files.append(this_batch_val)
+            valid_output_files.append(this_batch_val)'''
         # save the prediction in data2 drectory as a npy file
         #np.save(valid_npy_name, valid_output_files)
-        valid_df = Inference.ScenarioEvaluation2D(valid_output_files)
-        valid_df.to_csv(valid_df_name)
+        #valid_df = Inference.ScenarioEvaluation2D(valid_output_files)
+        #valid_df.to_csv(valid_df_name)
 
         #valid_block_names  = utils.npy_block_names(valid_output_files)
         #df1d_valid, df2d_valid = utils.time_series_eval_csv(valid_output_files, valid_block_names, patch_size)
@@ -513,13 +511,131 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             test_output_files.append(this_batch_test)
         #np.save(test_npy_name, test_output_files) 
         #print("Test Data is Saved!")
-        test_df = Inference.ScenarioEvaluation2D(test_output_files)
-        test_df.to_csv(test_df_name)
+        #test_df = Inference.ScenarioEvaluation2D(test_output_files)
+        #test_df.to_csv(test_df_name)
 
-        #test_block_names  = ['LIV_186_2017', 'LIV_025_2019', 'LIV_105_2018'] #utils.npy_block_names(test_output_files)
-        #df1d, df2d        = utils.time_series_eval_csv(test_output_files, test_block_names, patch_size)
-        #df1d.to_csv(test_bc_df1_name)
+        test_block_names  = ['LIV_186_2017', 'LIV_025_2019', 'LIV_105_2018'] #utils.npy_block_names(test_output_files)
+        df1d        = Inference.time_series_eval_csv(test_output_files, test_block_names, 16)
+        df1d.to_csv(test_bc_df1_name)
         #df2d.to_csv(test_bc_df2_name)
-        _ = Inference.time_series_evaluation_plots(train_df, valid_df, test_df, fig_save_name = timeseries_fig)
-        #_ = Inference.train_val_test_satterplot(train_df, valid_df, test_df, week = 15, cmap  = 'viridis', mincnt = 2000, fig_save_name = scatterplot)
 
+
+
+def adjust_learning_rate(optimizer, epoch, lr):
+    lr = lr * (0.1 ** (epoch // 5))
+
+    for param_group in optimizer.param_groups:
+        if 'name' in param_group and param_group['name'] == 'noise_sigma':
+            continue
+        param_group['lr'] = lr
+
+
+def train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, criterion: str, best_model_name: str):
+
+    best_val_loss = 100000000 # initial dummy value
+    early_stopping = EarlyStopping(tolerance = loss_stop_tolerance, min_delta=50)
+    
+    loss_stats = {'train': [],"val": []}
+    for epoch in range(1, epochs+1):
+
+        training_start_time = time.time()
+        train_epoch_loss = 0
+        model.train()
+
+        for batch, sample in enumerate(data_loader_training):
+            
+            Xtrain         = sample['image'].to(device)
+            ytrain_true    = sample['mask'][:,:,:,:,0].to(device)
+            EmbTrain       = sample['EmbMatrix'].to(device)
+            WgTrain        = sample['weight'].to(device)
+                
+            list_ytrain_pred  = model(Xtrain, EmbTrain)
+            train_loss_w = 0
+            optimizer.zero_grad()
+            for l in range(15):
+                if criterion == 'mse': 
+                    train_loss_ = F.mse_loss(ytrain_true, list_ytrain_pred[l])
+                    train_loss_w += train_loss_
+
+                elif criterion == 'wmse':
+                    train_loss_ = weighted_mse_loss(ytrain_true, list_ytrain_pred[l], WgTrain)
+                    train_loss_w += train_loss_
+
+                elif criterion == 'integral':
+
+                    train_loss_ = weighted_integral_mse_loss(ytrain_true, list_ytrain_pred[l], WgTrain)
+                    train_loss_w += train_loss_
+
+                elif criterion == 'huber': 
+                    train_loss_  = weighted_huber_mse_loss(ytrain_true, list_ytrain_pred[l], WgTrain)
+                    train_loss_w += train_loss_
+
+            if criterion == 'integral':
+                train_loss_w.requires_grad = True
+            train_loss_w.backward()
+            optimizer.step()
+            
+            train_epoch_loss += train_loss_w.item() 
+
+        # VALIDATION    
+        with torch.no_grad():
+            
+            val_epoch_loss = 0
+            
+            model.eval()
+            for batch, sample in enumerate(data_loader_validate):
+                
+                Xvalid      = sample['image'].to(device)
+                yvalid_true = sample['mask'][:,:,:,:,0].to(device)
+                EmbValid    = sample['EmbMatrix'].to(device)
+                WgValid     = sample['weight'].to(device)
+        
+                list_yvalid_pred   = model(Xvalid, EmbValid)
+                val_loss_sum_week = 0
+                for l in range(len(list_yvalid_pred)):
+                    if criterion == 'mse': 
+                        val_loss_w = F.mse_loss(yvalid_true, list_yvalid_pred[l])
+                        val_loss_sum_week += val_loss_w
+
+                    elif criterion == 'wmse':
+                        val_loss_w = weighted_mse_loss(yvalid_true, list_yvalid_pred[l], WgValid)
+                        val_loss_sum_week += val_loss_w
+
+                    elif criterion == 'integral':
+                        val_loss_w = weighted_integral_mse_loss(yvalid_true, list_yvalid_pred[l], WgValid)
+                        val_loss_sum_week += val_loss_w
+
+                    elif criterion == 'huber': 
+                        val_loss_w  = weighted_huber_mse_loss(yvalid_true, list_yvalid_pred[l], WgValid)
+                        val_loss_sum_week += val_loss_w
+
+                val_epoch_loss += val_loss_sum_week.item()
+
+        loss_stats['train'].append(train_epoch_loss/len(data_loader_training))
+        loss_stats['val'].append(val_epoch_loss/len(data_loader_validate))
+
+
+        training_duration_time = (time.time() - training_start_time)        
+        print(f'Epoch {epoch+0:03}: | Time(s): {training_duration_time:.3f}| Train Loss: {train_epoch_loss/len(data_loader_training):.4f} | Val Loss: {val_epoch_loss/len(data_loader_validate):.4f}') 
+        
+        if (val_epoch_loss/len(data_loader_validate)) < best_val_loss or epoch==0:
+                    
+            best_val_loss=(val_epoch_loss/len(data_loader_validate))
+            torch.save(model.state_dict(), best_model_name)
+            
+            status = True
+
+            
+            print(f'Best model Saved! Val MSE: {best_val_loss:.4f}')
+        else:
+            print(f'Model is not saved! Current val Loss: {(val_epoch_loss/len(data_loader_validate)):.4f}') 
+                
+            status = False
+            # early stopping
+        early_stopping(status)
+        if early_stopping.early_stop:
+            print("We are at epoch:", epoch)
+            break
+
+        
+    return loss_stats

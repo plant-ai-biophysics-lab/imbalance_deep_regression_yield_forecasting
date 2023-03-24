@@ -10,6 +10,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 from src import Inference 
 from src.RWSampler import lds_prepare_weights, return_cost_sensitive_weight_sampler
 from src.losses import *
+from geomloss import SamplesLoss   # ImagesLoss
 #======================================================================================================================================#
 #=========================================================== 2D Config =================================================================
 #======================================================================================================================================#
@@ -344,7 +345,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
 
     exp_output_dir = '/data2/hkaman/Imbalance/EXPs/' + 'EXP_' + Exp_name
 
-    best_model_name      = exp_output_dir + '/best_model' + Exp_name + '.pth'
+    best_model_name      = exp_output_dir + '/best_model_' + Exp_name + '.pth'
     train_df_name        = exp_output_dir + '/' + Exp_name + '_train.csv'
     valid_df_name        = exp_output_dir + '/' + Exp_name + '_valid.csv'
     test_df_name         = exp_output_dir + '/' + Exp_name + '_test.csv'
@@ -371,7 +372,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
         
         model.eval()
         #================ Train===========================
-        '''for batch, sample in enumerate(data_loader_training):
+        for batch, sample in enumerate(data_loader_training):
             
             X_batch_train       = sample['image'].to(device)
             y_batch_train       = sample['mask'].to(device)
@@ -380,8 +381,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             Cult_batch_train    = sample['cultivar']
             Xcoord_batch_train  = sample['X']
             ycoord_batch_train  = sample['Y']
-            
-            WithinBlockMean_train    = sample['win_block_mean']
+        
             
             list_y_train_pred = model(X_batch_train, C_batch_train)
             
@@ -405,7 +405,6 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
 
 
             this_batch_train = {"block": ID_batch_train, "cultivar": Cult_batch_train, "X": Xcoord_batch_train, "Y": ycoord_batch_train,
-                                "win_block_mean":WithinBlockMean_train,
                                 "ytrue": y_true_train, "ypred_w1": ytpw1, "ypred_w2": ytpw2,"ypred_w3": ytpw3,"ypred_w4": ytpw4,"ypred_w5": ytpw5,"ypred_w6": ytpw6,"ypred_w7": ytpw7,"ypred_w8": ytpw8,
                                 "ypred_w9": ytpw9,"ypred_w10": ytpw10,"ypred_w11": ytpw11,"ypred_w12": ytpw12,"ypred_w13": ytpw13,"ypred_w14": ytpw14,"ypred_w15": ytpw15}
             
@@ -413,7 +412,7 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
 
         train_df = Inference.ScenarioEvaluation2D(train_output_files)
         train_df.to_csv(train_df_name)
-
+        print("train evaluation is done!")
         #train_block_names      = utils.npy_block_names(train_output_files)
         #df1d_train, df2d_train = utils.time_series_eval_csv(train_output_files, train_block_names, patch_size)
         #df1d_train.to_csv(train_bc_df1_name)
@@ -429,7 +428,6 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             Cult_batch_val    = sample['cultivar']
             Xcoord_batch_val  = sample['X']
             ycoord_batch_val  = sample['Y']
-            WithinBlockMean_val    = sample['win_block_mean']
 
 
             list_y_val_pred = model(X_batch_val, C_batch_val)
@@ -453,22 +451,21 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             yvpw15 = list_y_val_pred[14].detach().cpu().numpy()
             
 
-            this_batch_val = {"block": ID_batch_val, "cultivar": Cult_batch_val, "X": Xcoord_batch_val, "Y": ycoord_batch_val, 
-                                "win_block_mean":WithinBlockMean_val, "ytrue": y_true_val, "ypred_w1": yvpw1, "ypred_w2": yvpw2, "ypred_w3": yvpw3, "ypred_w4": yvpw4, "ypred_w5": yvpw5, "ypred_w6": yvpw6, "ypred_w7": yvpw7, "ypred_w8": yvpw8,
+            this_batch_val = {"block": ID_batch_val, "cultivar": Cult_batch_val, "X": Xcoord_batch_val, "Y": ycoord_batch_val, "ytrue": y_true_val, "ypred_w1": yvpw1, "ypred_w2": yvpw2, "ypred_w3": yvpw3, "ypred_w4": yvpw4, "ypred_w5": yvpw5, "ypred_w6": yvpw6, "ypred_w7": yvpw7, "ypred_w8": yvpw8,
                                 "ypred_w9": yvpw9, "ypred_w10": yvpw10, "ypred_w11": yvpw11, "ypred_w12": yvpw12, "ypred_w13": yvpw13, "ypred_w14": yvpw14, "ypred_w15": yvpw15} 
 
                 
-            valid_output_files.append(this_batch_val)'''
+            valid_output_files.append(this_batch_val)
         # save the prediction in data2 drectory as a npy file
         #np.save(valid_npy_name, valid_output_files)
-        #valid_df = Inference.ScenarioEvaluation2D(valid_output_files)
-        #valid_df.to_csv(valid_df_name)
+        valid_df = Inference.ScenarioEvaluation2D(valid_output_files)
+        valid_df.to_csv(valid_df_name)
 
         #valid_block_names  = utils.npy_block_names(valid_output_files)
         #df1d_valid, df2d_valid = utils.time_series_eval_csv(valid_output_files, valid_block_names, patch_size)
         #df1d_valid.to_csv(valid_bc_df1_name)
         #df2d_valid.to_csv(valid_bc_df2_name)
-    
+        print("validation evaluation is done!")
         #=================== Test ========================
         for batch, sample in enumerate(data_loader_testing):
             
@@ -479,7 +476,6 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             Cult_batch_test    = sample['cultivar']
             Xcoord_batch_test  = sample['X']
             ycoord_batch_test  = sample['Y']
-            WithinBlockMean_test = sample['win_block_mean']
 
 
 
@@ -503,7 +499,6 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             ytepw15 = list_y_test_pred[14].detach().cpu().numpy()
 
             this_batch_test = {"block": ID_batch_test, "cultivar": Cult_batch_test, "X": Xcoord_batch_test, "Y": ycoord_batch_test, 
-                            "win_block_mean":WithinBlockMean_test,
                             "ytrue": y_true_test, "ypred_w1": ytepw1, "ypred_w2": ytepw2, "ypred_w3": ytepw3, "ypred_w4": ytepw4, "ypred_w5": ytepw5, "ypred_w6": ytepw6, "ypred_w7": ytepw7, 
                             "ypred_w8": ytepw8, "ypred_w9": ytepw9, "ypred_w10": ytepw10, "ypred_w11": ytepw11, "ypred_w12": ytepw12, "ypred_w13": ytepw13, "ypred_w14": ytepw14, "ypred_w15": ytepw15}
             
@@ -511,15 +506,13 @@ def predict(model, data_loader_training, data_loader_validate, data_loader_testi
             test_output_files.append(this_batch_test)
         #np.save(test_npy_name, test_output_files) 
         #print("Test Data is Saved!")
-        #test_df = Inference.ScenarioEvaluation2D(test_output_files)
-        #test_df.to_csv(test_df_name)
-
+        test_df = Inference.ScenarioEvaluation2D(test_output_files)
+        test_df.to_csv(test_df_name)
+        print("test evaluation is done!")
         test_block_names  = ['LIV_186_2017', 'LIV_025_2019', 'LIV_105_2018'] #utils.npy_block_names(test_output_files)
         df1d        = Inference.time_series_eval_csv(test_output_files, test_block_names, 16)
         df1d.to_csv(test_bc_df1_name)
         #df2d.to_csv(test_bc_df2_name)
-
-
 
 def adjust_learning_rate(optimizer, epoch, lr):
     lr = lr * (0.1 ** (epoch // 5))
@@ -548,7 +541,8 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
             ytrain_true    = sample['mask'][:,:,:,:,0].to(device)
             EmbTrain       = sample['EmbMatrix'].to(device)
             WgTrain        = sample['weight'].to(device)
-                
+            #BWgt           = sample['batch_w'].to(device)
+            print()
             list_ytrain_pred  = model(Xtrain, EmbTrain)
             train_loss_w = 0
             optimizer.zero_grad()
@@ -570,6 +564,20 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
                     train_loss_  = weighted_huber_mse_loss(ytrain_true, list_ytrain_pred[l], WgTrain)
                     train_loss_w += train_loss_
 
+                elif criterion == 'wass':
+                    loss = SamplesLoss(loss="sinkhorn", p=2, blur=.05) 
+                    #ytrain_true_ = ytrain_true[:, 0, :, :]
+                    #ytrain_pred  = list_ytrain_pred[l][:, 0, :, :]
+                    #train_weight = WgTrain[:, 0, :, :]
+                    ytrain_true_ = torch.reshape(ytrain_true, (ytrain_true.shape[0], ytrain_true.shape[1]*ytrain_true.shape[2]*ytrain_true.shape[3], 1))
+                    ytrain_pred  = torch.reshape(list_ytrain_pred[l], (list_ytrain_pred[l].shape[0], list_ytrain_pred[l].shape[1]*list_ytrain_pred[l].shape[2]*list_ytrain_pred[l].shape[3], 1))
+                    train_weight = torch.reshape(WgTrain, (WgTrain.shape[0], WgTrain.shape[1]*WgTrain.shape[2]*WgTrain.shape[3], 1))
+                    #print(f"{ytrain_true_.shape} | {ytrain_pred.shape}")
+                    train_loss_  = loss(train_weight, ytrain_true_, train_weight, ytrain_pred)
+                    train_loss_  = torch.mean(train_loss_)
+                    train_loss_w += train_loss_
+
+
             if criterion == 'integral':
                 train_loss_w.requires_grad = True
             train_loss_w.backward()
@@ -589,6 +597,7 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
                 yvalid_true = sample['mask'][:,:,:,:,0].to(device)
                 EmbValid    = sample['EmbMatrix'].to(device)
                 WgValid     = sample['weight'].to(device)
+                #VBWgt       = sample['batch_w'].to(device)
         
                 list_yvalid_pred   = model(Xvalid, EmbValid)
                 val_loss_sum_week = 0
@@ -608,6 +617,19 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
                     elif criterion == 'huber': 
                         val_loss_w  = weighted_huber_mse_loss(yvalid_true, list_yvalid_pred[l], WgValid)
                         val_loss_sum_week += val_loss_w
+                    elif criterion == 'wass':
+                        #loss = SamplesLoss(loss="sinkhorn", p=2, blur=.05, scaling = 0.5) 
+                        loss = SamplesLoss(loss="sinkhorn", p=2, blur=.05) 
+                        yvalid_true_ = torch.reshape(yvalid_true, (yvalid_true.shape[0], yvalid_true.shape[1]*yvalid_true.shape[2]*yvalid_true.shape[3], 1))
+                        yvalid_pred  = torch.reshape(list_yvalid_pred[l], (list_yvalid_pred[l].shape[0], list_yvalid_pred[l].shape[1]*list_yvalid_pred[l].shape[2]*list_yvalid_pred[l].shape[3], 1))
+                        valid_weight = torch.reshape(WgValid, (WgValid.shape[0], WgValid.shape[1]*WgValid.shape[2]*WgValid.shape[3], 1))
+                        
+                        #yvalid_true_ = yvalid_true[:, 0, :, :]
+                        #yvalid_pred  = list_yvalid_pred[l][:, 0, :, :]
+                        #valid_weight = WgValid[:, 0, :, :]
+                        val_loss_w  = loss(valid_weight, yvalid_true_, valid_weight, yvalid_pred)
+                        val_loss_w  = torch.mean(val_loss_w)
+                        val_loss_sum_week += val_loss_w
 
                 val_epoch_loss += val_loss_sum_week.item()
 
@@ -625,7 +647,6 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
             
             status = True
 
-            
             print(f'Best model Saved! Val MSE: {best_val_loss:.4f}')
         else:
             print(f'Model is not saved! Current val Loss: {(val_epoch_loss/len(data_loader_validate)):.4f}') 

@@ -9,6 +9,7 @@ from src.models import UNet2DConvLSTM
 from src import utils, ModelEngine, dataloader
 from src.RWSampler import lds_prepare_weights, return_cost_sensitive_weight_sampler
 from src.losses import *
+from geomloss import SamplesLoss
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -30,10 +31,9 @@ def run(batch_size: int, dropout: int,
         os.makedirs(exp_output_dir + '/coords')
         os.makedirs(exp_output_dir + '/loss')
 
-    best_model_name      = exp_output_dir + '/best_model' + exp_name + '.pth'
-    loss_fig_name        = exp_output_dir + '/loss/loss'  + exp_name + '.png'
-    loss_df_name         = exp_output_dir + '/loss/loss'  + exp_name + '.csv' 
-
+    best_model_name      = exp_output_dir + '/best_model_' + exp_name + '.pth'
+    loss_fig_name        = exp_output_dir + '/loss/loss_'  + exp_name + '.png'
+    loss_df_name         = exp_output_dir + '/loss/loss_'  + exp_name + '.csv' 
 
     data_loader_training, data_loader_validate, data_loader_test  = dataloader.getData(batch_size, 
                                                                                                   lds_ks, 
@@ -43,8 +43,7 @@ def run(batch_size: int, dropout: int,
                                                                                                   re_weighting_method = re_weighting_method, 
                                                                                                   exp_name= exp_name)
 
-
-    model = UNet2DConvLSTM(in_channels = 6, out_channels = 1, 
+    model = UNet2DConvLSTM(in_channels = 5, out_channels = 1, 
                                 num_filters   = 16, 
                                 dropout       = dropout, 
                                 Emb_Channels  = 4, 
@@ -64,10 +63,10 @@ if __name__ == "__main__":
     #lds_sigmas = [2, 4, 6, 8]
     #alpha_list = [3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
     #for a in alpha_list: 
-    ExpName = '016_64_001_05_WD_Resample_' + str(3.9) + '_huberLoss'
+    ExpName = '022_64_001_05_wmse_byho'
     run(batch_size = 64, dropout = 0.3, 
-        learning_rate = 0.001, weight_decay = 0.05,
-        epochs = 500, loss_stop_tolerance = 100, 
+        learning_rate = 0.001, weight_decay = 0.1,
+        epochs = 500, loss_stop_tolerance = 60, 
         lds_ks = 10, lds_sigma = 8, dw_alpha = 3.9, betha = 4, init_noise_sigma = 1.0, sigma_lr = 1e-2,
-        re_weighting_method = 'dw', criterion = 'huber', 
+        re_weighting_method = 'dw', criterion = 'wmse', 
         exp_name = ExpName) 

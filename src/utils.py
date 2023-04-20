@@ -18,8 +18,6 @@ from scipy.stats import pearsonr
 
 from src.configs import blocks_information
 
-
-
 #-------------------------------------------------------------------------------------------#
 #                                      Data Generation                                      #
 #-------------------------------------------------------------------------------------------#
@@ -390,14 +388,14 @@ def triple_emp_effective_weights_hist_plot(emp, effective, weights, method: str)
     plt.subplots_adjust(hspace = 0.01)
 
     bins_value  = np.arange(1, 31, 1)
-    ax1 = sns.barplot(x = bins_value, y= emp, color = sns.color_palette()[0], width = 0.9, ax = axs[0])
+    ax1 = sns.barplot(x = bins_value, y = emp, color = sns.color_palette()[0],  ax = axs[0]) #width = 0.9,
     ax1.set_title("Emprical Label Distribution", fontsize = 14)
 
 
-    ax2 = sns.barplot(x = bins_value, y= effective, color = sns.color_palette()[0], width = 0.9, ax = axs[1])
+    ax2 = sns.barplot(x = bins_value, y = effective, color = sns.color_palette()[0], ax = axs[1]) #width = 0.9, 
     ax2.set_title("Effective Label Distribution", fontsize = 14)
 
-    ax3 = sns.barplot(x = bins_value, y= weights, color = sns.color_palette()[0], width = 0.9, ax = axs[2])
+    ax3 = sns.barplot(x = bins_value, y = weights, color = sns.color_palette()[0],  ax = axs[2]) #width = 0.9,
     ax3.set_title(r" Weights ({})".format(method), fontsize = 14)
 
     None

@@ -26,15 +26,15 @@ def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method:
         os.makedirs(exp_output_dir + '/coords')
         os.makedirs(exp_output_dir + '/loss')
 
-    '''train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
+    train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
     train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
     valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/val.csv', index_col= 0)
     valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
     test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
     test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
-    print(f"{train_csv.shape} | {valid_csv.shape} | {test_csv.shape}")'''
+    print(f"{train_csv.shape} | {valid_csv.shape} | {test_csv.shape}")
 
-    train_csv, valid_csv, test_csv = data_generator(eval_scenario = 'block_year_hold_out', 
+    '''train_csv, valid_csv, test_csv = data_generator(eval_scenario = 'block_year_hold_out', 
                                                     spatial_resolution =10, 
                                                     patch_size = 16, 
                                                     patch_offset =2,  
@@ -43,12 +43,12 @@ def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method:
     train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
     valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
     test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
-    print(f"{train_csv.shape} | {valid_csv.shape} | {test_csv.shape}")
+    print(f"{train_csv.shape} | {valid_csv.shape} | {test_csv.shape}")'''
     #==============================================================================================================#
     #============================================ Imprical Data Weight Generation =================================#
     #==============================================================================================================#
     
-    train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
+    #train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
 
     train_weights = train_csv['NormWeight'].to_numpy() 
     train_weights = torch.DoubleTensor(train_weights)
@@ -105,11 +105,11 @@ def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method:
     #==============================================================================================================#                      
     # define training and validation data loaders
     data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
-                                                    shuffle=False, sampler=train_sampler, num_workers=8) # 
+                                                    shuffle=True,num_workers=8) #  sampler=train_sampler, 
     data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
-                                                    shuffle=False, sampler=val_sampler, num_workers=8) # 
+                                                    shuffle=False,  num_workers=8) # sampler=val_sampler,
     data_loader_test     = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, 
-                                                    shuffle=False, sampler=test_sampler, num_workers=8) # 
+                                                    shuffle=False, num_workers=8) # sampler=test_sampler, 
 
     return data_loader_training, data_loader_validate, data_loader_test
 
@@ -211,7 +211,6 @@ class data_generator():
             label = np.load(label_npy, allow_pickle=True)
             label = label[0,:,:,0]
             width, height = label.shape[1], label.shape[0]
-            
             
             
             for i in range(0, height - self.patch_size, self.patch_offset):
@@ -494,7 +493,30 @@ class data_generator():
         return train, valid, test
 
 
+    def return_pixelwise_weight_dw(self, dw_alpha):
 
+        masks = None
+        for idx, row in self.NewDf.iterrows():
+            xcoord     = row['X'] 
+            ycoord     = row['Y'] 
+            label_path = row['LABEL_PATH'] 
+            mask  = self.crop_gen(label_path, xcoord, ycoord) 
+            mask  = np.swapaxes(mask, -1, 0)
+
+            if masks is None: 
+                masks = mask
+            else: 
+                masks = np.concatenate([masks, mask], axis = 0)
+
+        reshaped_masks = np.reshape(masks, (masks.shape[0]*masks.shape[1]*masks.shape[2]))
+
+        #weights = TargetRelevance(reshaped_masks, alpha = dw_alpha).get_relevance()
+        weights = TargetRelevance(reshaped_masks, alpha = dw_alpha).__call__(reshaped_masks)
+
+        weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
+        return weights  
+    
+    
 
 class dataloader_RGB(object):
     def __init__(self, npy_dir, csv_dir, 
@@ -534,7 +556,7 @@ class dataloader_RGB(object):
             self.weights = self.return_pixelwise_weight_dw(dw_alpha)
             assert not np.isnan(self.weights).any()
             #self.weights = self.weights / np.max(self.weights)
-            #self.weights = np.where(self.weights >= 1, self.weights, 1)
+            self.weights = np.where(self.weights >= 1, 1/self.weights, 1)
             #print(f"Min weight {np.min(self.weights)} | Max weight {np.max(self.weights)}")
         elif re_weighting_method == 'cb':
             self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
@@ -584,7 +606,6 @@ class dataloader_RGB(object):
         mask  = torch.as_tensor(mask)
 
         weight_mtx = self.weights[idx, :, :]
-        
         weight_mtx = np.expand_dims(weight_mtx, axis = 0)
         weight_mtx = torch.as_tensor(weight_mtx)
         #weight_mtx = weight_mtx/torch.max(weight_mtx)
@@ -645,6 +666,8 @@ class dataloader_RGB(object):
 
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
         return weights  
+
+
     def return_pixelwise_weight_dw(self, dw_alpha):
 
         masks = None
@@ -667,6 +690,8 @@ class dataloader_RGB(object):
 
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
         return weights  
+
+
     def crop_gen(self, src, xcoord, ycoord):
         src = np.load(src, allow_pickle=True)
         crop_src = src[:, xcoord:xcoord + self.wsize, ycoord:ycoord + self.wsize, :]

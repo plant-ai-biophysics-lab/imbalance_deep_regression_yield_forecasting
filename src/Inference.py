@@ -15,9 +15,6 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, m
 from scipy.stats import pearsonr
 from src import configs
 
-
-
-
         
 def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = None, scale = None):
     

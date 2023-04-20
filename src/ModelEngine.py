@@ -571,9 +571,12 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
                     #train_weight = WgTrain[:, 0, :, :]
                     ytrain_true_ = torch.reshape(ytrain_true, (ytrain_true.shape[0], ytrain_true.shape[1]*ytrain_true.shape[2]*ytrain_true.shape[3], 1))
                     ytrain_pred  = torch.reshape(list_ytrain_pred[l], (list_ytrain_pred[l].shape[0], list_ytrain_pred[l].shape[1]*list_ytrain_pred[l].shape[2]*list_ytrain_pred[l].shape[3], 1))
-                    train_weight = torch.reshape(WgTrain, (WgTrain.shape[0], WgTrain.shape[1]*WgTrain.shape[2]*WgTrain.shape[3], 1))
-                    #print(f"{ytrain_true_.shape} | {ytrain_pred.shape}")
-                    train_loss_  = loss(train_weight, ytrain_true_, train_weight, ytrain_pred)
+                    pred_train_weight = torch.reshape(WgTrain, (WgTrain.shape[0], WgTrain.shape[1]*WgTrain.shape[2]*WgTrain.shape[3], 1))
+                    #N = pred_train_weight.shape[1]
+                    true_train_weight = torch.ones(WgTrain.shape[0], WgTrain.shape[1], 1).type_as(pred_train_weight) #/ WgTrain.shape[1]
+                    
+                    train_loss_  = loss(pred_train_weight, ytrain_true_, pred_train_weight, ytrain_pred)
+                    #train_loss_  = loss(ytrain_true_, ytrain_pred)
                     train_loss_  = torch.mean(train_loss_)
                     train_loss_w += train_loss_
 
@@ -622,12 +625,14 @@ def train(data_loader_training, data_loader_validate, model, optimizer, epochs, 
                         loss = SamplesLoss(loss="sinkhorn", p=2, blur=.05) 
                         yvalid_true_ = torch.reshape(yvalid_true, (yvalid_true.shape[0], yvalid_true.shape[1]*yvalid_true.shape[2]*yvalid_true.shape[3], 1))
                         yvalid_pred  = torch.reshape(list_yvalid_pred[l], (list_yvalid_pred[l].shape[0], list_yvalid_pred[l].shape[1]*list_yvalid_pred[l].shape[2]*list_yvalid_pred[l].shape[3], 1))
-                        valid_weight = torch.reshape(WgValid, (WgValid.shape[0], WgValid.shape[1]*WgValid.shape[2]*WgValid.shape[3], 1))
-                        
+                        valid_weight_pred = torch.reshape(WgValid, (WgValid.shape[0], WgValid.shape[1]*WgValid.shape[2]*WgValid.shape[3], 1))
+                        #M = pred_train_weight.shape[1]
+                        valid_weight_true = torch.ones(WgValid.shape[0],  WgValid.shape[1], 1).type_as(valid_weight_pred) #/  WgValid.shape[1]
                         #yvalid_true_ = yvalid_true[:, 0, :, :]
                         #yvalid_pred  = list_yvalid_pred[l][:, 0, :, :]
                         #valid_weight = WgValid[:, 0, :, :]
-                        val_loss_w  = loss(valid_weight, yvalid_true_, valid_weight, yvalid_pred)
+                        val_loss_w  = loss(valid_weight_pred, yvalid_true_, valid_weight_pred, yvalid_pred)
+                        #val_loss_w  = loss(yvalid_true_,  yvalid_pred)
                         val_loss_w  = torch.mean(val_loss_w)
                         val_loss_sum_week += val_loss_w
 

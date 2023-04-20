@@ -53,8 +53,8 @@ def run(batch_size: int, dropout: int,
 
     params     = [p for p in model.parameters() if p.requires_grad]
     optimizer  = torch.optim.Adam(params, lr=learning_rate, weight_decay = weight_decay)
-    #loss_stats = ModelEngine.train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, criterion = criterion, best_model_name = best_model_name)
-    #_          = ModelEngine.save_loss_df(loss_stats, loss_df_name, loss_fig_name)
+    loss_stats = ModelEngine.train(data_loader_training, data_loader_validate, model, optimizer, epochs, loss_stop_tolerance, criterion = criterion, best_model_name = best_model_name)
+    _          = ModelEngine.save_loss_df(loss_stats, loss_df_name, loss_fig_name)
     _          = ModelEngine.predict(model, data_loader_training, data_loader_validate, data_loader_test, Exp_name = exp_name)
 
 
@@ -63,10 +63,10 @@ if __name__ == "__main__":
     #lds_sigmas = [2, 4, 6, 8]
     #alpha_list = [3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
     #for a in alpha_list: 
-    ExpName = '022_64_001_05_wmse_byho'
-    run(batch_size = 64, dropout = 0.3, 
-        learning_rate = 0.001, weight_decay = 0.1,
-        epochs = 500, loss_stop_tolerance = 60, 
+    ExpName = '024_B64_Lr001_Wd.05_P2_Bl.05_dw3.9_2_wass'
+    run(batch_size = 64, dropout = 0.5, 
+        learning_rate = 0.001, weight_decay = 0.05,
+        epochs = 500, loss_stop_tolerance = 100, 
         lds_ks = 10, lds_sigma = 8, dw_alpha = 3.9, betha = 4, init_noise_sigma = 1.0, sigma_lr = 1e-2,
-        re_weighting_method = 'dw', criterion = 'wmse', 
+        re_weighting_method = 'dw', criterion = 'wass', 
         exp_name = ExpName) 

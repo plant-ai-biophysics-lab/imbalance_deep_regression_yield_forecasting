@@ -556,7 +556,7 @@ class dataloader_RGB(object):
             self.weights = self.return_pixelwise_weight_dw(dw_alpha)
             assert not np.isnan(self.weights).any()
             #self.weights = self.weights / np.max(self.weights)
-            self.weights = np.where(self.weights >= 1, 1/self.weights, 1)
+            self.weights = np.where(self.weights >= 1, self.weights, 1)
             #print(f"Min weight {np.min(self.weights)} | Max weight {np.max(self.weights)}")
         elif re_weighting_method == 'cb':
             self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
@@ -603,11 +603,11 @@ class dataloader_RGB(object):
         # return crooped mask tensor: 
         mask  = self.crop_gen(label_path, xcoord, ycoord) 
         mask  = np.swapaxes(mask, -1, 0)
-        mask  = torch.as_tensor(mask)
+        mask  = torch.as_tensor(mask, dtype=torch.float32)
 
         weight_mtx = self.weights[idx, :, :]
         weight_mtx = np.expand_dims(weight_mtx, axis = 0)
-        weight_mtx = torch.as_tensor(weight_mtx)
+        weight_mtx = torch.as_tensor(weight_mtx, dtype=torch.float32)
         #weight_mtx = weight_mtx/torch.max(weight_mtx)
 
         #mean_w     = torch.diagonal(weight_mtx[0, :, :], 0)

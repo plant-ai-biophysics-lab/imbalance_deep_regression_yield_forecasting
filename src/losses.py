@@ -8,7 +8,7 @@ from scipy.integrate import simps
 from sklearn.metrics import make_scorer
 import numpy as np
 from geomloss import SamplesLoss
-
+device = "cuda" if torch.cuda.is_available() else "cpu"
 def weighted_mse_loss(inputs, targets, weights=None):
     loss = (inputs - targets) ** 2
     if weights is not None:
@@ -193,9 +193,6 @@ def weighted_huber_loss(inputs, targets, weights=None, beta=1.):
 
 
 
-
-
-
 class BMCLoss(_Loss):
     def __init__(self, init_noise_sigma):
         super(BMCLoss, self).__init__()
@@ -230,8 +227,98 @@ def bmc_loss(pred, target, noise_var):
 
     return loss
 
+def custom_wasserstien_loss(ytrue_w, ytrue, ypred_w, ypred, blur: float, sinkhorn_nits: int, weighted_cost_func: True):
 
 
+    # Compute the logarithm of the weights (needed in the softmin reduction) ---
+    loga_i = torch.empty((ytrue_w.shape[0], ytrue_w.shape[1]), dtype = torch.float32).to(device) #requires_grad = True, 
+    logb_j = torch.empty((ytrue_w.shape[0], ytrue_w.shape[1]), dtype = torch.float32).to(device) #requires_grad = True, 
+
+    for b in range(ytrue_w.shape[0]):
+
+        this_loga_i, this_logb_j = ytrue_w[b, :, 0].log(), ypred_w[b, :, 0].log()
+        loga_i[b, :] = this_loga_i
+        logb_j[b, :] = this_logb_j
+
+    loga_i, logb_j = loga_i[:, :, None, None], logb_j[:, None, :, None]
+
+
+    if weighted_cost_func is True: 
+
+        D_w = (ytrue_w[:, :, :] @ (ypred_w[:, :, :]).transpose(1, 2))[:, :, :, None]
+        C_ij = ((ytrue[:, :,None,:] - ypred[:, None,:,:]) ** 2).sum(-1) / 2
+        C_ij = C_ij[:, :, :, None]  # reshape as a (N, M, 1) Tensor
+        C_ij = C_ij*D_w
+        C_ij.to(device)
+
+    else: 
+        C_ij = ((ytrue[:,None,:] - ypred[None,:,:]) ** 2).sum(-1) / 2
+        C_ij = C_ij[:, :, None]  # reshape as a (N, M, 1) Tensor
+
+    # Setup the dual variables -------------------------------------------------
+    eps = blur ** 2  # "Temperature" epsilon associated to our blurring scale
+    F_i, G_j = torch.zeros_like(loga_i, dtype = torch.float32), torch.zeros_like(
+        logb_j, dtype = torch.float32
+    )  # (scaled) dual vectors
+
+    # Sinkhorn loop = coordinate ascent on the dual maximization problem -------
+    for _ in range(sinkhorn_nits):
+        F_i = -((-C_ij / eps + (G_j + logb_j))).logsumexp(dim=2)[:, :, None, :]
+        G_j = -((-C_ij / eps + (F_i + loga_i))).logsumexp(dim=1)[:, None, :, :]
+
+    # Return the dual vectors F and G, sampled on the x_i's and y_j's respectively:
+    F_i, G_j = eps * F_i, eps * G_j
+
+    list_batch_loss = torch.empty(ytrue.shape[0], dtype = torch.float32)
+    for b in range(ytrue_w.shape[0]):
+        # Returns the entropic transport cost associated to the dual variables F_i and G_j.''ArithmeticError
+        entropic_transport_cost = ytrue_w[b, ...].view(-1).dot(F_i[b, ...].view(-1)) + ypred_w[b, ...].view(-1).dot(G_j[b, ...].view(-1))
+        loss = (2 * entropic_transport_cost).sqrt()
+        list_batch_loss[b] = loss
+    
+    return list_batch_loss
+
+
+'''def custom_wasserstien_loss(ytrue_w, ytrue, ypred_w, ypred, blur: float, sinkhorn_nits: int, weighted_cost_func: True):
+
+    list_batch_loss = torch.empty(ytrue.shape[0], dtype = torch.float32) #requires_grad = True, 
+    for b in range(ytrue.shape[0]):
+
+        loga_i, logb_j = ytrue_w[b, :, 0].log(), ypred_w[b, :, 0].log()
+        loga_i, logb_j = loga_i[:, None, None], logb_j[None, :, None]
+
+        if weighted_cost_func is True: 
+            D_w = (ytrue_w[b, :, :] @ (ypred_w[b, :, :]).t())[:, :, None]
+            C_ij = ((ytrue[b, :, None, :] - ypred[b, None,:,:]) ** 2).sum(-1) / 2
+            C_ij = C_ij[:, :, None]  # reshape as a (N, M, 1) Tensor
+            C_ij = C_ij*D_w
+
+        else: 
+            C_ij = ((ytrue[b, :,None,:] - ypred[b, None,:,:]) ** 2).sum(-1) / 2
+            C_ij = C_ij[:, :, None]  # reshape as a (N, M, 1) Tensor
+
+        # Setup the dual variables -------------------------------------------------
+        eps = blur ** 2  # "Temperature" epsilon associated to our blurring scale
+        F_i, G_j = torch.zeros_like(loga_i, dtype = torch.float32), torch.zeros_like(
+            logb_j, dtype = torch.float32
+        )  # (scaled) dual vectors
+
+        # Sinkhorn loop = coordinate ascent on the dual maximization problem -------
+        for _ in range(sinkhorn_nits):
+            F_i = -((-C_ij / eps + (G_j + logb_j))).logsumexp(dim=1)[:, None, :]
+            G_j = -((-C_ij / eps + (F_i + loga_i))).logsumexp(dim=0)[None, :, :]
+
+        # Return the dual vectors F and G, sampled on the x_i's and y_j's respectively:
+        F_i, G_j = eps * F_i, eps * G_j
+        F_i, G_j = F_i.view(-1), G_j.view(-1)
+        
+        # Returns the entropic transport cost associated to the dual variables F_i and G_j.''ArithmeticError
+        entropic_transport_cost = ytrue_w[b, :, 0].dot(F_i) + ypred_w[b, :, 0].dot(G_j)
+        loss = (2 * entropic_transport_cost).sqrt()
+
+        list_batch_loss[b] = loss
+
+    return list_batch_loss'''
 
 '''
 def calc_sera(y_true, y_pred,x_relevance=None):

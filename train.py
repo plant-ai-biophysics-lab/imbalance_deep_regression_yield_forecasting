@@ -63,7 +63,7 @@ if __name__ == "__main__":
     #lds_sigmas = [2, 4, 6, 8]
     #alpha_list = [3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
     #for a in alpha_list: 
-    ExpName = '024_B64_Lr001_Wd.05_P2_Bl.05_dw3.9_2_wass'
+    ExpName = '026_B64_Lr001_Wd.05_P3_Bl.05_dw3.9_WWass'
     run(batch_size = 64, dropout = 0.5, 
         learning_rate = 0.001, weight_decay = 0.05,
         epochs = 500, loss_stop_tolerance = 100, 

@@ -105,11 +105,11 @@ def getData(batch_size, lds_ks, lds_sigma, dw_alpha, betha, re_weighting_method:
     #==============================================================================================================#                      
     # define training and validation data loaders
     data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
-                                                    shuffle=True,num_workers=8) #  sampler=train_sampler, 
+                                                    shuffle=True,    num_workers=8) #  sampler=train_sampler,
     data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
-                                                    shuffle=False,  num_workers=8) # sampler=val_sampler,
+                                                    shuffle=False, num_workers=8) # sampler=val_sampler, 
     data_loader_test     = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, 
-                                                    shuffle=False, num_workers=8) # sampler=test_sampler, 
+                                                    shuffle=False,   num_workers=8) # sampler=test_sampler,
 
     return data_loader_training, data_loader_validate, data_loader_test
 

@@ -127,8 +127,8 @@ class check_lds_reweighting_():
         for idx, row in self.df.iterrows():
             xcoord     = row['X'] 
             ycoord     = row['Y'] 
-            label_path = row['LABEL_PATH'] 
-            mask  = self.crop_gen(label_path, xcoord, ycoord) 
+            label_path = row['LABEL_PATH']
+            mask  = self.crop_gen(label_path, xcoord, ycoord)
             mask  = np.swapaxes(mask, -1, 0)
 
             if masks is None: 
@@ -139,7 +139,7 @@ class check_lds_reweighting_():
 
         labels_ = np.reshape(masks, (masks.shape[0]*masks.shape[1]*masks.shape[2]))
 
-        weights, effective_value, emperical_values  = self.lds_prepare_weights(labels_, max_target=30, lds=True)
+        weights, effective_value, emperical_values  = self.lds_prepare_weights(labels_*2.2417, max_target=70, lds=True)
 
         avg_weights = self.return_avg_weights_per_labels(np.array(weights), np.array(labels_))
 
@@ -149,11 +149,11 @@ class check_lds_reweighting_():
 
         avg_weights = {}
 
-        for i in range(30):
+        for i in range(70):
             if i == 0: 
                 Ws = weights[np.where((labels >= i) &(labels <=(i+1)))]
                 avg_weights[i] = np.mean(Ws)
-            elif i == 29:
+            elif i == 69:
                 Ws = weights[np.where((labels >= i))]
                 avg_weights[i] = np.mean(Ws)
             else: 
@@ -452,7 +452,7 @@ class TargetRelevance():
         return rels
 
     def __call__(self, y):
-        return self.eval(y)
+        return self.eval(y)#, self.get_density(y)
     
 
 '''class TargetRelevance():

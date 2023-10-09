@@ -1,0 +1,6 @@
+nohup: ignoring input
+Check if there is GPU(s): True
+(13875, 33) | (8233, 33) | (12443, 33)
+Train evaluation is done!
+validation evaluation is done!
+Test evaluation is done!

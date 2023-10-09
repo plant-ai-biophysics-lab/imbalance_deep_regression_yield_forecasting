@@ -1,9 +1,8 @@
-
 import torch
 import torch.nn as nn
-from src.ModelEngine import *
+from models._CNN_Modules import *
 
-    
+   
 class UNet2DConvLSTM(nn.Module):
     
     def __init__(self, in_channels: int, 
@@ -100,6 +99,7 @@ class UNet2DConvLSTM(nn.Module):
             f.append(out1)
 
         return f
+
 
 
 

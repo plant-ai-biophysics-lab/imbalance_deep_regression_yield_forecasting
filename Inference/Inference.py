@@ -1,9 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from glob import glob
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
 import matplotlib.patches as  mpatches
 import matplotlib.gridspec as gridspec
 import seaborn as sns
@@ -13,10 +11,178 @@ sns.set_theme(style='white')
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
 from scipy.stats import pearsonr
-from src import configs
 
-        
-def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = None, scale = None):
+import sys
+sys.path.append('../')
+from models import configs
+
+
+#=============================================================================================#
+#=============================================================================================#
+#=============================================================================================#
+
+
+
+def plot_scatter(data_df, week=None, cmap=None, mincnt=None):
+    if week is None:
+        week_pred = 'ypred'
+    else:
+        week_pred = 'ypred_w' + str(week)
+
+    data = data_df[['ytrue', week_pred]].rename(columns={week_pred: "ypred"})
+
+    true_values = data['ytrue'] * 2.2417
+    pred_values = data['ypred'] * 2.2417
+
+    r2, mae, rmse, mape, _, _ = regression_metrics(true_values, pred_values)
+
+    g = sns.jointplot(x=true_values, y=pred_values, kind="hex", height=8, ratio=4,
+                      xlim=[0, 70], ylim=[0, 70], extent=[0, 70, 0, 70], gridsize=100,
+                      cmap=cmap, mincnt=mincnt, joint_kws={"facecolor": 'white'})
+
+    for patch in g.ax_marg_x.patches:
+        patch.set_facecolor('grey')
+
+    for patch in g.ax_marg_y.patches:
+        patch.set_facecolor('grey')
+
+    g.ax_joint.plot([0, 70], [0, 70], '--r', linewidth=2)
+
+    plt.xlabel('Measured (t/ac)')
+    plt.ylabel('Predicted (t/ac)')
+    plt.grid(False)
+
+    scores = (r'$R^2={:.2f}$' + '\n' + r'MAE={:.2f}' + '\n' + r'$RMSE={:.2f}$' + '\n' + r'$MAPE={:.2f}$').format(
+        r2, mae, rmse, mape)
+
+    plt.text(1, 70.7, scores, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round, pad=0.2'),
+             fontsize=13, ha='left', va='top')
+
+    return g
+
+def train_val_test_satterplot(train_df, valid_df, test_df, week=None, cmap=None, mincnt=None, fig_save_name=None):
+    fig = plt.figure(figsize=(21, 7))
+    gs  = gridspec.GridSpec(1, 3)
+
+    train_plot = plot_scatter(train_df, week, cmap, mincnt)
+    valid_plot = plot_scatter(valid_df, week, cmap, mincnt)
+    test_plot = plot_scatter(test_df, week, cmap, mincnt)
+
+
+    mg0 = SeabornFig2Grid(train_plot, fig, gs[0])
+    mg1 = SeabornFig2Grid(valid_plot, fig, gs[1])
+    mg2 = SeabornFig2Grid(test_plot, fig, gs[2])
+
+    gs.tight_layout(fig)
+    plt.show()
+
+    # Optionally save the figure
+    if fig_save_name:
+        plt.savefig(fig_save_name, dpi=300)
+
+
+
+def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
+
+    true_labels = df['ytrue'].values
+    pred_labels = df['ypred_w15'].values
+
+
+    #for i in range(30):
+
+    #if i < th1: 
+    true_label_C1 = true_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
+    pred_label_C1 = pred_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
+
+    #elif (i >= th1) & (i < th2):
+    true_label_C2 = true_labels[np.where((true_labels > th1) & (true_labels < th2))]
+    pred_label_C2 = pred_labels[np.where((true_labels > th1) & (true_labels < th2))]
+
+    #elif i >= th2: 
+    true_label_C3 = true_labels[np.where(true_labels >= th2)]
+    pred_label_C3 = pred_labels[np.where(true_labels >= th2)]
+
+    All_R2, All_MAE, All_RMSE, All_MAPE, _, _ = regression_metrics(true_labels, pred_labels)
+    print(f"C1 num samples: {len(true_label_C1)} | C2 num samples: {len(true_label_C2)} | C3 num samples: {len(true_label_C3)} ")
+    C1_R2, C1_MAE, C1_RMSE, C1_MAPE, _, _ = regression_metrics(true_label_C1, pred_label_C1)
+    C2_R2, C2_MAE, C2_RMSE, C2_MAPE, _, _ = regression_metrics(true_label_C2, pred_label_C2)
+    C3_R2, C3_MAE, C3_RMSE, C3_MAPE, _, _ = regression_metrics(true_label_C3, pred_label_C3)
+
+    print(f"C1 is yield value between 0 and {th1}, C2 is yield value between {th1} and {th2}, and C3 is yield value bigger than {th2}")
+    print(f"All: MAE = {All_MAE:.2f}, MAPE = {All_MAPE:.2f} | C1: MAE = {C1_MAE:.2f}, MAPE = {C1_MAPE*100:.2f} | C2: MAE = {C2_MAE:.2f}, MAPE = {C2_MAPE*100:.2f} | C3: MAE = {C3_MAE:.2f}, MAPE = {C3_MAPE*100:.2f}")
+    print(f"=========================================================================================================================")
+    return [C1_MAE, C1_MAPE, C2_MAE, C2_MAPE, C3_MAE, C3_MAPE]
+
+
+def _mape_extreme_bin_plot(df):
+    # Create a figure with one subplot
+    fig, axs = plt.subplots(1, 1, figsize=(20, 7))
+
+    # Set the style and adjust subplot spacing
+    sns.set_style("whitegrid", {'axes.grid': False})
+    plt.rcParams["figure.autolayout"] = True
+    plt.subplots_adjust(hspace=0.01)
+
+    MAPE_Errors, counts = [], []
+
+    # Loop through yield value bins
+    for i in range(1, 71, 2):
+        if i == 1:
+            Data = df.loc[((df['ytrue']*2.2417) < (i+1))]
+            d1 = df.loc[((df['ytrue']*2.2417) < (i+1))]
+        elif i == 70:
+            Data = df.loc[((df['ytrue']*2.2417) >= (i))]
+            d1 = df.loc[((df['ytrue']*2.2417) >= (i))]
+        else:
+            Data = df.loc[((df['ytrue']*2.2417) >= i) & (df['ytrue']*2.2417 < (i+1))]
+            d1 = df.loc[((df['ytrue']*2.2417) >= i) & (df['ytrue']*2.2417 < (i+1))]
+
+        counts.append(len(Data))
+
+        # Calculate MAPE and exclude values above 0.8
+        if len(Data) == 0:
+            MAPE = 0
+        else:
+            MAPE = mean_absolute_percentage_error(Data['ytrue'], Data['ypred_w15'])
+        if MAPE > 1:
+            MAPE = 0
+        MAPE_Errors.append(MAPE*100)
+
+    bins_value = np.arange(0, 70, 2)
+
+    # Create the first barplot (Number of Samples)
+    ax1 = sns.barplot(x=bins_value, y=counts, color=sns.color_palette()[0], ax=axs)  # width = 0.9
+
+    # Create the second barplot (MAPE Error)
+    axs01 = axs.twinx()
+    ax01 = sns.barplot(x=bins_value, y=MAPE_Errors, color=sns.color_palette()[3], alpha=0.5, ax=axs01)
+
+    # Create legend handles
+    handles = [mpatches.Patch(facecolor=sns.color_palette()[0], label='Number of Samples'),
+               mpatches.Patch(facecolor=sns.color_palette()[3], label='MAPE Error')]
+
+    # Add legend to the upper right
+    axs.legend(handles=handles, loc='upper right')
+    ax01.set_ylim(0, 100)
+
+
+    # Set fontsize for x and y axis labels and tick labels
+    ax1.set_xlabel('Yield Value (t/ac)', fontsize=14)
+    ax1.set_ylabel('Number of Samples', fontsize=14)
+    ax01.set_ylabel('MAPE Error (%)', fontsize=14)
+    ax1.tick_params(axis='both', labelsize=14)
+    ax01.tick_params(axis='y', labelsize=14)
+
+
+    # Display the plot
+    plt.show()
+
+
+
+def block_true_pred_mtx(df, block_id):
+    copied_df = df.copy()
+    copied_df['ytrue'] = copied_df['ytrue']*2.2417
+    copied_df['ypred_w15'] = copied_df['ypred_w15']*2.2417
     
     name_split = os.path.split(str(block_id))[-1]
     root_name  = name_split.replace(name_split[-4:], '')
@@ -30,14 +196,15 @@ def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = 
         this_block_name = 'LIV_' + root_name + '_' + year
     
     #print(this_block_name)
-    blocks_df = df.groupby(by = 'block')
+    blocks_df = copied_df.groupby(by = 'block')
     this_block_df = blocks_df.get_group(block_id)
+    
     
     
     res           = {key: configs.blocks_size[key] for key in configs.blocks_size.keys() & {this_block_name}}
     list_d        = res.get(this_block_name)
-    block_x_size  = int(list_d[0]/spatial_resolution)
-    block_y_size  = int(list_d[1]/spatial_resolution)
+    block_x_size  = int(list_d[0]/10)
+    block_y_size  = int(list_d[1]/10)
     
     print(this_block_df.shape)
     pred_out = np.full((block_x_size, block_y_size), -1) 
@@ -46,13 +213,58 @@ def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = 
     for x in range(block_x_size):
         for y in range(block_y_size):
             
-            new            = this_block_df.loc[(this_block_df['x'] == x)&(this_block_df['y'] == y)] 
+            new  = this_block_df.loc[(this_block_df['x'] == x)&(this_block_df['y'] == y)] 
             if len(new) > 0:
-                pred_out[x, y] = new['ypred_w15'].max()#*2.2417
-                true_out[x, y] = new['ytrue'].min()#*2.2417
+                pred_out[x, y] = new['ypred_w15'].mean()
+                true_out[x, y] = new['ytrue'].mean()
 
-    return this_block_df, true_out, pred_out
 
+    
+    return this_block_df, true_out, pred_out            
+    
+
+#=============================================================================================#
+#=============================================================================================#
+#=============================================================================================#
+
+
+        
+# def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = None, scale = None):
+    
+    # name_split = os.path.split(str(block_id))[-1]
+    # root_name  = name_split.replace(name_split[-4:], '')
+    # year       = name_split[-4:]
+    
+    # if len(root_name) == 1:
+    #     this_block_name = 'LIV_00' + root_name + '_' + year
+    # elif len(root_name) == 2:
+    #     this_block_name = 'LIV_0' + root_name + '_' + year
+    # elif len(root_name) == 3:
+    #     this_block_name = 'LIV_' + root_name + '_' + year
+    
+    # #print(this_block_name)
+    # blocks_df = df.groupby(by = 'block')
+    # this_block_df = blocks_df.get_group(block_id)
+    
+    
+    # res           = {key: configs.blocks_size[key] for key in configs.blocks_size.keys() & {this_block_name}}
+    # list_d        = res.get(this_block_name)
+    # block_x_size  = int(list_d[0]/spatial_resolution)
+    # block_y_size  = int(list_d[1]/spatial_resolution)
+    
+    # print(this_block_df.shape)
+    # pred_out = np.full((block_x_size, block_y_size), -1) 
+    # true_out = np.full((block_x_size, block_y_size), -1)  
+
+    # for x in range(block_x_size):
+    #     for y in range(block_y_size):
+            
+    #         new            = this_block_df.loc[(this_block_df['x'] == x)&(this_block_df['y'] == y)] 
+    #         if len(new) > 0:
+    #             pred_out[x, y] = new['ypred_w15'].max()#*2.2417
+    #             true_out[x, y] = new['ytrue'].min()#*2.2417
+
+    # return this_block_df, true_out, pred_out
 
 def image_mae_mape_map(ytrue, ypred): 
 
@@ -79,7 +291,6 @@ def image_mae_mape_map(ytrue, ypred):
     out2 = out_mape.reshape(ytrue.shape[0], ytrue.shape[1])
 
     return out1, out2
-
 
 def yield_true_pred_plot(ytrue, ypred, min_v = None, max_v= None):
 
@@ -362,36 +573,6 @@ def regression_metrics(ytrue, ypred):
     
     return [r_square , mae, rmse, mape, mean_ytrue, mean_ypred] 
 
-def eval_on_three_main_label_range_pred(df, th1: int, th2: int):
-
-    true_labels = df['ytrue'].values
-    pred_labels = df['ypred_w15'].values
-
-
-    #for i in range(30):
-
-    #if i < th1: 
-    true_label_C1 = true_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
-    pred_label_C1 = pred_labels[np.where((true_labels >= 0) & (true_labels <= th1))]
-
-    #elif (i >= th1) & (i < th2):
-    true_label_C2 = true_labels[np.where((true_labels > th1) & (true_labels < th2))]
-    pred_label_C2 = pred_labels[np.where((true_labels > th1) & (true_labels < th2))]
-
-    #elif i >= th2: 
-    true_label_C3 = true_labels[np.where(true_labels >= th2)]
-    pred_label_C3 = pred_labels[np.where(true_labels >= th2)]
-
-    All_R2, All_MAE, All_RMSE, All_MAPE, _, _ = regression_metrics(true_labels, pred_labels)
-    print(f"C1 num samples: {len(true_label_C1)} | C2 num samples: {len(true_label_C2)} | C3 num samples: {len(true_label_C3)} ")
-    C1_R2, C1_MAE, C1_RMSE, C1_MAPE, _, _ = regression_metrics(true_label_C1, pred_label_C1)
-    C2_R2, C2_MAE, C2_RMSE, C2_MAPE, _, _ = regression_metrics(true_label_C2, pred_label_C2)
-    C3_R2, C3_MAE, C3_RMSE, C3_MAPE, _, _ = regression_metrics(true_label_C3, pred_label_C3)
-
-    print(f"C1 is yield value between 0 and {th1}, C2 is yield value between {th1} and {th2}, and C3 is yield value bigger than {th2}")
-    print(f"All: MAE = {All_MAE:.2f}, MAPE = {All_MAPE:.2f} | C1: MAE = {C1_MAE:.2f}, MAPE = {C1_MAPE*100:.2f} | C2: MAE = {C2_MAE:.2f}, MAPE = {C2_MAPE*100:.2f} | C3: MAE = {C3_MAE:.2f}, MAPE = {C3_MAPE*100:.2f}")
-    print(f"=========================================================================================================================")
-    return [C1_MAE, C1_MAPE, C2_MAE, C2_MAPE, C3_MAE, C3_MAPE]
 
 def eval_on_extreme_main_label_range_pred(df, th1: int, th2: int):
 
@@ -468,43 +649,48 @@ def Erroe_hist_visulization(df):
 
 def Erroe_hist_visulization_V2(df):
 
-    fig, axs = plt.subplots(1, 1 , figsize = (12, 4))
+    fig, axs = plt.subplots(1, 1 , figsize = (16, 4))
 
     sns.set_style("whitegrid", {'axes.grid' : False})
     plt.rcParams["figure.autolayout"] = True
     plt.subplots_adjust(hspace = 0.01)
 
     MAPE_Errors, counts = [], []
-    for i in range(1, 30):
+    for i in range(1, 70):
         if i == 1:
-            Data  = df.loc[(df['ytrue'] < (i+1))]
-        elif i == 29: 
-            Data  = df.loc[(df['ytrue'] >= (i))]
+            Data  = df.loc[(df['ytrue']*2.2417 < (i+1))]
+        elif i == 69: 
+            Data  = df.loc[(df['ytrue']*2.2417 >= (i))]
         else: 
-            Data  = df.loc[(df['ytrue'] >= i) & (df['ytrue'] < (i+1))] 
+            Data  = df.loc[(df['ytrue']*2.2417 >= i) & (df['ytrue']*2.2417 < (i+1))] 
         counts.append(len(Data))
-        MAPE = mean_absolute_percentage_error(Data['ytrue'], Data['ypred_w15'])
+        if len(Data) == 0: 
+            MAPE = 0    
+        else: 
+            MAPE = mean_absolute_percentage_error(Data['ytrue'], Data['ypred_w15'])
         if MAPE > 1: 
-            MAPE = 1
+            MAPE = 0
         MAPE_Errors.append(MAPE*100)
 
-    pearson_value = pearsonr(MAPE_Errors, counts)[0]
-    bins_value  = np.arange(1, 30, 1)
 
-    ax1  = sns.barplot(x = bins_value, y= counts, color = sns.color_palette()[0], width = 0.9, ax = axs)
+    pearson_value = pearsonr(MAPE_Errors, counts)[0]
+    bins_value  = np.arange(1, 70, 1)
+
+    ax1  = sns.barplot(x = bins_value, y= counts, color = sns.color_palette()[0],  ax = axs) #width = 0.9,
     axs01 = axs.twinx()
-    ax01 = sns.barplot(x = bins_value, y= MAPE_Errors, color = sns.color_palette()[3], alpha = 0.5, width = 0.9, ax = axs01)
+    ax01 = sns.barplot(x = bins_value, y= MAPE_Errors, color = sns.color_palette()[3], alpha = 0.5, ax = axs01)
 
 
     handles = [mpatches.Patch(facecolor = sns.color_palette()[0], label = 'Number of Samples'),
-    mpatches.Patch(facecolor = sns.color_palette()[3], label = 'MAPE Error')
+    mpatches.Patch(facecolor = sns.color_palette()[3], label = 'MAPE Error (%)')
     ]
     axs.legend(handles = handles, loc = 'upper right')
 
 
     ax1.set(ylabel='Number of Samples')
-    ax01.set(ylabel='MAPE Error')
-    ax1.set(xlabel='yield value')
+    ax01.set(ylabel='MAPE Error (%)')
+    ax01.set_ylim(0, 100)
+    ax1.set(xlabel='Yield Value (t/ac)')
     plt.title(r"Pearson Correlation:{:.2f}".format(pearson_value))
 
     None
@@ -593,111 +779,6 @@ def time_series_evaluation_plots(train, val, test, fig_save_name):
     plt.savefig(fig_save_name, dpi = 300)
     
     return results 
-
-def train_val_test_satterplot(train_df, valid_df, test_df, week = None, cmap  = None, mincnt = None, fig_save_name = None):
-
-    
-    if week == None: 
-        week_pred = 'ypred'
-    else: 
-        week_pred = 'ypred_w' + str(week)
-
-    w_train_e1  = train_df[['ytrue', week_pred]]
-    w_train_e1  = w_train_e1.rename(columns={week_pred: "ypred"})
-    tarin_true  = w_train_e1['ytrue']
-    train_pred  = w_train_e1['ypred']
-    tr_r2, tr_mae, tr_rmse, tr_mape, _,_ = regression_metrics(tarin_true, train_pred)
-
-    TR = sns.jointplot(x=tarin_true, y=train_pred, kind="hex", height=8, ratio=4,  
-                        xlim = [0,30], ylim = [0,30], extent=[0, 30, 0, 30], gridsize=100, 
-                        cmap = cmap , mincnt=mincnt, joint_kws={"facecolor": 'white'})#,,  marginal_kws = dict(bins = np.arange(0, 50000))
-
-    for patch in TR.ax_marg_x.patches:
-        patch.set_facecolor('grey')
-
-    for patch in TR.ax_marg_y.patches:
-        patch.set_facecolor('grey')
-
-    TR.ax_joint.plot([0, 30], [0, 30],'--r', linewidth=2)
-
-    plt.xlabel('Measured (ton/ac) - Train')
-    plt.ylabel('Predict (ton/ac)')
-    plt.grid(False)
-
-    extra = plt.Rectangle((0, 0), 0, 0, fc="w", fill=False,
-                            edgecolor='none', linewidth=0)
-    scores = (r'$R^2={:.2f}$' + '\n' + r'MAE={:.2f}' + '\n' + r'$RMSE={:.2f}$'+'\n' + r'$MAPE={:.2f}$').format(tr_r2, tr_mae, tr_rmse, tr_mape)
-    plt.legend([extra], [scores], loc='upper left')
-    #plt.title('Train Data')
-    #========================================================
-    w_valid_e1  = valid_df[['ytrue', week_pred]]
-    w_valid_e1  = w_valid_e1.rename(columns={week_pred: "ypred"})
-    valid_true = w_valid_e1['ytrue']
-    valid_pred = w_valid_e1['ypred']
-    val_r2, val_mae, val_rmse, val_mape, _,_ = regression_metrics(valid_true, valid_pred)
-
-    Va = sns.jointplot(x = valid_true, y = valid_pred, kind="hex", height=8, ratio=4, 
-                        xlim = [0,30], ylim = [0,30], extent=[0, 30, 0, 30], gridsize=100, 
-                        cmap = 'viridis', mincnt = mincnt) #palette ='flare', ,   
-    for patch in Va.ax_marg_x.patches:
-        patch.set_facecolor('grey')
-    for patch in Va.ax_marg_y.patches:
-        patch.set_facecolor('grey')
-
-
-    Va.ax_joint.plot([0, 30], [0, 30],'--r', linewidth=2)
-    plt.xlabel('Measured (ton/ac) - Validation')
-    plt.ylabel('')
-    plt.grid(False)
-
-    extra = plt.Rectangle((0, 0), 0, 0, fc="w", fill=False,
-                            edgecolor='none', linewidth=0)
-    scores = (r'$R^2={:.2f}$' + '\n' + r'MAE={:.2f}' + '\n' + r'$RMSE={:.2f}$'+'\n' + r'$MAPE={:.2f}$').format(val_r2, val_mae, val_rmse, val_mape)
-    plt.legend([extra], [scores], loc='upper left')
-    #plt.title('Validation Data')
-    #========================================================
-
-
-    w_test_e1  = test_df[['ytrue', week_pred]]
-    w_test_e1  = w_test_e1.rename(columns={week_pred: "ypred"})
-    test_true = w_test_e1['ytrue']
-    valid_pred = w_test_e1['ypred']
-
-    test_r2, test_mae, test_rmse, test_mape, _,_ = regression_metrics(test_true, valid_pred)
-
-    Te = sns.jointplot(x=test_true, y = valid_pred, kind="hex", height=8, ratio=4, 
-                        xlim = [0,30], ylim = [0,30], extent=[0, 30, 0, 30], gridsize=100, 
-                        cmap = cmap, mincnt = mincnt) #palette ='flare', ,  
-    for patch in Te.ax_marg_x.patches:
-        patch.set_facecolor('grey')
-    for patch in Te.ax_marg_y.patches:
-        patch.set_facecolor('grey') 
-
-    Te.ax_joint.plot([0, 30], [0, 30],'--r', linewidth=2)
-
-    plt.xlabel('Measured (ton/ac)')
-    plt.ylabel('')
-    plt.grid(False)
-
-    extra = plt.Rectangle((0, 0), 0, 0, fc="w", fill=False,
-                            edgecolor='none', linewidth=0)
-    scores = (r'$R^2={:.2f}$' + '\n' + r'MAE={:.2f}' + '\n' + r'$RMSE={:.2f}$'+'\n' + r'$MAPE={:.2f}$').format(test_r2, test_mae, test_rmse, test_mape)
-    plt.legend([extra], [scores], loc='upper left')
-
-
-
-    fig = plt.figure(figsize=(21, 7))
-    gs = gridspec.GridSpec(1, 3)
-
-    mg0 = SeabornFig2Grid(TR, fig, gs[0])
-    mg1 = SeabornFig2Grid(Va, fig, gs[1])
-    mg2 = SeabornFig2Grid(Te, fig, gs[2])
-
-
-    gs.tight_layout(fig)
-    #gs.update(top=0.7)
-    #plt.savefig(fig_save_name, dpi = 300)
-    plt.show()
 
 class SeabornFig2Grid():
 

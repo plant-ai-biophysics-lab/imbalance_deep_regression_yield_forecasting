@@ -1,11 +1,5 @@
-
-
-
-
-
-
-
-
+import torch
+import ml_collections
 
 blocks_information = {'LIV_003':['MALVASIA_BIANCA', '7', '12', '7', '1991', '4WIREWO', '1'], 
           'LIV_004':['MUSCAT_OF_ALEXANDRIA', '10', '11', '5', '2011', 'SPLIT', '2'], 
@@ -280,3 +274,51 @@ blocks_size = {'LIV_003_2016': [392, 1560],
  'LIV_193_2017': [227, 326],
  'LIV_193_2018': [159, 295],
  'LIV_193_2019': [107, 288], }
+
+class SRTR_Configs():
+    def __init__(self, img_size: int, patch_size: int, embed_dim: int, mlp_dim: int, 
+                    in_channels: int, out_channels: int, num_heads: int, num_layers: int, cond: str,
+                    Attn_drop: float, Proj_drop: float, PostNorm = True, vis = True, 
+                    kernel_size = [3,3], dilation = [1, 1], stride  = [1, 1]):
+
+        self.img_size   = img_size
+        self.patch_size = patch_size
+        self.embed_dim  = embed_dim
+        self.mlp_dim    = mlp_dim
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.num_heads  = num_heads
+        self.num_layers = num_layers
+        self.Attn_drop  = Attn_drop
+        self.Proj_drop  = Proj_drop
+        self.PostNorm   = PostNorm
+        self.vis        = vis
+        self.kernel_size = kernel_size
+        self.dilation    = dilation
+        self.stride     = stride
+        self.cond       = cond
+    
+    def call(self):
+        """Returns the Spatio-temporal configuration."""
+        config = ml_collections.ConfigDict()
+
+        config.img_size    = self.img_size
+        config.patch_size  = self.patch_size 
+        config.embed_dim   = self.embed_dim 
+        config.mlp_dim     = self.mlp_dim
+        config.in_channels = self.in_channels
+        config.out_channels= self.out_channels
+        config.num_heads   = self.num_heads
+        config.num_layers  = self.num_layers
+        config.Attn_drop   = self.Attn_drop
+        config.Proj_drop   = self.Proj_drop
+        config.PostNorm    = self.PostNorm
+        config.PostNorm    = self.PostNorm
+        config.vis         = self.vis
+        config.kernel_size = self.kernel_size 
+        config.dilation    = self.dilation  
+        config.stride      = self.stride    
+        config.cond        = self.cond
+
+        return config
+   

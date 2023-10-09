@@ -6,6 +6,13 @@ import numpy as np
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def mse_loss(inputs, targets):
+    loss = (inputs - targets) ** 2
+    loss = torch.mean(loss)
+    
+    return loss
+
+
 def weighted_mse_loss(inputs, targets, weights=None):
     loss = (inputs - targets) ** 2
     if weights is not None:

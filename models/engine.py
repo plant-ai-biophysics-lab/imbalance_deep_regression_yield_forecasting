@@ -435,14 +435,12 @@ class ImbYieldEst():
                 WgTrain        = sample['weight'].to(device)
                 Emb_List       = sample["EmbList"]#.to(device)
 
-
-
                 list_ytrain_pred  = self.model(Xtrain, Emb_List) #model(Xtrain, EmbTrain)
 
                 self.optimizer.zero_grad()
 
                 if loss   == 'mse': 
-                    train_loss_   = F.mse_loss(ytrain_true, list_ytrain_pred)
+                    train_loss_   = mse_loss(ytrain_true, list_ytrain_pred)
 
                 elif loss == 'wmse':
                     train_loss_  = weighted_mse_loss(ytrain_true, list_ytrain_pred, WgTrain)
@@ -462,6 +460,12 @@ class ImbYieldEst():
 
                 train_loss_.backward()
                 self.optimizer.step()
+                # Anneal the learning rate (e.g., reduce by a factor)
+                self.lr *= 0.95   
+                # Warm-up the learning rate (e.g., increase linearly)
+                # self.lr += 0.0001
+                for param_group in self.optimizer.param_groups:
+                    param_group['lr'] = self.lr
                 
                 train_epoch_loss += train_loss_.item() 
 
@@ -481,7 +485,7 @@ class ImbYieldEst():
                     list_yvalid_pred   = self.model(Xvalid, EmbList) 
 
                     if loss == 'mse': 
-                        val_loss_w = F.mse_loss(yvalid_true, list_yvalid_pred)
+                        val_loss_w = mse_loss(yvalid_true, list_yvalid_pred)
 
                     elif loss == 'wmse':
                         val_loss_w = weighted_mse_loss(yvalid_true, list_yvalid_pred, WgValid)

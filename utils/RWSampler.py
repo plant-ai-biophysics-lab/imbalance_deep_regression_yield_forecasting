@@ -415,7 +415,7 @@ class TargetRelevance():
 
         self.kernel = FFTKDE(bw=best_bandwidth).fit(y, weights=None)
 
-        x, y_dens_grid = self.kernel.evaluate(4096)  # Default precision is 1024
+        x, y_dens_grid = self.kernel.evaluate(1024)  # Default precision is 1024
         self.x = x
         
         # Min-Max Scale to 0-1 since pdf's can actually exceed 1
@@ -453,39 +453,38 @@ class TargetRelevance():
 
     def __call__(self, y):
         return self.eval(y)#, self.get_density(y)
-    
 
-'''class TargetRelevance():
+# class TargetRelevance():
 
-    def __init__(self, y, alpha: int):
-        self.alpha = alpha
-        self.y = y
-        #print('TargetRelevance alpha:', self.alpha)
-    def get_relevance(self):
-        silverman_bandwidth = 1.06*np.std(self.y)*np.power(len(self.y), (-1.0/5.0))
+#     def __init__(self, y, alpha: int):
+#         self.alpha = alpha
+#         self.y = y
+#         #print('TargetRelevance alpha:', self.alpha)
+#     def get_relevance(self):
+#         silverman_bandwidth = 1.06*np.std(self.y)*np.power(len(self.y), (-1.0/5.0))
 
         
-        best_bandwidth = silverman_bandwidth
-        #print(f'Using Silverman Bandwidth: {best_bandwidth}')
+#         best_bandwidth = silverman_bandwidth
+#         #print(f'Using Silverman Bandwidth: {best_bandwidth}')
 
-        self.kernel = FFTKDE(bw=best_bandwidth).fit(self.y, weights=None)
+#         self.kernel = FFTKDE(bw=best_bandwidth).fit(self.y, weights=None)
 
-        self.y_min = self.y.min()
-        self.y_max = self.y.max()
+#         self.y_min = self.y.min()
+#         self.y_max = self.y.max()
 
-        x, y_dens = self.kernel.evaluate(self.y.shape[0])  # Default precision is 1024
-        self.x = x
+#         x, y_dens = self.kernel.evaluate(self.y.shape[0])  # Default precision is 1024
+#         self.x = x
 
-        # Min-Max Scale to 0-1 since pdf's can actually exceed 1
-        # See: https://stats.stackexchange.com/questions/5819/kernel-density-estimate-takes-values-larger-than-1
-        self.y_dens = MinMaxScaler().fit_transform(y_dens.reshape(-1, 1)).flatten()
+#         # Min-Max Scale to 0-1 since pdf's can actually exceed 1
+#         # See: https://stats.stackexchange.com/questions/5819/kernel-density-estimate-takes-values-larger-than-1
+#         self.y_dens = MinMaxScaler().fit_transform(y_dens.reshape(-1, 1)).flatten()
 
-        self.eps = 1e-9
-        w2 = np.maximum(1 - self.alpha * y_dens, self.eps)
-        self.mean_w2 = np.mean(w2)
-        relevances = w2 / self.mean_w2
+#         self.eps = 1e-9
+#         w2 = np.maximum(1 - self.alpha * y_dens, self.eps)
+#         self.mean_w2 = np.mean(w2)
+#         relevances = w2 / self.mean_w2
 
-        return relevances, self.y_dens,'''
+#         return relevances#, self.y_dens,
 #=======================================================================================================#
 #                                     Emprical Weight Sampler                                           #
 #=======================================================================================================#
@@ -520,8 +519,6 @@ def cost_sensitive_weight_sampler(df):
     df['NormWeight'] = NormWeights
     
     return df
-
-
 
 def return_cost_sensitive_weight_sampler(train, val, test, save_dir, run_status: str):
     

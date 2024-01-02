@@ -2,9 +2,8 @@ import torch
 import torch.nn.functional as F
 from torch.nn.modules.loss import _Loss
 import time
-import numpy as np
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def mse_loss(inputs, targets):
     loss = (inputs - targets) ** 2
@@ -12,149 +11,8 @@ def mse_loss(inputs, targets):
     
     return loss
 
-
 def weighted_mse_loss(inputs, targets, weights=None):
     loss = (inputs - targets) ** 2
-    if weights is not None:
-        loss *= weights.expand_as(loss)
-    loss = torch.mean(loss)
-    return loss
-
-def weighted_integral_mse_loss(inputs, targets, weights=None):
-    input_flat    = torch.flatten(inputs)
-    target_flat   = torch.flatten(targets)
-    weights_flat  = torch.flatten(weights)
-
-
-    intervals = np.arange(0, 30)
-    intervals = torch.as_tensor(intervals)
-    ser = []
-    trues, preds = [], []
-    weights = []
-
-    for phi in intervals:
-        ytrue  = input_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]  
-        ypred  = target_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]
-        im_    = weights_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]
-
-        if len(ytrue) > 0: 
-            #loss = (ytrue - ypred) ** 2
-            #loss = loss * im_
-            #loss = torch.trapz(torch.as_tensor(loss), dx=1) 
-            #loss = torch.trapz(torch.as_tensor(loss), torch.as_tensor((phi, phi +1))) 
-            #loss = torch.mean(loss) 
-            #assert not torch.isnan(loss).any()
-            true_mean = torch.sum(ytrue) 
-            pred_mean = torch.sum(ypred) 
-            #w_mean    = torch.mean(im_) 
-        else: 
-            X = 0.0
-            #true_mean = 0.0
-            #pred_mean = 0.0
-            #w_mean    = 0.0
-        
-        #ser.append(loss)
-        trues.append(true_mean)
-        preds.append(pred_mean)
-        #weights.append(w_mean)
-    t = torch.as_tensor(trues)
-    p = torch.as_tensor(preds)
-
-    k = torch.argmax(torch.abs(t - p))
-    loss = torch.abs(t[k] -p[k])
-    #mul = torch.as_tensor(ser)*torch.as_tensor(weights)
-    #loss = torch.sum((torch.as_tensor(trues)-torch.as_tensor(preds)) * torch.as_tensor(weights))
-    #print(ser)
-    #loss = torch.mean(torch.as_tensor(ser)) 
-    #loss = torch.trapz(torch.as_tensor(ser), intervals) 
-    return loss
-
-def EMD(inputs, targets,):
-    input_flat    = torch.flatten(inputs)
-    target_flat   = torch.flatten(targets)
-
-    intervals = np.arange(0, 30)
-    intervals = torch.as_tensor(intervals)
-
-    trues, preds = [], []
-
-    for phi in intervals:
-        ytrue  = input_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]  
-        ypred  = target_flat[torch.where((input_flat > phi) & (input_flat < phi +1))]
-
-        if len(ytrue) > 0: 
-            true_mean = torch.mean(ytrue) 
-            pred_mean = torch.mean(ypred) 
-        else: 
-            true_mean = 0.0
-            pred_mean = 0.0
-
-        trues.append(true_mean)
-        preds.append(pred_mean)
-
-    t = torch.as_tensor(trues)
-    P_t = t / torch.sum(P_t)
-
-
-    p = torch.as_tensor(preds)
-    P_r = p / torch.sum(P_r)
-
-
-    l = 30.0
-    D = torch.empty((l, l), dtype=torch.float32)
-
-    for i in range(l):
-        for j in range(l):
-            D[i,j] = abs(range(l)[i] - range(l)[j])
-
-    A_r = torch.zeros((l, l, l))
-    A_t = torch.zeros((l, l, l))
-
-    for i in range(l):
-        for j in range(l):
-            A_r[i, i, j] = 1
-            A_t[i, j, i] = 1
-            
-    A = torch.cat((A_r.reshape((l, l**2)), A_t.reshape((l, l**2))), axis=0)
-
-
-    b = torch.cat((P_r, P_t), axis=0)
-    c = D.reshape((l**2))
-
-
-    opt_res = torch.linalg.solve(-b, A.T, c)
-
-    loss = -opt_res.fun
-
-
-    return loss
-
-def weighted_huber_mse_loss(inputs, targets, weights=None):
-
-    input_flat    = torch.flatten(inputs)
-    target_flat   = torch.flatten(targets)
-    weights_flat  = torch.flatten(weights)
-
-
-    common_vales_true = input_flat[torch.where((weights_flat <= 1))]
-    common_vales_pred = target_flat[torch.where((weights_flat <= 1))]
-
-    extreme_vales_true = input_flat[torch.where((weights_flat > 1))]
-    extreme_vales_pred = target_flat[torch.where((weights_flat > 1))]
-    extreme_values_wg  = weights_flat[torch.where((weights_flat > 1))]
-
-    loss_common   = (common_vales_true - common_vales_pred) ** 2
-
-    loss_extreme = (extreme_vales_true - extreme_vales_pred) ** 2
-    loss_extreme *= extreme_values_wg.expand_as(loss_extreme)
-
-    cat_matrix = torch.cat((loss_common, loss_extreme))
-    loss = torch.mean(cat_matrix)
-
-    return loss
-
-def weighted_l1_loss(inputs, targets, weights=None):
-    loss = F.l1_loss(inputs, targets, reduction='none')
     if weights is not None:
         loss *= weights.expand_as(loss)
     loss = torch.mean(loss)
@@ -178,13 +36,27 @@ def weighted_focal_l1_loss(inputs, targets, weights=None, activate='sigmoid', be
     loss = torch.mean(loss)
     return loss
 
-def weighted_huber_loss(inputs, targets, weights=None, beta=1.):
-    l1_loss = torch.abs(inputs - targets)
-    cond = l1_loss < beta
-    loss = torch.where(cond, 0.5 * l1_loss ** 2 / beta, l1_loss - 0.5 * beta)
-    if weights is not None:
-        loss *= weights.expand_as(loss)
-    loss = torch.mean(loss)
+def weighted_huber_mse_loss(inputs, targets, weights=None):
+
+    input_flat    = torch.flatten(inputs)
+    target_flat   = torch.flatten(targets)
+    weights_flat  = torch.flatten(weights)
+
+    common_vales_true = input_flat[torch.where((weights_flat <= 1))]
+    common_vales_pred = target_flat[torch.where((weights_flat <= 1))]
+
+    extreme_vales_true = input_flat[torch.where((weights_flat > 1))]
+    extreme_vales_pred = target_flat[torch.where((weights_flat > 1))]
+    extreme_values_wg  = weights_flat[torch.where((weights_flat > 1))]
+
+    loss_common   = (common_vales_true - common_vales_pred) ** 2
+
+    loss_extreme = (extreme_vales_true - extreme_vales_pred) ** 2
+    loss_extreme *= extreme_values_wg.expand_as(loss_extreme)
+
+    cat_matrix = torch.cat((loss_common, loss_extreme))
+    loss = torch.mean(cat_matrix)
+
     return loss
 
 class BMCLoss(_Loss):
@@ -221,7 +93,6 @@ def bmc_loss(pred, target, noise_var):
     return loss
 
 def custom_wasserstien_loss(ytrue_w, ytrue, ypred_w, ypred, blur: float, sinkhorn_nits: int, weighted_cost_func: True):
-
 
     # Compute the logarithm of the weights (needed in the softmin reduction) ---
     loga_i = torch.empty((ytrue_w.shape[0], ytrue_w.shape[1]), dtype = torch.float32).to(device) #requires_grad = True, 
@@ -271,3 +142,221 @@ def custom_wasserstien_loss(ytrue_w, ytrue, ypred_w, ypred, blur: float, sinkhor
     
     return list_batch_loss
 
+# #PyTorch
+# class DiceBCELoss(nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(DiceBCELoss, self).__init__()
+
+    def forward(self, targets, inputs, smooth=1):
+        
+        #comment out if your model contains a sigmoid or equivalent activation layer
+        inputs = F.sigmoid(inputs)       
+        
+        #flatten label and prediction tensors
+        inputs = inputs.view(-1)
+        targets = targets.view(-1)
+        
+        intersection = (inputs * targets).sum()                            
+        dice_loss = 1 - (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
+        BCE = F.binary_cross_entropy(inputs, targets, reduction='mean')
+        Dice_BCE = BCE + dice_loss
+        
+        return Dice_BCE
+#
+# class DiceLoss(nn.Module):
+#     def __init__(self, weight=None, size_average=True):
+#         super(DiceLoss, self).__init__()
+
+#     def forward(self, inputs, targets, smooth=0.0):
+        
+#         #comment out if your model contains a sigmoid or equivalent activation layer
+#         inputs = F.sigmoid(inputs)       
+        
+#         #flatten label and prediction tensors
+#         inputs = inputs.view(-1)
+#         targets = targets.view(-1)
+        
+#         intersection = (inputs * targets).sum()                            
+#         dice = (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
+        
+#         return 1 - dice
+    
+
+# from typing import List
+
+# import torch
+# import torch.nn.functional as F
+# # from pytorch_toolbelt.utils.torch_utils import to_tensor
+# from torch import Tensor
+# from torch.nn.modules.loss import _Loss
+
+# # from .functional import soft_dice_score
+
+# __all__ = ["DiceLoss"]
+
+# BINARY_MODE = "binary"
+# MULTICLASS_MODE = "multiclass"
+# MULTILABEL_MODE = "multilabel"
+
+# def to_tensor(x, dtype=None) -> torch.Tensor:
+#     if isinstance(x, torch.Tensor):
+#         if dtype is not None:
+#             x = x.type(dtype)
+#         return x
+#     if isinstance(x, np.ndarray) and x.dtype.kind not in {"O", "M", "U", "S"}:
+#         x = torch.from_numpy(x)
+#         if dtype is not None:
+#             x = x.type(dtype)
+#         return x
+#     if isinstance(x, (list, tuple)):
+#         x = np.ndarray(x)
+#         x = torch.from_numpy(x)
+#         if dtype is not None:
+#             x = x.type(dtype)
+#         return x
+
+#     raise ValueError("Unsupported input type" + str(type(x)))
+
+# def soft_dice_score(
+#     output: torch.Tensor, target: torch.Tensor, smooth: float = 0.0, eps: float = 1e-7, dims=None
+# ) -> torch.Tensor:
+#     """
+
+#     :param output:
+#     :param target:
+#     :param smooth:
+#     :param eps:
+#     :return:
+
+#     Shape:
+#         - Input: :math:`(N, NC, *)` where :math:`*` means any number
+#             of additional dimensions
+#         - Target: :math:`(N, NC, *)`, same shape as the input
+#         - Output: scalar.
+
+#     """
+#     assert output.size() == target.size()
+#     if dims is not None:
+#         intersection = torch.sum(output * target, dim=dims)
+#         cardinality = torch.sum(output + target, dim=dims)
+#     else:
+#         intersection = torch.sum(output * target)
+#         cardinality = torch.sum(output + target)
+#     dice_score = (2.0 * intersection + smooth) / (cardinality + smooth).clamp_min(eps)
+#     return dice_score
+
+
+# class DiceLoss(_Loss):
+    """
+    Implementation of Dice loss for image segmentation task.
+    It supports binary, multiclass and multilabel cases
+    """
+
+    def __init__(
+        self,
+        mode: str = MULTILABEL_MODE,
+        classes: List[int] = [1, 2, 3],
+        log_loss=False,
+        from_logits=True,
+        smooth: float = 0.0,
+        ignore_index=None,
+        eps=1e-7,
+    ):
+        """
+
+        :param mode: Metric mode {'binary', 'multiclass', 'multilabel'}
+        :param classes: Optional list of classes that contribute in loss computation;
+        By default, all channels are included.
+        :param log_loss: If True, loss computed as `-log(jaccard)`; otherwise `1 - jaccard`
+        :param from_logits: If True assumes input is raw logits
+        :param smooth:
+        :param ignore_index: Label that indicates ignored pixels (does not contribute to loss)
+        :param eps: Small epsilon for numerical stability
+        """
+        assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
+        super(DiceLoss, self).__init__()
+        self.mode = mode
+        if classes is not None:
+            assert mode != BINARY_MODE, "Masking classes is not supported with mode=binary"
+            classes = to_tensor(classes, dtype=torch.long)
+
+        self.classes = classes
+        self.from_logits = from_logits
+        self.smooth = smooth
+        self.eps = eps
+        self.ignore_index = ignore_index
+        self.log_loss = log_loss
+
+    def forward(self, y_pred: Tensor, y_true: Tensor) -> Tensor:
+        """
+
+        :param y_pred: NxCxHxW
+        :param y_true: NxHxW
+        :return: scalar
+        """
+        assert y_true.size(0) == y_pred.size(0)
+
+        if self.from_logits:
+            # Apply activations to get [0..1] class probabilities
+            # Using Log-Exp as this gives more numerically stable result and does not cause vanishing gradient on
+            # extreme values 0 and 1
+            if self.mode == MULTICLASS_MODE:
+                y_pred = y_pred.log_softmax(dim=1).exp()
+            else:
+                y_pred = F.logsigmoid(y_pred).exp()
+
+        bs = y_true.size(0)
+        num_classes = y_pred.size(1)
+        dims = (0, 2)
+
+        if self.mode == BINARY_MODE:
+            y_true = y_true.view(bs, 1, -1)
+            y_pred = y_pred.view(bs, 1, -1)
+
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask
+                y_true = y_true * mask
+
+        if self.mode == MULTICLASS_MODE:
+            y_true = y_true.view(bs, -1)
+            y_pred = y_pred.view(bs, num_classes, -1)
+
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask.unsqueeze(1)
+
+                y_true = F.one_hot((y_true * mask).to(torch.long), num_classes)  # N,H*W -> N,H*W, C
+                y_true = y_true.permute(0, 2, 1) * mask.unsqueeze(1)  # H, C, H*W
+            else:
+                y_true = F.one_hot(y_true, num_classes)  # N,H*W -> N,H*W, C
+                y_true = y_true.permute(0, 2, 1)  # H, C, H*W
+
+        if self.mode == MULTILABEL_MODE:
+            y_true = y_true.view(bs, num_classes, -1)
+            y_pred = y_pred.view(bs, num_classes, -1)
+
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask
+                y_true = y_true * mask
+
+        scores = soft_dice_score(y_pred, y_true.type_as(y_pred), smooth=self.smooth, eps=self.eps, dims=dims)
+
+        if self.log_loss:
+            loss = -torch.log(scores.clamp_min(self.eps))
+        else:
+            loss = 1.0 - scores
+
+        # Dice loss is undefined for non-empty classes
+        # So we zero contribution of channel that does not have true pixels
+        # NOTE: A better workaround would be to use loss term `mean(y_pred)`
+        # for this case, however it will be a modified jaccard loss
+
+        mask = y_true.sum(dims) > 0
+        loss *= mask.to(loss.dtype)
+
+        if self.classes is not None:
+            loss = loss[self.classes]
+
+        return loss.mean()

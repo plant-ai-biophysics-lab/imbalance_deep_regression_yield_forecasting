@@ -4,12 +4,15 @@ from glob import glob
 import pandas as pd
 import torch
 
-
 from utils.RWSampler import lds_prepare_weights, cb_prepare_weights, TargetRelevance, return_cost_sensitive_weight_sampler
 from models import configs
-    
 
-def return_dataloaders(batch_size:int, 
+EXTREME_LOWER_THRESHOLD = 9  #22.24
+EXTREME_UPPER_THRESHOLD = 22 #54.36
+HECTARE_TO_ACRE_SCALE = 2.471 # 2.2417
+
+
+def dataloaders(batch_size:int, 
                        in_channels:int, 
                        lds_ks: float,
                        lds_sigma:float, 
@@ -20,7 +23,7 @@ def return_dataloaders(batch_size:int,
                        exp_name: str): 
 
     data_dir       = '/data2/hkaman/Livingston/data/10m/'
-    exp_output_dir = '/data2/hkaman/DiT/EXPs/' + 'EXP_' + exp_name
+    exp_output_dir = '/data2/hkaman/Imbalance/EXPs/CNNs/' + 'EXP_' + exp_name
 
 
 
@@ -28,8 +31,9 @@ def return_dataloaders(batch_size:int,
 
     if not isExist:
         os.makedirs(exp_output_dir)
-        os.makedirs(exp_output_dir + '/coords')
-        os.makedirs(exp_output_dir + '/loss')
+        os.makedirs(os.path.join(exp_output_dir, 'checkpoints'))
+        os.makedirs(os.path.join(exp_output_dir, 'coords'))
+        os.makedirs(os.path.join(exp_output_dir, 'loss'))
 
     train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
     train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
@@ -37,7 +41,6 @@ def return_dataloaders(batch_size:int,
     valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
     test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
     test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
-    
     
     train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
     valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
@@ -48,8 +51,21 @@ def return_dataloaders(batch_size:int,
     #============================================ Imprical Data Weight Generation =================================#
     #==============================================================================================================#
     
-    train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
+    # train_sampler, valid_sampler, test_sampler  = return_cost_sensitive_weight_sampler(train_csv, valid_csv, test_csv, exp_output_dir, run_status = 'train')
+    train_weights = train_csv['NormWeight'].to_numpy() 
+    train_weights = torch.DoubleTensor(train_weights)
+    train_sampler = torch.utils.data.sampler.WeightedRandomSampler(train_weights, 
+                                                                   len(train_weights), replacement=True)    
 
+    val_weights   = valid_csv['NormWeight'].to_numpy() 
+    val_weights   = torch.DoubleTensor(val_weights)
+    val_sampler   = torch.utils.data.sampler.WeightedRandomSampler(val_weights, 
+                                                                   len(val_weights), replacement=True)    
+    
+    test_weights   = test_csv['NormWeight'].to_numpy() 
+    test_weights   = torch.DoubleTensor(test_weights)
+    test_sampler   = torch.utils.data.sampler.WeightedRandomSampler(test_weights, 
+                                                                   len(test_weights), replacement=True)  
     #==============================================================================================================#
     #============================================     Reading Data                =================================#
     #==============================================================================================================#
@@ -63,7 +79,6 @@ def return_dataloaders(batch_size:int,
                                         dw_alpha            = dw_alpha, 
                                         betha               = betha,
                                         reweighting_method  = reweighting_method)
-
 
     dataset_validate = dataloader_RGB(data_dir, 
                                         exp_output_dir, 
@@ -93,12 +108,13 @@ def return_dataloaders(batch_size:int,
     #==============================================================================================================#                      
     # define training and validation data loaders
     if resmapling_status: 
+        print(f"resampling is calculating!")
         data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
-                                                        shuffle=True,  sampler=train_sampler, num_workers=8)  
+                                                        shuffle=False,  sampler=train_sampler, num_workers=8)  
         data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
-                                                        shuffle=False, sampler= valid_sampler, num_workers=8) 
+                                                        shuffle=False, sampler= val_sampler, num_workers=8) 
         data_loader_test     = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, 
-                                                        shuffle=False, sampler=test_sampler, num_workers=8) 
+                                                        shuffle=False, sampler= test_sampler, num_workers=8)  #
     else: 
         data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
                                                         shuffle=True,  num_workers=8) 
@@ -109,7 +125,6 @@ def return_dataloaders(batch_size:int,
 
 
     return data_loader_training, data_loader_validate, data_loader_test
-
 
 class data_generator():
     def __init__(self, eval_scenario: str, 
@@ -513,7 +528,6 @@ class data_generator():
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
         return weights  
     
-
 class dataloader_RGB(object):
     def __init__(self, npy_dir, csv_dir, 
                                 category: str, 
@@ -532,7 +546,6 @@ class dataloader_RGB(object):
         self.in_channels  = in_channels
         self.reweighting_method = reweighting_method
 
-
         if category    == 'train': 
             self.NewDf = pd.read_csv(os.path.join(self.csv_dir, 'coords') +'/train.csv', index_col=0) 
             self.NewDf.reset_index(inplace = True, drop = True)
@@ -543,20 +556,22 @@ class dataloader_RGB(object):
             self.NewDf = pd.read_csv(os.path.join(self.csv_dir, 'coords') +'/test.csv', index_col=0)
             self.NewDf.reset_index(inplace = True, drop = True)
         
-        self.images = sorted(glob(os.path.join(self.npy_dir , 'imgs') +'/*.npy'))
-        self.labels = sorted(glob(os.path.join(self.npy_dir , 'labels') +'/*.npy'))
+        self.images = sorted(glob(os.path.join(self.npy_dir , 'new_imgs') +'/*.npy'))
+        self.labels = sorted(glob(os.path.join(self.npy_dir , 'new_labels') +'/*.npy'))
 
         if reweighting_method == 'lds':
+            print(f"LDS: {lds_ks}| {lds_sigma}")
             self.weights = self.return_pixelwise_weight_lds(lds_ks, lds_sigma)
+            
         elif reweighting_method == 'dw':
+            print(f"DW: {dw_alpha}")
             self.weights = self.return_pixelwise_weight_dw(dw_alpha)
             assert not np.isnan(self.weights).any()
-            #self.weights = self.weights / np.max(self.weights)
             self.weights = np.where(self.weights >= 1, self.weights, 1)
-            #print(f"Min weight {np.min(self.weights)} | Max weight {np.max(self.weights)}")
+
         elif reweighting_method == 'cb':
+            print(f"CB: {lds_ks}| {lds_sigma} | {betha}")
             self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
-            #self.weights = np.where(self.weights >= 1, self.weights, 1)
 
 
     def __getitem__(self, idx):
@@ -596,15 +611,24 @@ class dataloader_RGB(object):
         TMatrix   = self.patch_tid_matrix(t_id)  
         EmbMat    = np.concatenate([CulMatrix, RWMatrix, SpMatrix, TMatrix], axis = 0)
 
+
+        EmbTensor = torch.as_tensor((cultivar_id, t_id, rw_id, sp_id), dtype=torch.int64)
+        EmbText = f"The {cultivar} has a trellis id {t_id}, row space {rw_id} and canopy space {sp_id}."
         # return crooped mask tensor: 
         mask  = self.crop_gen(label_path, xcoord, ycoord) 
         mask  = np.swapaxes(mask, -1, 0)
         mask  = torch.as_tensor(mask, dtype=torch.float32)
 
-        
+
+        # return yield zone: 
+        yz = self.return_yield_zone(mask)
+        yz  = torch.as_tensor(yz, dtype=torch.float32)
+
+
         if self.reweighting_method is None: 
             sample = {"image": image, "mask": mask, "EmbMatrix": EmbMat, "block": block_id, "cultivar": cultivar, 
-                    "X": xcoord, "Y": ycoord, "EmbList": [cultivar_id, t_id, rw_id, sp_id]} 
+                    "X": xcoord, "Y": ycoord, "EmbList": [cultivar_id, t_id, rw_id, sp_id], 
+                    "EmbTensor": EmbTensor, "EmbText": EmbText, "YZ": yz} 
             
         else:
             weight_mtx = self.weights[idx, :, :]
@@ -612,14 +636,26 @@ class dataloader_RGB(object):
             weight_mtx = torch.as_tensor(weight_mtx, dtype=torch.float32)
 
             sample = {"image": image, "mask": mask, "EmbMatrix": EmbMat, "block": block_id, "cultivar": cultivar, 
-                    "X": xcoord, "Y": ycoord, "weight": weight_mtx, "EmbList": [cultivar_id, t_id, rw_id, sp_id]} 
+                    "X": xcoord, "Y": ycoord, "weight": weight_mtx, "EmbList": [cultivar_id, t_id, rw_id, sp_id], 
+                    "EmbTensor": EmbTensor, "EmbText": EmbText, "YZ": yz} 
             
-
         return sample
 
     def __len__(self):
         return len(self.NewDf)
     
+    def return_yield_zone(self, mask):
+        # Initialize an empty array with the same shape as the image for the segmented output
+        segmented = np.zeros_like(mask)
+        # Class 1: Pixel values <= 9
+        segmented[mask < EXTREME_LOWER_THRESHOLD] = 1
+        # Class 2: Pixel values > 9 and < 22
+        segmented[(mask >= EXTREME_LOWER_THRESHOLD) & (mask < EXTREME_UPPER_THRESHOLD)] = 2
+        # Class 3: Pixel values >= 22
+        segmented[mask >= EXTREME_UPPER_THRESHOLD] = 3
+
+        return segmented
+
     def return_pixelwise_weight_lds(self, lds_ks, lds_sigma):
 
         masks = None

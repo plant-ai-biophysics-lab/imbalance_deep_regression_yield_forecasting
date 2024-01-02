@@ -25,5 +25,7 @@ Before running the code, ensure you have the following dependencies installed:
 - Seaborn (for visualization)
 
 
+```bash
+python train.py --exp_name my_experiment --batch_size 64 --in_channels 4 --dropout 0.1 --ldsks 10 --ldssigma 8 --alphs 3.9 --betha 4 --lr 0.0001 --wd 0.0001 --epochs 50 --loss mse --reweight dw
 
-python train.py --exp_name my_experiment --batch_size 512 --embd_size 1024 --num_heads 8 --num_layers 6 --in_channels 4 --dropout 0.1 --ldsks 10 --ldssigma 8 --alphs 3.9 --betha 4 --postnorm False --lr 0.0001 --wd 0.0001 --epochs 50 --loss mse --reweight dw
+

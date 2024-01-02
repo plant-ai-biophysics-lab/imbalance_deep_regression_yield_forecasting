@@ -4,14 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as  mpatches
 import seaborn as sns
-import cv2
-import rasterio 
-from rasterio.mask import mask
-from rasterio.coords import BoundingBox
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from rasterio import windows
-from rasterio import warp
-
 from models.configs import blocks_information, blocks_size
 
 
@@ -327,7 +320,6 @@ def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = 
     else:
         return this_block_df, true_out, pred_out            
 
-
 def image_mae_mape_map(ytrue, ypred): 
 
     w = ytrue.shape[0]
@@ -353,8 +345,6 @@ def image_mae_mape_map(ytrue, ypred):
     out2 = out_mape.reshape(ytrue.shape[0], ytrue.shape[1])
 
     return out1, out2
-
-
 
 def yield_true_pred_plot(ytrue, ypred, min_v = None, max_v= None):
 

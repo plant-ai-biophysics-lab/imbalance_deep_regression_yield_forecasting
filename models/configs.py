@@ -64,7 +64,6 @@ blocks_information = {'LIV_003':['MALVASIA_BIANCA', '7', '12', '7', '1991', '4WI
           'LIV_186':['RIESLING', '13', '11', '7', '2012', 'SPLIT', '2'], 
           'LIV_193':['MERLOT', '8', '11', '5', '2010', 'SPLIT', '2']}
 
-
 blocks_size = {'LIV_003_2016': [392, 1560],
  'LIV_003_2017': [394, 1560],
  'LIV_003_2018': [396, 1563],
@@ -275,50 +274,32 @@ blocks_size = {'LIV_003_2016': [392, 1560],
  'LIV_193_2018': [159, 295],
  'LIV_193_2019': [107, 288], }
 
-class SRTR_Configs():
-    def __init__(self, img_size: int, patch_size: int, embed_dim: int, mlp_dim: int, 
-                    in_channels: int, out_channels: int, num_heads: int, num_layers: int, cond: str,
-                    Attn_drop: float, Proj_drop: float, PostNorm = True, vis = True, 
-                    kernel_size = [3,3], dilation = [1, 1], stride  = [1, 1]):
 
-        self.img_size   = img_size
-        self.patch_size = patch_size
-        self.embed_dim  = embed_dim
-        self.mlp_dim    = mlp_dim
+class build_configs():
+    def __init__(self, 
+                 img_size: int, 
+                 in_channels: int, 
+                 out_channels: int, 
+                 dropout: float, 
+                 multi_conv: str = True,
+                 cond: str = False,):
+
+        self.img_size = img_size
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.num_heads  = num_heads
-        self.num_layers = num_layers
-        self.Attn_drop  = Attn_drop
-        self.Proj_drop  = Proj_drop
-        self.PostNorm   = PostNorm
-        self.vis        = vis
-        self.kernel_size = kernel_size
-        self.dilation    = dilation
-        self.stride     = stride
-        self.cond       = cond
+        self.cond = cond
+        self.multi_conv = multi_conv
+        self.dropout = dropout
     
     def call(self):
         """Returns the Spatio-temporal configuration."""
         config = ml_collections.ConfigDict()
 
-        config.img_size    = self.img_size
-        config.patch_size  = self.patch_size 
-        config.embed_dim   = self.embed_dim 
-        config.mlp_dim     = self.mlp_dim
+        config.img_size = self.img_size
         config.in_channels = self.in_channels
         config.out_channels= self.out_channels
-        config.num_heads   = self.num_heads
-        config.num_layers  = self.num_layers
-        config.Attn_drop   = self.Attn_drop
-        config.Proj_drop   = self.Proj_drop
-        config.PostNorm    = self.PostNorm
-        config.PostNorm    = self.PostNorm
-        config.vis         = self.vis
-        config.kernel_size = self.kernel_size 
-        config.dilation    = self.dilation  
-        config.stride      = self.stride    
-        config.cond        = self.cond
+        config.dropout = self.dropout
+        config.cond = self.cond
 
         return config
    

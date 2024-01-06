@@ -572,6 +572,9 @@ class dataloader_RGB(object):
         elif reweighting_method == 'cb':
             print(f"CB: {lds_ks}| {lds_sigma} | {betha}")
             self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
+        
+        elif reweighting_method == 'ours':
+            self.weights = self.return_pixelwise_weight_dw(dw_alpha)
 
 
     def __getitem__(self, idx):
@@ -685,6 +688,38 @@ class dataloader_RGB(object):
 
         return weights
     
+    def return_pixelwise_weight_ours(self, lds_ks, lds_sigma):
+
+        masks = None
+        for idx, row in self.NewDf.iterrows():
+            xcoord     = row['X'] 
+            ycoord     = row['Y'] 
+            label_path = row['LABEL_PATH'] 
+            mask  = self.crop_gen(label_path, xcoord, ycoord) 
+            mask  = np.swapaxes(mask, -1, 0)
+
+            if masks is None: 
+                masks = mask
+            else: 
+                masks = np.concatenate([masks, mask], axis = 0)
+
+
+        reshaped_masks = np.reshape(masks, (masks.shape[0]*masks.shape[1]*masks.shape[2]))
+        lds_density = lds_prepare_weights(reshaped_masks, 'inverse', 
+                                    max_target=30, 
+                                    lds=True, 
+                                    lds_kernel='gaussian', 
+                                    lds_ks   =lds_ks, 
+                                    lds_sigma=lds_sigma)
+        
+        all_mean_value = np.mean(reshaped_masks)
+
+        weights = ((1/lds_density) * ((reshaped_masks - all_mean_value)**2)) + 1
+        weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
+
+        return weights
+    
+
     def return_pixelwise_weight_cb(self, lds_ks, lds_sigma, betha):
 
         masks = None

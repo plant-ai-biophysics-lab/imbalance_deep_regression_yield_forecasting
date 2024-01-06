@@ -12,7 +12,7 @@ class UNet2DConvLSTM(nn.Module):
         self.in_channels = config.in_channels
         self.out_channels = config.out_channels
         self.num_filters = 16
-        self.dropout = config.proj_dropout
+        self.dropout = config.dropout
         self.Emb_Channels = 4
         self.batch_size = 512
         self.botneck_size = 2

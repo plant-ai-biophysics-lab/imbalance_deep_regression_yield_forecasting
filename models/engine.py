@@ -265,8 +265,12 @@ class YieldEst:
                     current_loss = losses.weighted_huber_mse_loss(y_pred, y_true, weight)
                 elif loss_type == 'focal':
                     current_loss = losses.weighted_focal_mse_loss(y_pred, y_true, weights=None, activate='sigmoid', beta=.2, gamma=1)
+                elif loss_type == 'focal-r':
+                    current_loss = losses.weighted_focal_l1_loss(y_pred, y_true, weights=weight, activate='sigmoid', beta=.2, gamma=1)
                 elif loss_type == 'wass':
                     current_loss = SamplesLoss(y_pred, y_true)
+                elif loss_type =='bmc':
+                    current_loss = losses.BMCLoss(init_noise_sigma = 0.5)(y_pred, y_true)
                 
                 total_loss += current_loss
         else:
@@ -279,8 +283,10 @@ class YieldEst:
             elif loss_type == 'huber':
                 total_loss = losses.weighted_huber_mse_loss(y_pred, y_true, weight)
             elif loss_type == 'focal':
-                current_loss = losses.weighted_focal_mse_loss(y_pred, y_true, weights=None, activate='sigmoid', beta=.2, gamma=1)
-            
+                total_loss = losses.weighted_focal_mse_loss(y_pred, y_true, weights=None, activate='sigmoid', beta=.2, gamma=1)
+            elif loss_type =='bmc':
+                total_loss = losses.BMCLoss(init_noise_sigma = 8.0)(y_pred, y_true)
+                
 
         return total_loss
 

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as  mpatches
 import matplotlib.gridspec as gridspec
 import matplotlib.colors as mcolors
+from scipy.stats import gaussian_kde
 import seaborn as sns
 sns.set(rc={'axes.facecolor':'white', 'figure.facecolor':'white'})
 sns.set(font_scale=1.5)
@@ -345,6 +346,8 @@ class weight_vis():
             weights = self._return_cb_weights(ytrue)
         elif self.method == 'dw':
             weights = self._return_dw_weights(ytrue)
+        elif self.method == 'ours':
+            weights = self._return_extreme_weights(ytrue)
 
         weight_means, ytrue_counts = self._return_samples_weight_per_bins(ytrue, weights)    
         
@@ -355,6 +358,18 @@ class weight_vis():
         crop_src = src[:, xcoord:xcoord + 16, ycoord:ycoord + 16, :]
         return crop_src 
     
+
+    def _return_extreme_weights(self, ytrue):
+        all_mean_value = np.mean(ytrue)
+        # Perform Kernel Density Estimation
+        # density_lds = self._return_lds_weights(ytrue)
+        # density_lds = density_lds/np.max(density_lds)
+
+        print(f"mean value: {all_mean_value}")
+        weights = ((1) * ((ytrue - all_mean_value)**2)) + 1
+        weights = np.array(weights, dtype = np.float32)
+        return weights
+
     def _return_lds_weights(self, ytrue):
         weights = RWSampler.lds_prepare_weights(ytrue, 'inverse', 
                             max_target = 30, 

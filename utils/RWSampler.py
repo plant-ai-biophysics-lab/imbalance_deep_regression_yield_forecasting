@@ -33,7 +33,6 @@ def return_num_samples_of_bins(df):
 
     return  dict_
 
-
 def get_lds_kernel_window(kernel, ks, sigma):
     assert kernel in ['gaussian', 'triang', 'laplace']
     half_ks = (ks - 1) // 2
@@ -58,7 +57,6 @@ def calc_lds_effective_dist(df, ks: int, sigma: int):
     eff_label_dist = convolve1d(np.array(emp_label_dist), weights=lds_kernel_window, mode='constant')
 
     return emp_label_dist, eff_label_dist
-
 
 def lds_prepare_weights(labels, reweight, max_target=30, lds=True, lds_kernel='gaussian', lds_ks=5, lds_sigma=2):
     assert reweight in {'none', 'inverse', 'sqrt_inv'}
@@ -88,6 +86,8 @@ def lds_prepare_weights(labels, reweight, max_target=30, lds=True, lds_kernel='g
     weights = [np.float32(1 / x) for x in num_per_label]
     scaling = len(weights) / np.sum(weights)
     weights = [scaling * x for x in weights]
+
+
     return weights
 
 def cb_prepare_weights(labels, lds_kernel='gaussian', lds_ks=5, lds_sigma=2, betha=2):
@@ -111,7 +111,6 @@ def cb_prepare_weights(labels, lds_kernel='gaussian', lds_ks=5, lds_sigma=2, bet
     weights = [np.float32((1-betha) / (1-(betha**x))) if (1-(betha**x)) != 0 else 1 for x in effective_value_norm]
 
     return weights
-
 
 
 class check_lds_reweighting_():
@@ -365,7 +364,6 @@ class check_cost_sensitive_reweighting():
         crop_src = src[:, xcoord:xcoord + 16, ycoord:ycoord + 16, :]
         return crop_src 
     
-
 #=======================================================================================================#
 #                                             DenseWeight                                               #
 #=======================================================================================================#
@@ -525,6 +523,7 @@ def return_cost_sensitive_weight_sampler(train, val, test, save_dir, run_status:
     save_dir = os.path.join(save_dir, 'coords')
 
     if run_status == 'train':
+
         train_df   = cost_sensitive_weight_sampler(train)
         train_df.reset_index(inplace = True, drop = True)
         train_df.to_csv(os.path.join(save_dir,'train.csv'))
@@ -533,12 +532,14 @@ def return_cost_sensitive_weight_sampler(train, val, test, save_dir, run_status:
         valid_df.reset_index(inplace = True, drop = True)
         valid_df.to_csv(os.path.join(save_dir,'val.csv'))
         
-        
         test_df = cost_sensitive_weight_sampler(test)
         test_df.reset_index(inplace = True, drop = True)
         test_df.to_csv(os.path.join(save_dir, 'test.csv'))
+
+
     
     elif run_status == 'eval':
+
         train_df = pd.read_csv(os.path.join(save_dir,'train.csv'), index_col=0) 
         train_df.reset_index(inplace = True, drop = True)
 
@@ -547,6 +548,7 @@ def return_cost_sensitive_weight_sampler(train, val, test, save_dir, run_status:
 
         test_df = pd.read_csv(os.path.join(save_dir, 'test.csv'), index_col=0)
         test_df.reset_index(inplace = True, drop = True)
+
 
     train_weights = train_df['NormWeight'].to_numpy() 
     train_weights = torch.DoubleTensor(train_weights)

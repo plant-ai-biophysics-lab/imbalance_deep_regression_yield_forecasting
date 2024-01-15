@@ -216,7 +216,6 @@ class vineyard_data_visulization():
 
         fig.suptitle('All cultivars label distribution')
 
-
     def all_cultivar_image_dist_vis(self): 
 
         new_dict = {}
@@ -260,6 +259,8 @@ class vineyard_data_visulization():
         ax2 = sns.kdeplot(concat_matrix_all_blocks, ax = axs[1], palette='Dark2', shade ='fill')
 
         fig.suptitle('All cultivars feature distribution')
+
+
 
 def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = None, scale = None):
     
@@ -392,7 +393,6 @@ def yield_true_pred_plot(ytrue, ypred, min_v = None, max_v= None):
 
     #return mape_map
     #plt.savefig('./imgs/B186_1m.png', dpi = 300)
-
 
 #-------------------------------------------------------------------------------------------#
 #                                Data Complexity Measures                                   #

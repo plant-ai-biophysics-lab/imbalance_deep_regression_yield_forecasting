@@ -56,7 +56,7 @@ class UNet2DConvLSTM(nn.Module):
             if m.bias is not None:
                 init.constant_(m.bias, 0)
         elif isinstance(m, nn.BatchNorm2d):
-            init.constant_(m.weight, 1e-6)
+            init.constant_(m.weight, 1)
             init.constant_(m.bias, 0)
 
     def forward(self, x, e, yz):

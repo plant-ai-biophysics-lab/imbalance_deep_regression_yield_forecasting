@@ -68,7 +68,6 @@ def apply_percentile(row, target_percentile):
         row = np.array([row])
     return np.percentile(row, target_percentile)
 
-
 def safe_mean(x):
     if isinstance(x, np.ndarray):
         return np.mean(x)
@@ -353,21 +352,28 @@ class weight_vis():
         
         self._plot(ytrue_counts, weight_means)
 
+        return weight_means
+
     def crop_gen(self, src, xcoord, ycoord):
         src = np.load(src, allow_pickle=True)
         crop_src = src[:, xcoord:xcoord + 16, ycoord:ycoord + 16, :]
         return crop_src 
     
-
     def _return_extreme_weights(self, ytrue):
         all_mean_value = np.mean(ytrue)
         # Perform Kernel Density Estimation
-        # density_lds = self._return_lds_weights(ytrue)
-        # density_lds = density_lds/np.max(density_lds)
+        density_lds = self._return_lds_weights(ytrue)
 
-        print(f"mean value: {all_mean_value}")
-        weights = ((1) * ((ytrue - all_mean_value)**2)) + 1
+        # density_lds =  RWSampler.cb_prepare_weights(ytrue, 
+        #                                 lds_kernel = 'gaussian', 
+        #                                 lds_ks = self.lds_ks, 
+        #                                 lds_sigma = self.lds_sigma, 
+        #                                 betha = 3.9)
+        
+        density_lds = density_lds/np.max(density_lds)
+        weights = ((density_lds) * ((ytrue - all_mean_value)**2)) + 1
         weights = np.array(weights, dtype = np.float32)
+
         return weights
 
     def _return_lds_weights(self, ytrue):
@@ -420,20 +426,20 @@ class weight_vis():
     
     def _plot(self, ytrue_counts, weights):
 
-        fig, axs = plt.subplots(1, 1, figsize=(16, 4))
+        fig, axs = plt.subplots(1, 1, figsize=(12, 5))
 
         sns.set_style("whitegrid", {'axes.grid': False})
         plt.rcParams["figure.autolayout"] = True
         plt.subplots_adjust(hspace=0.01)
 
-        bins_value = np.arange(1, 31, 1)  
+        bins_value = np.floor(np.arange(1, 75, 2.5)).astype(int)
 
-        ax1 = sns.barplot(x=bins_value, y=ytrue_counts, color=sns.color_palette()[0], ax=axs)
+        ax1 = sns.barplot(x=bins_value, y=ytrue_counts, color= sns.color_palette()[0], ax=axs) #sns.color_palette()[0]
         axs01 = axs.twinx()
-        ax01 = sns.barplot(x=bins_value, y=weights, color='gray', alpha=0.7, ax=axs01)
+        ax01 = sns.barplot(x=bins_value, y=weights, color='red', alpha=0.6, ax=axs01)
 
         handles = [mpatches.Patch(facecolor=sns.color_palette()[0], label='Number of Samples'),
-                mpatches.Patch(facecolor='gray', label='Weight')]
+                mpatches.Patch(facecolor='red', label='Weight')]
         axs.legend(handles=handles, loc='upper right')
 
         ax1.set(ylabel='Number of Samples')
@@ -683,23 +689,26 @@ class multi_model_timeseries_plot():
     
         model_files_dict = self._return_full_df_names()
         self.full_df = self._return_full_df(model_files_dict)
-
+        
 
     def plot(self):
         custom_labels_dict = {
                 'EXP_00_lr001_wd05_drop30_vanilla': 'Vanilla',
                 'EXP_01_lr001_wd05_resampling': 'CSR',
-                'EXP_02_lr001_wd05_LDSinv_10_8': 'LDS',
-                'EXP_03_lr001_wd05_CB_3': 'Class Balanced',
+                'EXP_02_lr001_wd05_drop30_focalr': 'Focal-R',
+                'EXP_03_lr001_wd05_LDSinv_10_8': 'LDS',
                 'EXP_04_lr001_wd05_DW_3.9': 'Dense Weight',
-                'EXP_05_lr001_wd05_drop30_resampling_yz': 'CSR_Yield Zone',
+                'EXP_05_lr001_wd05_CB_3': 'Class Balanced',
+                'EXP_06_lr001_wd05_ExW': 'Extreme Weight',
+                'EXP_07_lr001_wd05_drop30_yz': 'Yield Zone',
+                'EXP_08_lr001_wd05_drop30_resampling_yz': 'Extreme Weight + Yield Zone',
             }
         
         fig, axs = plt.subplots(2, 2, figsize=(20, 10), sharex=True)
         metrics = [('R2', 'R2'), ('RMSE', 'RMSE'), ('MAE', 'MAE (t/ha)'), ('MAPE', 'MAPE (%)')]
         axs = axs.flatten() 
         # custom_labels = ['Vanilla', 'CSR', 'LDS', 'Class Balanced', 'Dense Weight', 'CSR_Yield Zone']  
-        markers = ['o', 'v', '^', '<', '>', 's']  
+        markers = ['o', 'v', '^', '<', '>', 's', '^', 'o', 'v']  
         models = self.full_df['model'].unique()
 
 
@@ -713,7 +722,7 @@ class multi_model_timeseries_plot():
             ax.set_facecolor('white')
             plt.setp(ax.spines.values(), color='k')
             if ax == axs[-1]:  # Show legend only for the last plot
-                ax.legend(title='Model', loc="upper right", fontsize=12)
+                ax.legend(title='Model', loc="upper right", fontsize=10)
             else:
                 ax.legend().remove()
 
@@ -855,7 +864,7 @@ class timeseries_spatial_variability():
         'Matrix': ['Yield Observation']*len(ytrue10_vector) + ['Yield Prediction (10m)']*len(ypred10_vector) + ['Yield Prediction (20m)']*len(ypred20_vector) + ['Yield Prediction (40m)']*len(ypred40_vector) + ['Yield Prediction (60m)']*len(ypred60_vector) 
             }
         df = pd.DataFrame(data)
-
+        
         categories = df['Matrix'].unique()
         for category in categories:
             sns.kdeplot(df[df['Matrix'] == category], x='Yield (t/ha)', fill=True, ax=axs[0, 2], label=category)
@@ -870,7 +879,7 @@ class timeseries_spatial_variability():
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar = fig.colorbar(img,  cax=cax)
         img.set_clim(min_v, max_v)
-    
+
         img = axs[1, 1].imshow(ypred_40_w15, vmin=min_v, vmax=max_v)
         _, test_mae, _, test_mape, _, _ = regression_metrics(ytrue40, ypred_40_w15)
         axs[1, 1].set_title(f'Yield Prediction Week 15 (40m): \nMAE (t/ha) = {test_mae:.2f}, MAPE = {test_mape:.2f}', fontsize=16)
@@ -891,9 +900,6 @@ class timeseries_spatial_variability():
 
         plt.tight_layout()
         plt.subplots_adjust(hspace=0.25, wspace=0.1)
-
-
-
 
     def timeseries_plot(self, block_name:str, year: int,  min_v: None, max_v: None):
 
@@ -948,37 +954,32 @@ class timeseries_spatial_variability():
         list_ytrue, list_ypred = self.return_rebuild_block_matrix(block_name, year = year)
         num_years = len(list_ytrue)
 
-        # if year == 2016:
-        #     i = 0
-        # elif year == 2017:
-        #     i = 1
-        # elif year == 2018:
-        #     i = 2
-        # elif year == 2019:
-        #     i = 3
-
         plt.rcParams["axes.grid"] = False
         fig, axs = plt.subplots(1, 4, figsize = (24, 8*num_years))
 
         # for i in range(num_years):
         img1 = axs[0].imshow(list_ytrue)
-        axs[0].set_title('Yield Observation', fontsize = 14)
+        axs[0].set_title('Yield Observation', fontsize = 16)
         divider = make_axes_locatable(axs[0])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar1 = fig.colorbar(img1,  cax=cax)
         img1.set_clim(min_v, max_v)
 
         img2 = axs[1].imshow(list_ypred[-1])
-        axs[1].set_title('Yield Prediction', fontsize = 14)
+        axs[1].set_title('Yield Prediction (Week 15)', fontsize = 16)
         divider = make_axes_locatable(axs[1])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar2 =fig.colorbar(img2, cax=cax)
         img2.set_clim(min_v, max_v)
         axs[1].get_yaxis().set_visible(False)
 
+        _, test_mae, _, test_mape, _, _ = regression_metrics(list_ytrue[list_ytrue !=- 1], list_ypred[-1][list_ypred[-1] != -1])
+
+
         mae_map, mape_map = self.image_mae_mape_map(list_ytrue, list_ypred[-1])
+
         img3 = axs[2].imshow(mae_map, cmap = 'viridis') #, cmap = 'magma'
-        axs[2].set_title('MAE Map (t/ha)', fontsize = 14)
+        axs[2].set_title(f'MAE Map (t/ha) = {test_mae:.2f}', fontsize = 16)
         divider = make_axes_locatable(axs[2])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar2 =fig.colorbar(img3, cax=cax)
@@ -986,7 +987,7 @@ class timeseries_spatial_variability():
         axs[2].get_yaxis().set_visible(False)
 
         img4 = axs[3].imshow(mape_map, cmap = 'viridis') #
-        axs[3].set_title('MAPE Map (%)', fontsize = 14)
+        axs[3].set_title(f'MAPE Map (%) = {test_mape:.2f}', fontsize = 16)
         divider = make_axes_locatable(axs[3])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar3 =fig.colorbar(img4, cax=cax)

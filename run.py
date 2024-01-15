@@ -95,7 +95,7 @@ if __name__ == "__main__":
     parser.add_argument("--wd",          type=float, default = 0.05,  help = "Value of weight decay")
     parser.add_argument("--epochs",      type=int,   default = 500,   help = "The number of epochs")
     parser.add_argument("--loss",        type=str,   default = "mse", help = "Loss function  mse wmse huber wass")
-    parser.add_argument("--reweight",    type=str,   default = "dw",  help = "Reweight strategy") # "dw", "lds", "cb"
+    parser.add_argument("--reweight",    type=str,   default = "dw",  help = "Reweight strategy") # "dw", "lds", "cb", ""
     parser.add_argument("--resampling",  type=str,   default = False, help = "Weight resampling status") 
     parser.add_argument("--cond",        type=str,   default = False, help = "Conditional Model to use") 
 

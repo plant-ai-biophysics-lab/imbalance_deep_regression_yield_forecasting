@@ -198,12 +198,12 @@ def return_modified_df(test_df, cat: str):
 
         if mean_ytrue < 9:
             if cat == 'extreme': 
-                percentile_value = 5
+                percentile_value = 100
             elif cat == 'mean': 
                 percentile_value = 50
         elif mean_ytrue >= 20:
             if cat == 'extreme': 
-                percentile_value = 95
+                percentile_value = 100
             elif cat == 'mean': 
                 percentile_value = 50
         else:
@@ -671,15 +671,15 @@ class performance():
 
         g.ax_joint.plot([0, MAXIMUM_AXIS_VALUE], [0, MAXIMUM_AXIS_VALUE], '--r', linewidth=2)
 
-        plt.xlabel('Measured (t/ha)')
-        plt.ylabel('Predicted (t/ha)')
+        plt.xlabel('Measured (t/ha)', fontsize = 16)
+        plt.ylabel('Predicted (t/ha)', fontsize = 16)
         plt.grid(False)
 
         scores = (r'R^2={:.2f}' + '\n' + r'MAE={:.2f} (t/ha)' + '\n' + r'RMSE={:.2f} (t/ha)' + '\n' + r'MAPE={:.2f} %').format(
             r2, mae, rmse, mape)
 
         plt.text(1, 74.7, scores, bbox=dict(facecolor = PLOT_VIS_FACE_COLOR, edgecolor = PLOT_BOX_FACE_COLOR, boxstyle = 'round, pad=0.2'),
-                fontsize = PLOT_TEXT_FONTSIZE, ha='left', va = 'top')
+                fontsize = 16, ha='left', va = 'top')
 
         return g
 
@@ -899,7 +899,7 @@ class timeseries_spatial_variability():
         img.set_clim(min_v, max_v)
 
         plt.tight_layout()
-        plt.subplots_adjust(hspace=0.25, wspace=0.1)
+        plt.subplots_adjust(hspace=0.25, wspace=0.25)
 
     def timeseries_plot(self, block_name:str, year: int,  min_v: None, max_v: None):
 
@@ -912,7 +912,7 @@ class timeseries_spatial_variability():
 
    
         im_true = axs[0, 0].imshow(list_ytrue, vmin=min_v, vmax=max_v)
-        axs[0, 0].set_title('Yield Observation', fontsize=16)
+        axs[0, 0].set_title('Yield Observation', fontsize=18)
         axs[0, 0].axis('off')  # Turn off axis
         divider = make_axes_locatable(axs[0, 0])
         cax = divider.append_axes("right", size="5%", pad=0.1)
@@ -925,7 +925,7 @@ class timeseries_spatial_variability():
             row, col = divmod(i + 1, 4)
             img = axs[row, col].imshow(list_ypred[i], vmin=min_v, vmax=max_v)
             _, test_mae, _, test_mape, _, _ = regression_metrics(list_ytrue, list_ypred[i])
-            axs[row, col].set_title(f'Yield Prediction Week {i+1}: \nMAE (t/ha) = {test_mae:.2f}, MAPE = {test_mape:.2f}', fontsize=16)
+            axs[row, col].set_title(f'Yield Prediction Week {i+1}: \nMAE (t/ha) = {test_mae:.2f}, MAPE = {test_mape:.2f}', fontsize=18)
             axs[row, col].axis('off')  # Turn off axis
             divider = make_axes_locatable(axs[row, col])
             cax = divider.append_axes("right", size="5%", pad=0.1)
@@ -952,21 +952,22 @@ class timeseries_spatial_variability():
     def plot(self, block_name:str, year: int, min_v: None, max_v: None):
 
         list_ytrue, list_ypred = self.return_rebuild_block_matrix(block_name, year = year)
+
         num_years = len(list_ytrue)
 
         plt.rcParams["axes.grid"] = False
-        fig, axs = plt.subplots(1, 4, figsize = (24, 8*num_years))
+        fig, axs = plt.subplots(1, 4, figsize = (24, 6))
 
         # for i in range(num_years):
         img1 = axs[0].imshow(list_ytrue)
-        axs[0].set_title('Yield Observation', fontsize = 16)
+        axs[0].set_title('Yield Observation', fontsize = 18)
         divider = make_axes_locatable(axs[0])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar1 = fig.colorbar(img1,  cax=cax)
         img1.set_clim(min_v, max_v)
 
         img2 = axs[1].imshow(list_ypred[-1])
-        axs[1].set_title('Yield Prediction (Week 15)', fontsize = 16)
+        axs[1].set_title('Yield Prediction (Week 15)', fontsize = 18)
         divider = make_axes_locatable(axs[1])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar2 =fig.colorbar(img2, cax=cax)
@@ -979,7 +980,7 @@ class timeseries_spatial_variability():
         mae_map, mape_map = self.image_mae_mape_map(list_ytrue, list_ypred[-1])
 
         img3 = axs[2].imshow(mae_map, cmap = 'viridis') #, cmap = 'magma'
-        axs[2].set_title(f'MAE Map (t/ha) = {test_mae:.2f}', fontsize = 16)
+        axs[2].set_title(f'MAE Map (t/ha) = {test_mae:.2f}', fontsize = 18)
         divider = make_axes_locatable(axs[2])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar2 =fig.colorbar(img3, cax=cax)
@@ -987,14 +988,14 @@ class timeseries_spatial_variability():
         axs[2].get_yaxis().set_visible(False)
 
         img4 = axs[3].imshow(mape_map, cmap = 'viridis') #
-        axs[3].set_title(f'MAPE Map (%) = {test_mape:.2f}', fontsize = 16)
+        axs[3].set_title(f'MAPE Map (%) = {test_mape:.2f}', fontsize = 18)
         divider = make_axes_locatable(axs[3])
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar3 =fig.colorbar(img4, cax=cax)
         img4.set_clim(-5, 20)
         axs[3].get_yaxis().set_visible(False)
 
-        fig.subplots_adjust(hspace=0.01, wspace=0.01)  # Adjust these values as needed to reduce the space
+        fig.subplots_adjust(hspace=0.01, wspace=0.01) 
         fig.tight_layout()
 
     def variability_plot(self, min_v, max_v):
@@ -1252,6 +1253,14 @@ class timeseries_spatial_variability():
         list_ypred = [pred_out_w1, pred_out_w2, pred_out_w3, pred_out_w4, pred_out_w5,
                             pred_out_w6, pred_out_w7, pred_out_w8, pred_out_w9, pred_out_w10,
                             pred_out_w11, pred_out_w12, pred_out_w13, pred_out_w14, pred_out_w15]
+        # Check if any pixel in true_out is -1 and update pred_out_w{i} accordingly
+        # for x in range(block_x_size):
+        #     for y in range(block_y_size):
+        #         if  true_out[x, y] != -1: 
+        #             for pred_matrix in list_ypred:
+        #                 # if true_out[x, y]  -  pred_matrix[x, y] == 5:
+        #                 pred_matrix[x, y] = pred_matrix[x, y] + 5
+
 
         return true_out, list_ypred     
 

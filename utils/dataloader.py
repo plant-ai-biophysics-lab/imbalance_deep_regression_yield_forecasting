@@ -596,10 +596,8 @@ class dataloader_RGB(object):
         # return cropped input image using each patch coordinates
         image = self.crop_gen(img_path, xcoord, ycoord) 
         image = np.swapaxes(image, -1, 0)    
+        
         if self.in_channels == 5: 
-            block_timeseries_encode = self.time_series_encoding(block_id)
-            image = np.concatenate([image, block_timeseries_encode], axis = 0)
-        elif self.in_channels == 6:
             block_means = self.add_input_within_bc_mean(WithinBlockMean)
             block_timeseries_encode = self.time_series_encoding(block_id)
             image = np.concatenate([image, block_means, block_timeseries_encode], axis = 0)

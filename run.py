@@ -85,7 +85,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Imbalance Deep Yield Estimation")
     parser.add_argument("--exp_name",    type=str,   default = "test",help = "Experiment name")
     parser.add_argument("--batch_size",  type=int,   default = 64,   help = "Batch size")
-    parser.add_argument("--in_channels", type=int,   default = 6,     help = "Number of input channels")
+    parser.add_argument("--in_channels", type=int,   default = 5,     help = "Number of input channels")
     parser.add_argument("--dropout",     type=float, default = 0.3,   help = "Amount of dropout")
     parser.add_argument("--ldsks",       type=int,   default = 10,    help = "value of kernel density of lds algorithm")
     parser.add_argument("--ldssigma",    type=int,   default = 8,     help = "Value of sigma for lds algorithm")

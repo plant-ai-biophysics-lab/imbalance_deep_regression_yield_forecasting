@@ -10,10 +10,6 @@ from scipy.ndimage import convolve1d
 from KDEpy import FFTKDE
 from sklearn.preprocessing import MinMaxScaler
 
-
-
-
-
 #=======================================================================================================#
 #                                     LDS and inverse weight sampler                                    #
 #=======================================================================================================#

@@ -597,7 +597,7 @@ class dataloader_RGB(object):
         image = self.crop_gen(img_path, xcoord, ycoord) 
         image = np.swapaxes(image, -1, 0)    
         
-        if self.in_channels == 5: 
+        if self.in_channels == 6: 
             block_means = self.add_input_within_bc_mean(WithinBlockMean)
             block_timeseries_encode = self.time_series_encoding(block_id)
             image = np.concatenate([image, block_means, block_timeseries_encode], axis = 0)
@@ -610,8 +610,8 @@ class dataloader_RGB(object):
         RWMatrix  = self.patch_rw_matrix(rw_id) 
         SpMatrix  = self.patch_sp_matrix(sp_id)
         TMatrix   = self.patch_tid_matrix(t_id)  
-        EmbMat    = np.concatenate([CulMatrix, RWMatrix, SpMatrix, TMatrix], axis = 0)
 
+        EmbMat    = np.concatenate([CulMatrix, RWMatrix, SpMatrix, TMatrix], axis = 0)
 
         EmbTensor = torch.as_tensor((cultivar_id, t_id, rw_id, sp_id), dtype=torch.int64)
         EmbText = f"The {cultivar} has a trellis id {t_id}, row space {rw_id} and canopy space {sp_id}."
@@ -620,11 +620,10 @@ class dataloader_RGB(object):
         mask  = np.swapaxes(mask, -1, 0)
         mask  = torch.as_tensor(mask, dtype=torch.float32)
 
-
         # return yield zone: 
-        yz = self.return_yield_zone(mask)
+        # yz = self.return_yield_zone(mask)
+        yz = self.return_yield_zone_15_classes(mask)
         yz  = torch.as_tensor(yz, dtype=torch.float32)
-
 
         if self.reweighting_method is None: 
             sample = {"image": image, "mask": mask, "EmbMatrix": EmbMat, "block": block_id, "cultivar": cultivar, 
@@ -654,6 +653,20 @@ class dataloader_RGB(object):
         segmented[(mask >= EXTREME_LOWER_THRESHOLD) & (mask < EXTREME_UPPER_THRESHOLD)] = 2
         # Class 3: Pixel values >= 22
         segmented[mask >= EXTREME_UPPER_THRESHOLD] = 3
+
+        return segmented
+
+    def return_yield_zone_15_classes(self, mask):
+        # Initialize an empty array with the same shape as the image for the segmented output
+        segmented = np.zeros_like(mask)
+        
+        for i in range(15):
+            lower_bound = i * 2
+            upper_bound = (i + 1) * 2
+            segmented[(mask >= lower_bound) & (mask < upper_bound)] = i + 1
+        
+        # Special case for the upper boundary of the last class to include the value 30
+        segmented[mask == 30] = 15
 
         return segmented
 

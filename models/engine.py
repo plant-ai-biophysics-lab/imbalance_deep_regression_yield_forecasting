@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from geomloss import SamplesLoss   # ImagesLoss
+# from geomloss import SamplesLoss   # ImagesLoss
 # from torch.optim.lr_scheduler import CosineAnnealingLR 
 # from warmup_scheduler_pytorch import WarmUpScheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -267,8 +267,8 @@ class YieldEst:
                     current_loss = losses.weighted_focal_mse_loss(y_pred, y_true, weights=None, activate='sigmoid', beta=.2, gamma=1)
                 elif loss_type == 'focal-r':
                     current_loss = losses.weighted_focal_l1_loss(y_pred, y_true, weights=weight, activate='sigmoid', beta=.2, gamma=1)
-                elif loss_type == 'wass':
-                    current_loss = SamplesLoss(y_pred, y_true)
+                # elif loss_type == 'wass':
+                #     current_loss = SamplesLoss(y_pred, y_true)
                 elif loss_type =='bmc':
                     current_loss = losses.BMCLoss(init_noise_sigma = 0.5)(y_pred, y_true)
                 

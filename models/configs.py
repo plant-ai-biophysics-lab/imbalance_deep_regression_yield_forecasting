@@ -280,15 +280,11 @@ class build_configs():
                  img_size: int, 
                  in_channels: int, 
                  out_channels: int, 
-                 dropout: float, 
-                 multi_conv: str = True,
-                 cond: str = False,):
+                 dropout: float,):
 
         self.img_size = img_size
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.cond = cond
-        self.multi_conv = multi_conv
         self.dropout = dropout
     
     def call(self):
@@ -299,7 +295,7 @@ class build_configs():
         config.in_channels = self.in_channels
         config.out_channels= self.out_channels
         config.dropout = self.dropout
-        config.cond = self.cond
+
 
         return config
    

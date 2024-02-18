@@ -35,11 +35,18 @@ def dataloaders(batch_size:int,
         os.makedirs(os.path.join(exp_output_dir, 'coords'))
         os.makedirs(os.path.join(exp_output_dir, 'loss'))
 
-    train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
+    # train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
+    # train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
+    # valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/val.csv', index_col= 0)
+    # valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
+    # test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
+    # test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
+
+    train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_BYHO/coords/train.csv', index_col=0)
     train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
-    valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/val.csv', index_col= 0)
+    valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_BYHO/coords/val.csv', index_col= 0)
     valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
-    test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
+    test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_BYHO/coords/test.csv', index_col= 0)
     test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
     
     train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
@@ -587,8 +594,7 @@ class dataloader_RGB(object):
         rw_id              = self.NewDf.loc[idx]['row']
         sp_id              = self.NewDf.loc[idx]['space']
         t_id               = self.NewDf.loc[idx]['trellis_id']
-        WithinBlockMean    = self.NewDf.loc[idx]['win_block_mean']
-
+    
         
         img_path   = self.NewDf.loc[idx]['IMG_PATH']
         label_path = self.NewDf.loc[idx]['LABEL_PATH']
@@ -598,9 +604,15 @@ class dataloader_RGB(object):
         image = np.swapaxes(image, -1, 0)    
         
         if self.in_channels == 6: 
+            WithinBlockMean    = self.NewDf.loc[idx]['win_block_mean']
             block_means = self.add_input_within_bc_mean(WithinBlockMean)
             block_timeseries_encode = self.time_series_encoding(block_id)
             image = np.concatenate([image, block_means, block_timeseries_encode], axis = 0)
+
+        elif self.in_channels == 5: 
+            block_timeseries_encode = self.time_series_encoding(block_id)
+            image = np.concatenate([image, block_timeseries_encode], axis = 0)
+
 
         image = torch.as_tensor(image, dtype=torch.float32)
         image = image / 255.
@@ -622,8 +634,10 @@ class dataloader_RGB(object):
 
         # return yield zone: 
         # yz = self.return_yield_zone(mask)
-        yz = self.return_yield_zone_15_classes(mask)
-        yz  = torch.as_tensor(yz, dtype=torch.float32)
+        # yz = self.return_yield_zone_15_classes(mask)
+        # yz = self.return_yield_zone_11_classes(mask)
+        yz = self.return_yield_zone_9_classes(mask)
+        yz = torch.as_tensor(yz, dtype=torch.float32)
 
         if self.reweighting_method is None: 
             sample = {"image": image, "mask": mask, "EmbMatrix": EmbMat, "block": block_id, "cultivar": cultivar, 
@@ -667,6 +681,50 @@ class dataloader_RGB(object):
         
         # Special case for the upper boundary of the last class to include the value 30
         segmented[mask == 30] = 15
+
+        return segmented
+    
+    def return_yield_zone_11_classes(self, mask):
+        # Initialize an empty array with the same shape as the image for the segmented output
+        segmented = np.zeros_like(mask)
+        # Values < 4: Class 1
+        segmented[mask < 4] = 1
+        # Values >= 4 and < 8: Class 2
+        segmented[(mask >= 4) & (mask < 8)] = 2
+        # Values between 8 and 22: Segmenting into classes with interval of 2
+        for i, val in enumerate(range(8, 22, 2), start=3):
+            lower_bound = val
+            upper_bound = val + 2
+            segmented[(mask >= lower_bound) & (mask < upper_bound)] = i
+        # Adjusting class index based on the loop iterations for the range between 8 and 22
+        last_class_index = i + 1
+        # Values > 22 and <= 26: Second-to-last class
+        segmented[(mask > 22) & (mask <= 26)] = last_class_index
+        # Values > 26 and < 30: Last class
+        segmented[(mask > 26) & (mask < 30)] = last_class_index + 1
+        # Value == 30: Also last class
+        segmented[mask == 30] = last_class_index + 1
+
+        return segmented
+
+    def return_yield_zone_9_classes(self, mask):
+        # Initialize an empty array with the same shape as the image for the segmented output
+        segmented = np.zeros_like(mask)
+        
+        # Values < 8: Class 1
+        segmented[mask < 8] = 1
+        
+        # Values between 8 and 22: Classes 2 to 8 (7 intervals of 2)
+        for i, val in enumerate(range(8, 22, 2), start=2):
+            lower_bound = val
+            upper_bound = val + 2
+            segmented[(mask >= lower_bound) & (mask < upper_bound)] = i
+        
+        # Values > 22 and < 30: Last class (9)
+        segmented[(mask > 22) & (mask < 30)] = 9
+        
+        # Value == 30: Also last class (9)
+        segmented[mask == 30] = 9
 
         return segmented
 

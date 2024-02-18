@@ -198,7 +198,7 @@ def return_modified_df(test_df, cat: str):
 
         if mean_ytrue < 9:
             if cat == 'extreme': 
-                percentile_value = 100
+                percentile_value = 0
             elif cat == 'mean': 
                 percentile_value = 50
         elif mean_ytrue >= 20:
@@ -214,7 +214,7 @@ def return_modified_df(test_df, cat: str):
             if percentile_value is not None:
                 result = np.percentile(group[key], percentile_value).astype('float32')
             else:
-                result = group[key].max().astype('float32')
+                result = group[key].mean().astype('float32')
             results[key].append(result)
 
         results['block'].append(name)

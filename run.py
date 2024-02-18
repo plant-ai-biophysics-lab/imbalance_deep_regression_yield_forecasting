@@ -14,7 +14,6 @@ def main(args):
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Check if there is GPU(s): {torch.cuda.is_available()}")
 
@@ -53,7 +52,6 @@ def main(args):
         img_size = 16, 
         in_channels = in_channels,
         out_channels = 1, 
-        cond = cond_status,
         dropout = dropout, 
         ).call()
     
@@ -64,28 +62,33 @@ def main(args):
     print(f"Number of parameters: {num_params}")
 
     # Create an instance of ImbYieldEst engine
-    YE = engine.YieldEst(model, 
-                                 lr = lr, 
-                                 wd = wd, 
-                                 exp = Exp_name)
+    YE = engine.YieldEst(
+        model, 
+        lr = lr, 
+        wd = wd, 
+        exp = Exp_name)
+    
+
     # Train the model
-    _ = YE.train(data_loader_training, data_loader_validate, 
-                      loss = loss, 
-                      epochs = epochs, 
-                      loss_stop_tolerance = 100)
+    _ = YE.train(
+        data_loader_training, 
+        data_loader_validate, 
+        loss = loss, 
+        epochs = epochs, 
+        loss_stop_tolerance = 100, 
+        reweighting_method = reweight)
+
     # Predict 
-    model_pred = UNet2DConvLSTM(config, cond = False).to(device)
-    # _ = YE.predict(model, data_loader_training, data_loader_validate, data_loader_test)
-    _ = YE.predict(model_pred, data_loader_training, category= 'train', iter = 1)
-    _ = YE.predict(model_pred, data_loader_validate, category= 'valid', iter = 1)
-    _ = YE.predict(model_pred, data_loader_test, category= 'test', iter = 2)
+    _ = YE.predict(data_loader_training, category= 'train', iter = 1)
+    _ = YE.predict(data_loader_validate, category= 'valid', iter = 1)
+    _ = YE.predict(data_loader_test, category= 'test', iter = 2)
 
 if __name__ == "__main__":
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Imbalance Deep Yield Estimation")
     parser.add_argument("--exp_name",    type=str,   default = "test",help = "Experiment name")
     parser.add_argument("--batch_size",  type=int,   default = 64,   help = "Batch size")
-    parser.add_argument("--in_channels", type=int,   default = 6,     help = "Number of input channels")
+    parser.add_argument("--in_channels", type=int,   default = 5,     help = "Number of input channels")
     parser.add_argument("--dropout",     type=float, default = 0.3,   help = "Amount of dropout")
     parser.add_argument("--ldsks",       type=int,   default = 10,    help = "value of kernel density of lds algorithm")
     parser.add_argument("--ldssigma",    type=int,   default = 8,     help = "Value of sigma for lds algorithm")
@@ -95,7 +98,7 @@ if __name__ == "__main__":
     parser.add_argument("--wd",          type=float, default = 0.05,  help = "Value of weight decay")
     parser.add_argument("--epochs",      type=int,   default = 500,   help = "The number of epochs")
     parser.add_argument("--loss",        type=str,   default = "mse", help = "Loss function  mse wmse huber wass")
-    parser.add_argument("--reweight",    type=str,   default = "dw",  help = "Reweight strategy") # "dw", "lds", "cb", ""
+    parser.add_argument("--reweight",    type=str,   default = None,  help = "Reweight strategy") # "dw", "lds", "cb", ""
     parser.add_argument("--resampling",  type=str,   default = False, help = "Weight resampling status") 
     parser.add_argument("--cond",        type=str,   default = False, help = "Conditional Model to use") 
 

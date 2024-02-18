@@ -11,7 +11,7 @@ import seaborn as sns
 # from torch.optim.lr_scheduler import CosineAnnealingLR 
 # from warmup_scheduler_pytorch import WarmUpScheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
+from models.CNNs import UNet2DConvLSTM
 # from utils.losses import DiceLoss as SegLoss
 from utils import losses
 from models import configs
@@ -141,7 +141,13 @@ class YieldEst:
         self.scatterplot = os.path.join(self.exp_output_dir, self.exp + '_scatterplot.png')
 
 
-    def train(self, data_loader_training, data_loader_validate, loss: str, epochs: int, loss_stop_tolerance: int):
+    def train(self, 
+              data_loader_training, 
+              data_loader_validate, 
+              loss: str, 
+              epochs: int, 
+              loss_stop_tolerance: int,
+              reweighting_method: str):
         """
         Trains the model using the provided training and validation data loaders.
 
@@ -168,12 +174,17 @@ class YieldEst:
                 
                 xtrain = sample['image'].to(device)
                 ytrain_true = sample['mask'][:,:,:,:,0].to(device)
-                weight_train = sample['weight'].to(device)
+                
                 embmatrix_train = sample['EmbMatrix'].to(device)
                 yieldzone_train = sample['YZ'].to(device)
 
                 list_ytrain_pred  = self.model(xtrain, embmatrix_train, yieldzone_train)
                 self.optimizer.zero_grad()
+
+                if reweighting_method is None:
+                    weight_train = None
+                else:
+                    weight_train = sample['weight'].to(device)
 
                 train_loss = self._calculate_timeseries_loss(ytrain_true, list_ytrain_pred, weight_train, loss)
 
@@ -189,12 +200,17 @@ class YieldEst:
                     
                     xvalid = sample['image'].to(device)
                     yvalid_true = sample['mask'][:,:,:,:,0].to(device)
-                    weight_valid = sample['weight'].to(device)
+                    
                     embmatrix_valid = sample['EmbMatrix'].to(device)
                     yieldzone_valid = sample['YZ'].to(device)
 
                     list_yvalid_pred   = self.model(xvalid, embmatrix_valid, yieldzone_valid) 
-  
+
+                    if reweighting_method is None:
+                        weight_valid = None
+                    else:
+                        weight_valid = sample['weight'].to(device)
+
                     valid_loss = self._calculate_timeseries_loss(yvalid_true, list_yvalid_pred, weight_valid, loss)
 
                     val_epoch_loss += valid_loss.item()
@@ -204,7 +220,6 @@ class YieldEst:
 
             training_duration_time = (time.time() - training_start_time)        
             print(f'Epoch {epoch+0:03}: | Time(s): {training_duration_time:.3f}| Train Loss: {train_epoch_loss/len(data_loader_training):.4f} | Val Loss: {val_epoch_loss/len(data_loader_validate):.4f}') 
-
 
             checkpoint = {
             'epoch': epoch + 1,
@@ -290,8 +305,16 @@ class YieldEst:
 
         return total_loss
 
-    def predict(self, model, data_loader, category: str, iter: int):
+    def predict(self, data_loader, category: str, iter: int):
+        config = configs.build_configs(
+            img_size = 16, 
+            in_channels = 5,
+            out_channels = 1, 
+            dropout = 0.3, 
+            ).call()
 
+
+        model = UNet2DConvLSTM(config, cond = False).to(device)
         model.load_state_dict(torch.load(self.best_model_name))
         output_files =[]
 

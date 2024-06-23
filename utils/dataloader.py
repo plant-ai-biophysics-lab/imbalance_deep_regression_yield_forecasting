@@ -17,13 +17,14 @@ def dataloaders(batch_size:int,
                        lds_ks: float,
                        lds_sigma:float, 
                        dw_alpha: float, 
-                       betha: float, 
+                       cb_betha: float, 
                        reweighting_method: str, 
                        resmapling_status: False,
+                       data: str,
                        exp_name: str): 
 
     data_dir       = '/data2/hkaman/Livingston/data/10m/'
-    exp_output_dir = '/data2/hkaman/Imbalance/EXPs/CNNs/' + 'EXP_' + exp_name
+    exp_output_dir = '/data2/hkaman//Projects/Imbalanced/EXPs/comp/' + 'EXP_' + exp_name
 
 
 
@@ -35,23 +36,15 @@ def dataloaders(batch_size:int,
         os.makedirs(os.path.join(exp_output_dir, 'coords'))
         os.makedirs(os.path.join(exp_output_dir, 'loss'))
 
-    # train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/train.csv', index_col=0)
-    # train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
-    # valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/val.csv', index_col= 0)
-    # valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
-    # test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_S3_UNetLSTM_10m_time/coords/test.csv', index_col= 0)
-    # test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
 
-    train_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_BYHO/coords/train.csv', index_col=0)
+
+    train_csv = pd.read_csv('/data2/hkaman/Data/Coords/S2/BHO/train.csv', index_col=0)
     train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
-    valid_csv = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_BYHO/coords/val.csv', index_col= 0)
+    valid_csv = pd.read_csv('/data2/hkaman/Data/Coords/S2/BHO/val.csv', index_col= 0)
     valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
-    test_csv  = pd.read_csv('/data2/hkaman/Livingston/EXPs/10m/EXP_BYHO/coords/test.csv', index_col= 0)
+    test_csv  = pd.read_csv('/data2/hkaman/Data/Coords/S2/BHO/test.csv', index_col= 0)
     test_csv.to_csv(os.path.join(exp_output_dir + '/coords','test.csv'))
-    
-    train_csv.to_csv(os.path.join(exp_output_dir + '/coords','train.csv'))
-    valid_csv.to_csv(os.path.join(exp_output_dir + '/coords','val.csv'))
-    test_csv.to_csv(os.path.join(exp_output_dir  + '/coords','test.csv'))
+
     
     print(f"{train_csv.shape} | {valid_csv.shape} | {test_csv.shape}")
     #==============================================================================================================#
@@ -84,7 +77,7 @@ def dataloaders(batch_size:int,
                                         lds_ks              = lds_ks,
                                         lds_sigma           = lds_sigma, 
                                         dw_alpha            = dw_alpha, 
-                                        betha               = betha,
+                                        cb_betha            = cb_betha,
                                         reweighting_method  = reweighting_method)
 
     dataset_validate = dataloader_RGB(data_dir, 
@@ -95,7 +88,7 @@ def dataloaders(batch_size:int,
                                         lds_ks              = lds_ks,
                                         lds_sigma           = lds_sigma,
                                         dw_alpha            = dw_alpha, 
-                                        betha               = betha,
+                                        cb_betha            = cb_betha,
                                         reweighting_method  = reweighting_method)
     
 
@@ -107,7 +100,7 @@ def dataloaders(batch_size:int,
                                         lds_ks              = lds_ks,
                                         lds_sigma           = lds_sigma,
                                         dw_alpha            = dw_alpha, 
-                                        betha               = betha,
+                                        cb_betha            = cb_betha,
                                         reweighting_method  = reweighting_method)     
 
     #==============================================================================================================#
@@ -115,7 +108,7 @@ def dataloaders(batch_size:int,
     #==============================================================================================================#                      
     # define training and validation data loaders
     if resmapling_status: 
-        print(f"resampling is calculating!")
+        print(f"The experiment is using sample resampling!")
         data_loader_training = torch.utils.data.DataLoader(dataset_training, batch_size= batch_size, 
                                                         shuffle=False,  sampler=train_sampler, num_workers=8)  
         data_loader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size= batch_size, 
@@ -511,7 +504,6 @@ class data_generator():
 
         return train, valid, test
 
-
     def return_pixelwise_weight_dw(self, dw_alpha):
 
         masks = None
@@ -543,7 +535,7 @@ class dataloader_RGB(object):
                                 lds_ks: int, 
                                 lds_sigma: int, 
                                 dw_alpha: float,
-                                betha: float,
+                                cb_betha: float,
                                 reweighting_method: str
                                 ):
 
@@ -577,11 +569,13 @@ class dataloader_RGB(object):
             self.weights = np.where(self.weights >= 1, self.weights, 1)
 
         elif self.reweighting_method == 'cb':
-            print(f"CB: {lds_ks}| {lds_sigma} | {betha}")
-            self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, betha)
+            print(f"CB: {lds_ks}| {lds_sigma} | {cb_betha}")
+            self.weights = self.return_pixelwise_weight_cb(lds_ks, lds_sigma, cb_betha)
         
         elif self.reweighting_method == 'ours':
             self.weights = self.return_pixelwise_weight_ours(lds_ks, lds_sigma)
+        else:
+            print(f"There is NO cost-sensitive loss running!")
 
 
     def __getitem__(self, idx):
@@ -598,24 +592,33 @@ class dataloader_RGB(object):
         
         img_path   = self.NewDf.loc[idx]['IMG_PATH']
         label_path = self.NewDf.loc[idx]['LABEL_PATH']
-
-        # return cropped input image using each patch coordinates
         image = self.crop_gen(img_path, xcoord, ycoord) 
         image = np.swapaxes(image, -1, 0)    
         
-        if self.in_channels == 6: 
+        if self.in_channels == 8: 
             WithinBlockMean    = self.NewDf.loc[idx]['win_block_mean']
             block_means = self.add_input_within_bc_mean(WithinBlockMean)
             block_timeseries_encode = self.time_series_encoding(block_id)
-            image = np.concatenate([image, block_means, block_timeseries_encode], axis = 0)
+            image = np.concatenate([image, block_timeseries_encode], axis = 0)
+            image = torch.as_tensor(image, dtype=torch.float32)
+            image = image / 255.
+            S1_path = self.NewDf.loc[idx]['S1_PATH']
+            S1 = self.crop_gen(S1_path, xcoord, ycoord) 
+            S1 = np.swapaxes(S1, -1, 0)
+            S1 = torch.as_tensor(S1, dtype=torch.float32)
+            image = torch.cat([image, S1], dim = 0)
 
-        elif self.in_channels == 5: 
+        elif self.in_channels == 7: 
             block_timeseries_encode = self.time_series_encoding(block_id)
             image = np.concatenate([image, block_timeseries_encode], axis = 0)
+            image = torch.as_tensor(image, dtype=torch.float32)
+            image = image / 255.
+            S1_path = self.NewDf.loc[idx]['S1_PATH']
+            S1 = self.crop_gen(S1_path, xcoord, ycoord) 
+            S1 = np.swapaxes(S1, -1, 0)
+            S1 = torch.as_tensor(S1, dtype=torch.float32)
+            image = torch.cat([image, S1], dim = 0)
 
-
-        image = torch.as_tensor(image, dtype=torch.float32)
-        image = image / 255.
 
         # return embedding tensor: 
         CulMatrix = self.patch_cultivar_matrix(cultivar_id)  
@@ -753,8 +756,6 @@ class dataloader_RGB(object):
                                     lds_sigma=lds_sigma)
         
         weights = np.reshape(weights, (masks.shape[0], masks.shape[1], masks.shape[2]))
-
-
         return weights
     
     def _return_full_target_data(self, df):

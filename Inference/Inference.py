@@ -471,7 +471,7 @@ class performance():
                  exp_name: str):
         self.exp_name = exp_name
 
-        self.exp_output_dir = '/data2/hkaman/Imbalance/EXPs/CNNs/' + 'EXP_' + exp_name 
+        self.exp_output_dir = '/data2/hkaman/Projects/Imbalanced/EXPs/comp/' + 'EXP_' + exp_name 
 
         self.train_df = pd.read_csv(os.path.join(self.exp_output_dir, exp_name + '_train.csv'), index_col=0)
         self.valid_df = pd.read_csv(os.path.join(self.exp_output_dir, exp_name + '_valid.csv'), index_col=0)
@@ -690,44 +690,60 @@ class multi_model_timeseries_plot():
         model_files_dict = self._return_full_df_names()
         self.full_df = self._return_full_df(model_files_dict)
         
-
     def plot(self):
+
         custom_labels_dict = {
-                'EXP_00_lr001_wd05_drop30_vanilla': 'Vanilla',
-                'EXP_01_lr001_wd05_resampling': 'CSR',
-                'EXP_02_lr001_wd05_drop30_focalr': 'Focal-R',
-                'EXP_03_lr001_wd05_LDSinv_10_8': 'LDS',
-                'EXP_04_lr001_wd05_DW_3.9': 'Dense Weight',
-                'EXP_05_lr001_wd05_CB_3': 'Class Balanced',
-                'EXP_06_lr001_wd05_ExW': 'Extreme Weight',
-                'EXP_07_lr001_wd05_drop30_yz': 'Yield Zone',
-                'EXP_08_lr001_wd05_drop30_resampling_yz': 'Extreme Weight + Yield Zone',
-            }
-        
+            'EXP_00_lr001_wd05_drop30_vanilla': 'Vanilla',
+            'EXP_01_lr001_wd05_resampling': 'CSR',
+            'EXP_02_lr001_wd05_drop30_focalr': 'Focal-R',
+            'EXP_03_lr001_wd05_LDSinv_10_8': 'LDS',
+            'EXP_04_lr001_wd05_DW_3.9': 'Dense Weight',
+            'EXP_05_lr001_wd05_CB_3': 'Class Balanced',
+            'EXP_06_lr001_wd05_ExW': 'Extreme Weight',
+            'EXP_07_lr001_wd05_drop30_yz': 'Yield Zone3',
+            'EXP_10_lr001_wd05_drop30_yz9': 'Yield Zone9',
+            'EXP_09_lr001_wd05_drop30_yz15': 'Yield Zone15',
+            'EXP_08_lr001_wd05_drop30_ExtYZ': 'Extreme Weight + Yield Zone3',
+            'EXP_12_lr001_wd05_drop30_exyz9': 'Extreme Weight + Yield Zone9',
+        }
+
         fig, axs = plt.subplots(2, 2, figsize=(20, 10), sharex=True)
         metrics = [('R2', 'R2'), ('RMSE', 'RMSE'), ('MAE', 'MAE (t/ha)'), ('MAPE', 'MAPE (%)')]
-        axs = axs.flatten() 
-        # custom_labels = ['Vanilla', 'CSR', 'LDS', 'Class Balanced', 'Dense Weight', 'CSR_Yield Zone']  
-        markers = ['o', 'v', '^', '<', '>', 's', '^', 'o', 'v']  
+        axs = axs.flatten()
+        markers = ['o', 'v', '^', '<', '>', 's', 'p', '*', '+', 'x', 'D', 'h', 'H', 'd', '|', '_', '.', ',', '1', '2']
         models = self.full_df['model'].unique()
-
+        
+        # Define colormap for 20 distinct colors
+        cmap = plt.get_cmap('tab20')
 
         for ax, (metric, label) in zip(axs, metrics):
-            for model, marker in zip(models, markers):
+            for i, (model, marker) in enumerate(zip(models, markers)):
                 custom_label = custom_labels_dict.get(model)
-                sns.lineplot(x="weeks", y=f'{metric}_mean', data=self.full_df[self.full_df['model'] == model], 
-                            ax=ax, marker=marker, linewidth = 2.5, label=custom_label)
-            ax.set_ylabel(label, fontsize=14)
-            ax.tick_params(axis='y', labelsize=14)
+                # Darken colors
+                base_color = cmap(i)
+                dark_color = tuple(component * 0.8 for component in base_color[:3])  # Darkening the RGB components
+                sns.lineplot(x="weeks", y=f'{metric}_mean', data=self.full_df[self.full_df['model'] == model], legend = False,
+                            ax=ax, marker=marker, linewidth=3, label=custom_label, color=dark_color)
+            ax.set_ylabel(label, fontsize=16)
+            ax.tick_params(axis='both', labelsize=16)
             ax.set_facecolor('white')
             plt.setp(ax.spines.values(), color='k')
-            if ax == axs[-1]:  # Show legend only for the last plot
-                ax.legend(title='Model', loc="upper right", fontsize=10)
-            else:
-                ax.legend().remove()
 
-        axs[2].tick_params(axis='x', labelsize=14, rotation=45) 
-        axs[3].tick_params(axis='x', labelsize=14, rotation=45)
+        # Ensure y-axis ticks are integers
+        yticks = ax.get_yticks()
+        ax.set_yticks([int(y) for y in yticks if y.is_integer() or not y.is_integer()])
+
+
+        # Place the legend outside the plot area
+        handles, labels = axs[0].get_legend_handles_labels()
+        fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1.15, 1), fontsize=16, title_fontsize=18, title='Model', ncol=1,
+                handleheight=3.5, handletextpad=2, borderaxespad=3)  # Adjust legend spacing
+
+
+        axs[2].tick_params(axis='x', labelsize=16, rotation=45)
+        axs[3].tick_params(axis='x', labelsize=16, rotation=45)
+        plt.tight_layout(rect=[0, 0, 0.85, 1])  # Adjust layout to make room for the legend on the right
+        plt.savefig('./fig.png', dpi=300)
         plt.show()
 
     def _return_full_df(self, dict):
@@ -783,7 +799,7 @@ class multi_model_timeseries_plot():
 
     def _return_full_df_names(self):
 
-        base_dir = '/data2/hkaman/Imbalance/EXPs/CNNs'  # Replace with the actual path to your 'CNN' folder
+        base_dir = '/data2/hkaman/Projects/Imbalanced/EXPs/CNNs'  # Replace with the actual path to your 'CNN' folder
         model_dirs = sorted([d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))])
 
         model_files_dict = {}
@@ -1141,24 +1157,6 @@ class timeseries_spatial_variability():
             segmented_ytrue[ytrue >= class_boundaries[i-1]] = i
             segmented_ypred[ypred >= class_boundaries[i-1]] = i
 
-        # segmented_ytrue[ytrue < A] = 1
-        # segmented_ypred[ypred < A] = 1
-
-        # segmented_ytrue[ytrue < A] = 1
-        # segmented_ypred[ypred < A] = 1
-        # # Class 2: Pixel values > 7 and < 9
-        # segmented_ytrue[(ytrue >= A) & (ytrue < B)] = 2
-        # segmented_ypred[(ypred >= A) & (ypred < B)] = 2
-        # # Class 2: Pixel values > 9 and < 13
-        # segmented_ytrue[(ytrue >= B) & (ytrue < C)] = 3
-        # segmented_ypred[(ypred >= B) & (ypred < C)] = 3
-        #     # Class 2: Pixel values > 13 and < 20
-        # segmented_ytrue[(ytrue >= C) & (ytrue < D)] = 4
-        # segmented_ypred[(ypred >= C) & (ypred < D)] = 4
-        # # Class 3: Pixel values >= 20
-        # segmented_ytrue[ytrue >= D] = 5
-        # segmented_ypred[ypred >= D] = 5
-
         return segmented_ytrue, segmented_ypred
     
     def _return_full_list_names(self, block_name):
@@ -1243,23 +1241,10 @@ class timeseries_spatial_variability():
                     pred_out_w14[x, y] = new['ypred_w14']* HECTARE_TO_ACRE_SCALE
                     pred_out_w15[x, y] = new['ypred_w15']* HECTARE_TO_ACRE_SCALE
 
-                        # if mode == 'mean':
-                        #     pred_out[x, y] = new['ypred_w15'].mean()* HECTARE_TO_ACRE_SCALE
-                        # elif mode == 'close': 
-                        #     pred_out[x, y] = self._find_closest_value(list(new['ypred_w15']), new['ytrue'].mean())* HECTARE_TO_ACRE_SCALE
-                        # elif mode == 'median': 
-                        #     pred_out[x, y] = new['ypred_w15'].quantile(0.5)* HECTARE_TO_ACRE_SCALE
 
         list_ypred = [pred_out_w1, pred_out_w2, pred_out_w3, pred_out_w4, pred_out_w5,
                             pred_out_w6, pred_out_w7, pred_out_w8, pred_out_w9, pred_out_w10,
                             pred_out_w11, pred_out_w12, pred_out_w13, pred_out_w14, pred_out_w15]
-        # Check if any pixel in true_out is -1 and update pred_out_w{i} accordingly
-        # for x in range(block_x_size):
-        #     for y in range(block_y_size):
-        #         if  true_out[x, y] != -1: 
-        #             for pred_matrix in list_ypred:
-        #                 # if true_out[x, y]  -  pred_matrix[x, y] == 5:
-        #                 pred_matrix[x, y] = pred_matrix[x, y] + 5
 
 
         return true_out, list_ypred     
@@ -1278,9 +1263,7 @@ class timeseries_spatial_variability():
             if (ytrue_flat[i] == -1) and (ypred_flat[i] == -1):
                 out_mae[i]  = -10
                 out_mape[i] = -10
-            # elif abs(ytrue_flat[i] - ypred_flat[i]) > 11:
-            #     out_mae[i]  = -10
-            #     out_mape[i] = -10
+
             else: 
                 out_mae[i]  = abs(ytrue_flat[i] - ypred_flat[i])
                 out_mape[i] = ((abs(ytrue_flat[i] - ypred_flat[i]))/ytrue_flat[i])*100

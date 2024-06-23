@@ -1,38 +1,36 @@
+from imbalance_deep_regression_yield_forecasting.test import DataLoaders
 import torch
 import argparse
 import numpy as np
-# Import custom dataloader, model, and engine modules
+
 from utils import dataloader
 from models import configs, engine
 
+from models.CNNs import UNet2DConvLSTM, UNet
+# fix the seed for reproducibility
+seed = 1987 
+torch.manual_seed(seed)
+np.random.seed(seed)
 
-from models.CNNs import UNet2DConvLSTM
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Check if there is GPU(s): {torch.cuda.is_available()}")
 
 def main(args):
-    # fix the seed for reproducibility
-    seed = 1987 + engine.get_rank()
-    torch.manual_seed(seed)
-    np.random.seed(seed)
-
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"Check if there is GPU(s): {torch.cuda.is_available()}")
-
-
-    Exp_name = args.exp_name
+    exp_name = args.exp_name
     batch_size = args.batch_size
     in_channels = args.in_channels
     dropout = args.dropout
-    lds_ks = args.ldsks
-    lds_sigma = args.ldssigma
-    dw_alpha = args.alphs
-    cb_betha = args.betha
+    lds_ks = args.lds_ks
+    lds_sigma = args.lds_sigma
+    dw_alpha = args.dw_alpha
+    cb_betha = args.cb_betha
     lr = args.lr
     wd = args.wd
     loss = args.loss
     epochs = args.epochs
     reweight = args.reweight
     resampling = args.resampling
-    cond_status = args.cond
+    cond = args.cond
 
 
     data_loader_training, data_loader_validate, data_loader_test = dataloader.dataloaders(
@@ -41,10 +39,10 @@ def main(args):
         lds_ks = lds_ks,
         lds_sigma = lds_sigma, 
         dw_alpha = dw_alpha, 
-        betha = cb_betha, 
+        cb_betha = cb_betha, 
         reweighting_method = reweight, 
         resmapling_status = resampling,
-        exp_name = Exp_name
+        exp_name = exp_name
         )
 
     # Create model configuration using custom configs module
@@ -56,17 +54,18 @@ def main(args):
         ).call()
     
     # Create and move model to GPU
-    model = UNet2DConvLSTM(config, cond = cond_status).to(device)
+    model = UNet2DConvLSTM(config, cond = cond).to(device)
     # Calculate the number of parameters
     num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Number of parameters: {num_params}")
 
     # Create an instance of ImbYieldEst engine
+    model = UNet2DConvLSTM(config, cond = cond).to(device)
     YE = engine.YieldEst(
         model, 
         lr = lr, 
         wd = wd, 
-        exp = Exp_name)
+        exp = exp_name)
     
 
     # Train the model
@@ -78,10 +77,10 @@ def main(args):
         loss_stop_tolerance = 100, 
         reweighting_method = reweight)
 
-    # Predict 
-    _ = YE.predict(data_loader_training, category= 'train', iter = 1)
-    _ = YE.predict(data_loader_validate, category= 'valid', iter = 1)
-    _ = YE.predict(data_loader_test, category= 'test', iter = 2)
+    # Predict
+    _ = YE.predict(config, data_loader_training, category= 'train', iter = 1)
+    _ = YE.predict(config, data_loader_validate, category= 'valid', iter = 1)
+    _ = YE.predict(config, data_loader_test, category= 'test', iter = 1)
 
 if __name__ == "__main__":
     # Parse command line arguments
@@ -90,10 +89,10 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size",  type=int,   default = 64,   help = "Batch size")
     parser.add_argument("--in_channels", type=int,   default = 5,     help = "Number of input channels")
     parser.add_argument("--dropout",     type=float, default = 0.3,   help = "Amount of dropout")
-    parser.add_argument("--ldsks",       type=int,   default = 10,    help = "value of kernel density of lds algorithm")
-    parser.add_argument("--ldssigma",    type=int,   default = 8,     help = "Value of sigma for lds algorithm")
-    parser.add_argument("--alphs",       type=float, default = 3.9,   help = "Value of alpha for dense weight algorithm")
-    parser.add_argument("--betha",       type=int,   default = 3,     help = "Value of Betha for BC algorithm")
+    parser.add_argument("--lds_ks",      type=int,   default = 10,    help = "value of kernel density of lds algorithm")
+    parser.add_argument("--lds_sigma",   type=int,   default = 8,     help = "Value of sigma for lds algorithm")
+    parser.add_argument("--dw_alpha",    type=float, default = 3.9,   help = "Value of alpha for dense weight algorithm")
+    parser.add_argument("--cb_betha",    type=int,   default = 3,     help = "Value of Betha for BC algorithm")
     parser.add_argument("--lr",          type=float, default = 0.001, help = "Learning rate")
     parser.add_argument("--wd",          type=float, default = 0.05,  help = "Value of weight decay")
     parser.add_argument("--epochs",      type=int,   default = 500,   help = "The number of epochs")

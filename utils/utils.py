@@ -260,8 +260,6 @@ class vineyard_data_visulization():
 
         fig.suptitle('All cultivars feature distribution')
 
-
-
 def block_true_pred_mtx(df, block_id, aggregation = None, spatial_resolution  = None, scale = None):
     
     name_split = os.path.split(str(block_id))[-1]

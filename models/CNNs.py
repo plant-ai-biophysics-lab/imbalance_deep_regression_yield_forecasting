@@ -16,6 +16,8 @@ class UNet2DConvLSTM(nn.Module):
         self.Emb_Channels = 4
         self.batch_size = 512
         self.botneck_size = 2
+        self.timeserise = 14
+
 
         # Down sampling
         self.Encoder1 = Encoder2D(self.in_channels, self.num_filters, self.num_filters, self.dropout)
@@ -26,7 +28,7 @@ class UNet2DConvLSTM(nn.Module):
         self.Pool3 = MaxPooling2D()
 
         # LSTM at the bottleneck for capturing temporal dependencies
-        self.LSTM = ConvLSTM(img_size=(self.batch_size, 15, (self.num_filters * 4) + self.Emb_Channels, self.botneck_size, self.botneck_size),
+        self.LSTM = ConvLSTM(img_size=(self.batch_size, self.timeserise, (self.num_filters * 4) + self.Emb_Channels, self.botneck_size, self.botneck_size),
                              img_width=self.botneck_size,
                              input_dim=(self.num_filters * 4) + self.Emb_Channels,
                              hidden_dim=(self.num_filters * 4),
@@ -45,7 +47,6 @@ class UNet2DConvLSTM(nn.Module):
         # Output layer for pixel-wise regression
         self.out1 = OutConv2D(self.num_filters, 1) 
 
-
         # Apply weight initialization
         self.apply(self._init_weights)
 
@@ -61,15 +62,15 @@ class UNet2DConvLSTM(nn.Module):
 
     def forward(self, x, e, yz):
         # Conditional input modulation
-        if self.cond:
+        if self.cond is True:
             x = x * yz
+        else: 
+            x = x
 
-        # Encoder outputs for skip connections
         enc_outputs = []
 
         for i in range(x.shape[-1]):
             img = x[:, :, :, :, i]
-
             # Down sampling
             Encoder1 = self.Encoder1(img)
             Pool1 = self.Pool1(Encoder1)
@@ -99,7 +100,7 @@ class UNet2DConvLSTM(nn.Module):
         # Decoder outputs
         reg_outputs = []
 
-        for i in range(15):
+        for i in range(x.shape[-1]):
             in_ = layer_output[:, i, :, :, :]
 
             # Up sampling with skip connections
@@ -120,3 +121,4 @@ class UNet2DConvLSTM(nn.Module):
             reg_outputs.append(reg)
 
         return reg_outputs
+

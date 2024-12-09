@@ -1,5 +1,8 @@
 import torch
 import ml_collections
+import random 
+import numpy as np
+
 
 blocks_information = {'LIV_003':['MALVASIA_BIANCA', '7', '12', '7', '1991', '4WIREWO', '1'], 
           'LIV_004':['MUSCAT_OF_ALEXANDRIA', '10', '11', '5', '2011', 'SPLIT', '2'], 
@@ -299,3 +302,16 @@ class build_configs():
 
         return config
    
+def set_seed(seed=1987):
+    """
+    Set the seed for reproducibility across random, numpy, and torch (CPU and CUDA).
+    
+    Parameters:
+    seed (int): The seed value to use for random, numpy, and PyTorch operations.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False

@@ -1,16 +1,30 @@
-# Vineyard Yield Estimation with Spatio-Temporal CNN and Vision Transformer
+# Predicting Crop Yield Lows Through Highs via Binned Deep Imbalanced Regression
 
 ## Overview
 
-This repository contains the code and resources for implementing spatio-temporal Convolutional Neural Networks (CNN) and Vision Transformer (ViT) models to perform vineyard yield estimation, focusing on the regression of imbalanced data. Vineyard yield estimation plays a crucial role in agriculture for optimizing crop management and harvest planning.
+This repository contains the code and resources for predicting crop yield extremes via binned deep imbalanced regression. The project focuses on addressing challenges in regression with highly imbalanced data, a common issue in agricultural applications.  
 
-In this project, we explore the use of state-of-the-art deep learning architectures, combining spatio-temporal CNNs and ViT models, to accurately predict vineyard yields. We address the challenge of handling imbalanced data by providing a new custom loss function and Label Density Smoothing (LDS). The results provide options for various algorithms for comparison, including Dense Weighting (DW), Lobel Density Smoothing (LDS), and Class Balancing (CB).
+Accurate crop yield estimation is critical for effective agricultural management and decision-making. However, predicting extreme yield values remains particularly challenging due to their rarity and disproportionate impact on operations and markets. Traditional models often struggle to handle these extremes, leading to biased predictions and reduced accuracy.  
+![Figure 1: Illustration of Imbalanced Learning](src/figs/Figure_1.png)  
+
+
+To tackle this problem, our study introduces two key innovations:  
+
+1. **ExtremeLoss**: A novel cost-sensitive loss function designed to better capture and represent less frequent data points, ensuring a focus on extreme values without compromising overall performance.  
+2. **Conditional Deep Learning Model**: This model incorporates a binned yield observation map as a conditioning factor during training, enabling enhanced feature representation and improved predictive accuracy for rare yield scenarios.  
+
+
+Our approach demonstrates significant improvements over traditional methods, particularly in accurately predicting low-frequency, high-impact yield values. This work bridges the gap between robust predictive models and the practical needs of agricultural management, with a focus on real-world applicability and interpretability.  
+
+![Figure 2: Architecture of the Conditional Deep Learning Model](src/figs/Figure_2.png)  
+
+
 
 ## Features
-
-- Implementation of spatio-temporal CNN and Vision Transformer models for vineyard yield estimation.
-- Custom data loaders for handling imbalanced data and applying data resampling techniques.
-- Support for different reweighting strategies, including Dense Weighting (DW), Local Density Smoothing (LDS), and Class Balancing (CB).
+- A versatile conditional training approach that enhances input feature maps by leveraging similarity within distinct yield zones, adaptable to a range of deep learning architectures.
+- A new cost-sensitive loss function designed to address imbalanced regression in yield estimation tasks. 
+- An extensive comparative analysis between previously established methods including Dense Weighting (DW), Local Density Smoothing (LDS), and Class Balancing (CB) and the current approach for tackling imbalanced regression in vineyard yield estimation.
+- A detailed analysis of the proposed deep imbalanced regression model, emphasizing its enhanced capability to interpret extreme yield values and spatial variability.  
 
 
 ## Requirements

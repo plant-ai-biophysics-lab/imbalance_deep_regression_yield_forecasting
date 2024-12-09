@@ -6,12 +6,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-# from geomloss import SamplesLoss   # ImagesLoss
-# from torch.optim.lr_scheduler import CosineAnnealingLR 
-# from warmup_scheduler_pytorch import WarmUpScheduler
+
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
-from models.CNNs import UNet2DConvLSTM
-from utils import losses
+from models.UNet2DConvLSTM import UNet2DConvLSTM
+from src import losses
 from models import configs
 
 #======================================================================================================================================#
@@ -109,7 +108,8 @@ class YieldEst:
         self.exp = exp
 
         params = [p for p in self.model.parameters() if p.requires_grad]
-        self.optimizer = torch.optim.Adam(params, lr=self.lr, weight_decay=self.wd)
+        self.optimizer = torch.optim.AdamW(params, lr=self.lr, weight_decay=self.wd)
+
 
         self.exp_output_dir = '/data2/hkaman/Projects/Imbalanced/EXPs/comp/' + 'EXP_' + self.exp
 

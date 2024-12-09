@@ -18,7 +18,7 @@ from scipy.stats import pearsonr
 import sys
 sys.path.append('../')
 from models import configs
-from utils import utils, RWSampler
+from src import RWSampler
 
 #=============================================================================================#
 #=============================================================================================#
@@ -238,7 +238,8 @@ def return_modified_df(test_df, cat: str):
 
 def calc_test_blocks_range_values(range: str):
 
-    df = pd.read_csv('/data2/hkaman/Imbalance/EXPs/CNNs/EXP_00_lr001_wd05_drop30_vanilla/00_lr001_wd05_drop30_vanilla_test.csv')
+    # df = pd.read_csv('/data2/hkaman/Projects/Imbalanced/EXPs/CNNs/EXP_00_lr001_wd05_drop30_vanilla/00_lr001_wd05_drop30_vanilla_test.csv')
+    df = pd.read_csv('/data2/hkaman/Projects/Imbalanced/EXPs/CNNs/EXP_00_lr001_wd05_drop30_vanilla/00_lr001_wd05_drop30_vanilla_train.csv')
     
     blocks_df = df.groupby(by = 'block')
 

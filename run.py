@@ -1,16 +1,14 @@
-from imbalance_deep_regression_yield_forecasting.test import DataLoaders
 import torch
 import argparse
 import numpy as np
 
-from utils import dataloader
+from src import dataloader
 from models import configs, engine
+import random
+from models.UNet2DConvLSTM import UNet2DConvLSTM
 
-from models.CNNs import UNet2DConvLSTM, UNet
-# fix the seed for reproducibility
-seed = 1987 
-torch.manual_seed(seed)
-np.random.seed(seed)
+from models.configs import set_seed
+set_seed(1987)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Check if there is GPU(s): {torch.cuda.is_available()}")

@@ -10,22 +10,32 @@ Accurate crop yield estimation is critical for effective agricultural management
 
 To tackle this problem, our study introduces two key innovations:  
 
-1. **ExtremeLoss**: A novel cost-sensitive loss function designed to better capture and represent less frequent data points, ensuring a focus on extreme values without compromising overall performance.  
+1. **ExtremeLoss**: A novel cost-sensitive loss function designed to better capture and represent less frequent data points, ensuring a focus on extreme values without compromising overall performance. 
+The ExtremeWeight function is defined as:
+
+\[
+f_{\text{ExtremeWeight}} = \alpha (y - \bar{y})^2 + 1
+\]
+
+where:
+- \( y \) is the observed yield,
+- \( \bar{y} \) is the mean yield,
+- \( \alpha \) is a scaling factor as inverse of normalized density for each sample.
+
 2. **Conditional Deep Learning Model**: This model incorporates a binned yield observation map as a conditioning factor during training, enabling enhanced feature representation and improved predictive accuracy for rare yield scenarios.  
-
-
-Our approach demonstrates significant improvements over traditional methods, particularly in accurately predicting low-frequency, high-impact yield values. This work bridges the gap between robust predictive models and the practical needs of agricultural management, with a focus on real-world applicability and interpretability.  
+Our approach demonstrates significant improvements over traditional methods, particularly in accurately predicting low-frequency, high-impact yield values. 
 
 ![Figure 2: Architecture of the Conditional Deep Learning Model](src/figs/Figure_2.png)  
-
-
 
 ## Features
 - A versatile conditional training approach that enhances input feature maps by leveraging similarity within distinct yield zones, adaptable to a range of deep learning architectures.
 - A new cost-sensitive loss function designed to address imbalanced regression in yield estimation tasks. 
 - An extensive comparative analysis between previously established methods including Dense Weighting (DW), Local Density Smoothing (LDS), and Class Balancing (CB) and the current approach for tackling imbalanced regression in vineyard yield estimation.
-- A detailed analysis of the proposed deep imbalanced regression model, emphasizing its enhanced capability to interpret extreme yield values and spatial variability.  
+![Figure 3: Model's Performance using various imbalanced learning scenarion on extreme yield values](src/figs/Figure_3.png)  
 
+
+- A detailed analysis of the proposed deep imbalanced regression model, emphasizing its enhanced capability to interpret extreme yield values and spatial variability.  
+![Figure 4: Model's Spatial Variability Performance Learning](src/figs/Figure_4.png) 
 
 ## Requirements
 

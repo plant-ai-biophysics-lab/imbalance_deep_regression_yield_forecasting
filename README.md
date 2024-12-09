@@ -13,14 +13,12 @@ To tackle this problem, our study introduces two key innovations:
 1. **ExtremeLoss**: A novel cost-sensitive loss function designed to better capture and represent less frequent data points, ensuring a focus on extreme values without compromising overall performance. 
 The ExtremeWeight function is defined as:
 
-\[
-f_{\text{ExtremeWeight}} = \alpha (y - \bar{y})^2 + 1
-\]
+`f_ExtremeWeight = α * (y - ȳ)^2 + 1`
 
 where:
-- \( y \) is the observed yield,
-- \( \bar{y} \) is the mean yield,
-- \( \alpha \) is a scaling factor as inverse of normalized density for each sample.
+- y is the observed yield,
+- ȳ is the mean yield,
+- α is a scaling factor as inverse of normalized density for each sample.
 
 2. **Conditional Deep Learning Model**: This model incorporates a binned yield observation map as a conditioning factor during training, enabling enhanced feature representation and improved predictive accuracy for rare yield scenarios.  
 Our approach demonstrates significant improvements over traditional methods, particularly in accurately predicting low-frequency, high-impact yield values. 
